@@ -79,7 +79,7 @@ export function CopywritingWorkspace() {
       setCopiedKey(key);
       setTimeout(() => setCopiedKey(null), 1800);
     } catch {
-      // Ignore clipboard permission errors silently
+      // ignore
     }
   };
 
@@ -148,21 +148,21 @@ export function CopywritingWorkspace() {
   const activePlatformMeta = PLATFORMS[platform];
 
   return (
-    <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
-      {/* Left Configuration Panel */}
-      <section className="space-y-5 lg:col-span-5">
-        {/* Step 1: Platform Selection */}
-        <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs">
-          <div className="mb-3.5 flex items-center justify-between">
-            <h2 className="text-sm font-semibold text-slate-900">
-              1. 选择发布平台
-            </h2>
-            <span className="text-xs text-slate-400">
+    <div className="grid grid-cols-1 overflow-hidden rounded-xl border border-neutral-200 bg-white lg:grid-cols-12">
+      {/* Left Unified Parameter Rail */}
+      <aside className="divide-y divide-neutral-200/70 border-b border-neutral-200 bg-[#FAFAFA] lg:col-span-5 lg:border-b-0 lg:border-r">
+        {/* 1. Platform Selection */}
+        <div className="p-5">
+          <div className="mb-3 flex items-center justify-between">
+            <span className="text-xs font-semibold text-neutral-900">
+              1. 分发平台
+            </span>
+            <span className="text-[11px] text-neutral-400">
               {activePlatformMeta.recommendedLength}
             </span>
           </div>
 
-          <div className="grid grid-cols-2 gap-2.5">
+          <div className="grid grid-cols-2 gap-2">
             {(Object.keys(PLATFORMS) as PlatformId[]).map((pid) => {
               const meta = PLATFORMS[pid];
               const Icon = PLATFORM_ICONS[pid];
@@ -172,51 +172,41 @@ export function CopywritingWorkspace() {
                   key={pid}
                   type="button"
                   onClick={() => setPlatform(pid)}
-                  className={`group flex flex-col items-start rounded-xl border p-3.5 text-left transition-all ${
+                  className={`flex flex-col items-start rounded-lg border p-3 text-left transition ${
                     isSelected
-                      ? "border-indigo-500 bg-indigo-50/40 ring-2 ring-indigo-500/15"
-                      : "border-slate-200/80 bg-white hover:border-slate-300 hover:bg-slate-50/60"
+                      ? "border-neutral-900 bg-white shadow-2xs"
+                      : "border-neutral-200/80 bg-white/60 hover:border-neutral-300 hover:bg-white"
                   }`}
                 >
                   <div className="flex w-full items-center justify-between">
-                    <span
-                      className={`flex h-8 w-8 items-center justify-center rounded-lg transition ${
-                        isSelected
-                          ? "bg-indigo-600 text-white"
-                          : "bg-slate-100 text-slate-600 group-hover:bg-slate-200/70"
+                    <Icon
+                      className={`h-4 w-4 ${
+                        isSelected ? "text-blue-600" : "text-neutral-500"
                       }`}
-                    >
-                      <Icon className="h-4 w-4" />
-                    </span>
-                    <span
-                      className={`rounded-full px-2 py-0.5 text-[11px] font-medium ${
-                        isSelected
-                          ? "bg-indigo-100 text-indigo-700"
-                          : "bg-slate-100 text-slate-500"
-                      }`}
-                    >
+                    />
+                    <span className="text-[10px] font-medium text-neutral-400">
                       {meta.tagline}
                     </span>
                   </div>
-                  <span className="mt-2.5 text-sm font-semibold text-slate-900">
+                  <span className="mt-2 text-xs font-semibold text-neutral-900">
                     {meta.name}
-                  </span>
-                  <span className="mt-0.5 line-clamp-2 text-xs leading-relaxed text-slate-500">
-                    {meta.description}
                   </span>
                 </button>
               );
             })}
           </div>
+          <p className="mt-2.5 text-[11px] leading-relaxed text-neutral-500">
+            {activePlatformMeta.description}
+          </p>
         </div>
 
-        {/* Step 2: Content Type & Tone */}
-        <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs space-y-4">
+        {/* 2. Content Type, Tone & Length */}
+        <div className="space-y-4 p-5">
           <div>
-            <h2 className="mb-2.5 text-sm font-semibold text-slate-900">
-              2. 文案类型与调性
-            </h2>
-            <div className="flex flex-wrap gap-2">
+            <span className="mb-2 block text-xs font-semibold text-neutral-900">
+              2. 内容类型
+            </span>
+            <div className="flex flex-wrap gap-1.5">
               {CONTENT_TYPES.map((ct) => {
                 const active = contentType === ct.id;
                 return (
@@ -225,10 +215,10 @@ export function CopywritingWorkspace() {
                     type="button"
                     onClick={() => setContentType(ct.id)}
                     title={ct.hint}
-                    className={`rounded-lg border px-3 py-1.5 text-xs font-medium transition ${
+                    className={`rounded-md border px-2.5 py-1 text-xs font-medium transition ${
                       active
-                        ? "border-indigo-500 bg-indigo-50 text-indigo-700"
-                        : "border-slate-200 bg-white text-slate-600 hover:border-slate-300 hover:text-slate-900"
+                        ? "border-neutral-900 bg-neutral-900 text-white"
+                        : "border-neutral-200 bg-white text-neutral-600 hover:border-neutral-300 hover:text-neutral-900"
                     }`}
                   >
                     {ct.label}
@@ -238,21 +228,21 @@ export function CopywritingWorkspace() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 gap-4 pt-1 sm:grid-cols-2">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
             <div>
-              <span className="mb-2 block text-xs font-medium text-slate-500">
+              <span className="mb-2 block text-[11px] font-medium text-neutral-500">
                 表达语气
               </span>
-              <div className="flex flex-wrap gap-1.5">
+              <div className="flex flex-wrap gap-1">
                 {TONES.map((t) => (
                   <button
                     key={t.id}
                     type="button"
                     onClick={() => setTone(t.id)}
-                    className={`rounded-md px-2.5 py-1 text-xs transition ${
+                    className={`rounded-md px-2 py-1 text-[11px] font-medium transition ${
                       tone === t.id
-                        ? "bg-slate-900 text-white"
-                        : "bg-slate-100 text-slate-600 hover:bg-slate-200/80"
+                        ? "bg-blue-50 text-blue-700 ring-1 ring-blue-200"
+                        : "bg-white text-neutral-600 ring-1 ring-neutral-200/80 hover:text-neutral-900"
                     }`}
                   >
                     {t.label}
@@ -262,19 +252,19 @@ export function CopywritingWorkspace() {
             </div>
 
             <div>
-              <span className="mb-2 block text-xs font-medium text-slate-500">
+              <span className="mb-2 block text-[11px] font-medium text-neutral-500">
                 目标篇幅
               </span>
-              <div className="grid grid-cols-3 rounded-xl bg-slate-100 p-1">
+              <div className="grid grid-cols-3 rounded-lg border border-neutral-200/80 bg-neutral-100/80 p-0.5">
                 {WORD_COUNTS.map((wc) => (
                   <button
                     key={wc.id}
                     type="button"
                     onClick={() => setWordCount(wc.id)}
-                    className={`relative rounded-lg py-1.5 text-xs font-medium transition-colors ${
+                    className={`relative rounded-md py-1 text-[11px] font-medium transition-colors ${
                       wordCount === wc.id
-                        ? "text-slate-900"
-                        : "text-slate-500 hover:text-slate-800"
+                        ? "text-neutral-900"
+                        : "text-neutral-500 hover:text-neutral-800"
                     }`}
                   >
                     {wordCount === wc.id && (
@@ -285,7 +275,7 @@ export function CopywritingWorkspace() {
                           stiffness: 420,
                           damping: 32,
                         }}
-                        className="absolute inset-0 rounded-lg bg-white shadow-xs"
+                        className="absolute inset-0 rounded-md bg-white shadow-2xs"
                       />
                     )}
                     <span className="relative z-10">{wc.label}</span>
@@ -296,13 +286,15 @@ export function CopywritingWorkspace() {
           </div>
         </div>
 
-        {/* Step 3: Topic & Details */}
-        <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs space-y-4">
+        {/* 3. Topic & Submit */}
+        <div className="space-y-3.5 p-5">
           <div className="flex items-center justify-between">
-            <h2 className="text-sm font-semibold text-slate-900">
-              3. 输入创作主题
-            </h2>
-            <span className="text-xs text-slate-400">越具体越容易出爆款</span>
+            <span className="text-xs font-semibold text-neutral-900">
+              3. 创作主题
+            </span>
+            <span className="text-[11px] text-neutral-400">
+              支持一句话概述或详细大纲
+            </span>
           </div>
 
           <div>
@@ -311,52 +303,42 @@ export function CopywritingWorkspace() {
               value={topic}
               onChange={(e) => setTopic(e.target.value)}
               placeholder="例如：分享一套适合上班族的极简时间管理法，强调不需要早起也能多出 2 小时..."
-              className="w-full resize-none rounded-xl border border-slate-200 bg-slate-50/50 p-3.5 text-sm leading-relaxed text-slate-900 outline-none transition placeholder:text-slate-400 focus:border-indigo-500 focus:bg-white focus:ring-3 focus:ring-indigo-500/10"
+              className="w-full resize-none rounded-lg border border-neutral-200 bg-white p-3 text-xs leading-relaxed text-neutral-900 outline-none transition placeholder:text-neutral-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10"
             />
             <div className="mt-2 flex flex-wrap items-center gap-1.5">
-              <span className="text-[11px] text-slate-400">灵感示例：</span>
+              <span className="text-[11px] text-neutral-400">示例：</span>
               {QUICK_TOPICS.map((sample) => (
                 <button
                   key={sample}
                   type="button"
                   onClick={() => setTopic(sample)}
-                  className="rounded-md bg-slate-100 px-2 py-0.5 text-[11px] text-slate-600 transition hover:bg-indigo-50 hover:text-indigo-700"
+                  className="rounded border border-neutral-200/80 bg-white px-2 py-0.5 text-[11px] text-neutral-600 transition hover:border-neutral-300 hover:text-neutral-900"
                 >
-                  {sample.slice(0, 12)}...
+                  {sample.slice(0, 11)}...
                 </button>
               ))}
             </div>
           </div>
 
-          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
-            <div>
-              <label className="mb-1.5 block text-xs font-medium text-slate-600">
-                核心关键词（选填）
-              </label>
-              <input
-                type="text"
-                value={keywords}
-                onChange={(e) => setKeywords(e.target.value)}
-                placeholder="用逗号分隔，如：效率, 复盘"
-                className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3 py-2 text-xs text-slate-900 outline-none transition focus:border-indigo-500 focus:bg-white"
-              />
-            </div>
-            <div>
-              <label className="mb-1.5 block text-xs font-medium text-slate-600">
-                目标受众（选填）
-              </label>
-              <input
-                type="text"
-                value={targetAudience}
-                onChange={(e) => setTargetAudience(e.target.value)}
-                placeholder="如：25-35岁职场新人"
-                className="w-full rounded-xl border border-slate-200 bg-slate-50/50 px-3 py-2 text-xs text-slate-900 outline-none transition focus:border-indigo-500 focus:bg-white"
-              />
-            </div>
+          <div className="grid grid-cols-2 gap-2.5">
+            <input
+              type="text"
+              value={keywords}
+              onChange={(e) => setKeywords(e.target.value)}
+              placeholder="关键词（选填，逗号隔开）"
+              className="w-full rounded-lg border border-neutral-200 bg-white px-3 py-2 text-xs text-neutral-900 outline-none transition focus:border-blue-600"
+            />
+            <input
+              type="text"
+              value={targetAudience}
+              onChange={(e) => setTargetAudience(e.target.value)}
+              placeholder="目标受众（选填）"
+              className="w-full rounded-lg border border-neutral-200 bg-white px-3 py-2 text-xs text-neutral-900 outline-none transition focus:border-blue-600"
+            />
           </div>
 
           {generationError && (
-            <div className="rounded-xl border border-rose-200 bg-rose-50 px-3.5 py-2.5 text-xs text-rose-700">
+            <div className="rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-xs text-rose-700">
               {generationError}
             </div>
           )}
@@ -365,41 +347,34 @@ export function CopywritingWorkspace() {
             type="button"
             disabled={isGenerating}
             onClick={handleGenerate}
-            className="flex w-full items-center justify-center gap-2 rounded-xl bg-indigo-600 py-3 text-sm font-medium text-white shadow-sm shadow-indigo-600/20 transition hover:bg-indigo-700 disabled:cursor-not-allowed disabled:opacity-60"
+            className="flex w-full items-center justify-center gap-2 rounded-lg bg-neutral-900 py-2.5 text-xs font-medium text-white transition hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-60"
           >
             {isGenerating ? (
               <>
-                <Loader2 className="h-4 w-4 animate-spin" />
-                <span>正在为{activePlatformMeta.name}构思推流文案...</span>
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                <span>正在生成{activePlatformMeta.name}文案...</span>
               </>
             ) : (
               <>
-                <Sparkles className="h-4 w-4" />
+                <Sparkles className="h-3.5 w-3.5" />
                 <span>生成{activePlatformMeta.name}推流文案</span>
               </>
             )}
           </button>
         </div>
-      </section>
+      </aside>
 
-      {/* Right Result & History Panel */}
-      <section className="flex flex-col gap-4 lg:col-span-7">
-        <div className="flex items-center justify-between rounded-2xl border border-slate-200/80 bg-white px-5 py-3.5 shadow-xs">
+      {/* Right Unified Document Canvas */}
+      <section className="flex flex-col lg:col-span-7">
+        {/* Top Slim Document Toolbar */}
+        <div className="flex items-center justify-between border-b border-neutral-200/80 px-5 py-3">
           <div className="flex items-center gap-2.5">
-            <span className="text-sm font-semibold text-slate-900">
-              创作画布
+            <span className="text-xs font-semibold text-neutral-900">
+              文稿画布
             </span>
             {currentResult && (
-              <span
-                className={`rounded-full px-2.5 py-0.5 text-[11px] font-medium ${
-                  currentResult.mode === "ai"
-                    ? "bg-emerald-50 text-emerald-700"
-                    : "bg-slate-100 text-slate-600"
-                }`}
-              >
-                {currentResult.mode === "ai"
-                  ? "大模型智能生成"
-                  : "内置推流引擎"}
+              <span className="rounded border border-neutral-200 bg-neutral-50 px-2 py-0.5 text-[11px] font-medium text-neutral-600">
+                {currentResult.mode === "ai" ? "大模型生成" : "内置推流引擎"}
               </span>
             )}
           </div>
@@ -408,14 +383,14 @@ export function CopywritingWorkspace() {
             <button
               type="button"
               onClick={() => setShowHistory((v) => !v)}
-              className={`flex items-center gap-1.5 rounded-lg border px-3 py-1.5 text-xs font-medium transition ${
+              className={`flex items-center gap-1.5 rounded-md border px-2.5 py-1 text-xs font-medium transition ${
                 showHistory
-                  ? "border-indigo-200 bg-indigo-50 text-indigo-700"
-                  : "border-slate-200 bg-white text-slate-600 hover:bg-slate-50"
+                  ? "border-neutral-900 bg-neutral-900 text-white"
+                  : "border-neutral-200 bg-white text-neutral-600 hover:bg-neutral-50"
               }`}
             >
               <History className="h-3.5 w-3.5" />
-              <span>历史记录 ({history.length})</span>
+              <span>历史 ({history.length})</span>
             </button>
 
             {currentResult && (
@@ -424,7 +399,7 @@ export function CopywritingWorkspace() {
                   type="button"
                   onClick={handleGenerate}
                   disabled={isGenerating}
-                  className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-white px-3 py-1.5 text-xs font-medium text-slate-700 transition hover:bg-slate-50 disabled:opacity-50"
+                  className="flex items-center gap-1.5 rounded-md border border-neutral-200 bg-white px-2.5 py-1 text-xs font-medium text-neutral-700 transition hover:bg-neutral-50 disabled:opacity-50"
                 >
                   <RefreshCw className="h-3.5 w-3.5" />
                   <span>重写</span>
@@ -432,12 +407,12 @@ export function CopywritingWorkspace() {
                 <button
                   type="button"
                   onClick={handleCopyAll}
-                  className="flex items-center gap-1.5 rounded-lg bg-slate-900 px-3.5 py-1.5 text-xs font-medium text-white transition hover:bg-slate-800"
+                  className="flex items-center gap-1.5 rounded-md bg-blue-600 px-3 py-1 text-xs font-medium text-white transition hover:bg-blue-700"
                 >
                   {copiedKey === "all" ? (
                     <>
-                      <Check className="h-3.5 w-3.5 text-emerald-400" />
-                      <span>已复制全文</span>
+                      <Check className="h-3.5 w-3.5" />
+                      <span>已复制</span>
                     </>
                   ) : (
                     <>
@@ -451,34 +426,27 @@ export function CopywritingWorkspace() {
           </div>
         </div>
 
-        {/* History Drawer */}
+        {/* Collapsible History Strip */}
         <AnimatePresence>
           {showHistory && (
             <motion.div
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: "auto" }}
               exit={{ opacity: 0, height: 0 }}
-              transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
-              className="overflow-hidden"
+              transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+              className="overflow-hidden border-b border-neutral-200/80 bg-[#FAFAFA]"
             >
-              <div className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-xs">
-                <h3 className="mb-3 text-xs font-semibold text-slate-700">
-                  最近生成记录
-                </h3>
+              <div className="p-4">
                 {history.length === 0 ? (
-                  <p className="py-4 text-center text-xs text-slate-400">
-                    暂无历史记录，生成一次文案后将自动保存于此
+                  <p className="py-2 text-center text-xs text-neutral-400">
+                    暂无历史记录
                   </p>
                 ) : (
-                  <div className="max-h-52 space-y-2 overflow-y-auto pr-1">
+                  <div className="max-h-44 divide-y divide-neutral-200/60 overflow-y-auto rounded-lg border border-neutral-200 bg-white">
                     {history.map((item) => (
                       <div
                         key={item.id}
-                        className={`flex items-center justify-between rounded-xl border p-2.5 transition ${
-                          currentResult?.id === item.id
-                            ? "border-indigo-300 bg-indigo-50/40"
-                            : "border-slate-100 bg-slate-50/60 hover:border-slate-200"
-                        }`}
+                        className="flex items-center justify-between px-3 py-2 text-xs hover:bg-neutral-50"
                       >
                         <button
                           type="button"
@@ -486,21 +454,19 @@ export function CopywritingWorkspace() {
                             selectFromHistory(item.id);
                             setShowHistory(false);
                           }}
-                          className="flex flex-1 flex-col items-start text-left"
+                          className="flex flex-1 items-center gap-2 text-left min-w-0"
                         >
-                          <div className="flex items-center gap-2">
-                            <span className="rounded bg-white px-1.5 py-0.5 text-[10px] font-medium text-slate-600 shadow-2xs">
-                              {PLATFORMS[item.platform].name}
-                            </span>
-                            <span className="line-clamp-1 text-xs font-medium text-slate-800">
-                              {item.topic}
-                            </span>
-                          </div>
+                          <span className="shrink-0 rounded bg-neutral-100 px-1.5 py-0.5 text-[10px] font-medium text-neutral-600">
+                            {PLATFORMS[item.platform].name}
+                          </span>
+                          <span className="truncate font-medium text-neutral-800">
+                            {item.topic}
+                          </span>
                         </button>
                         <button
                           type="button"
                           onClick={() => removeFromHistory(item.id)}
-                          className="ml-2 rounded-lg p-1.5 text-slate-400 hover:bg-rose-50 hover:text-rose-600"
+                          className="ml-2 rounded p-1 text-neutral-400 hover:text-rose-600"
                           aria-label="删除记录"
                         >
                           <Trash2 className="h-3.5 w-3.5" />
@@ -514,167 +480,164 @@ export function CopywritingWorkspace() {
           )}
         </AnimatePresence>
 
-        {/* Empty State or Generated Result */}
-        <AnimatePresence mode="wait">
-          {!currentResult ? (
-            <motion.div
-              key="empty"
-              initial={{ opacity: 0, y: 8 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -8 }}
-              transition={{ duration: 0.24 }}
-              className="flex min-h-[480px] flex-col items-center justify-center rounded-2xl border border-dashed border-slate-200 bg-white/70 p-8 text-center"
-            >
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-indigo-50 text-indigo-600">
-              <Sparkles className="h-6 w-6" />
-            </div>
-            <h3 className="mt-4 text-base font-semibold text-slate-900">
-              准备就绪，开始你的推流创作
-            </h3>
-            <p className="mt-1.5 max-w-sm text-xs leading-relaxed text-slate-500">
-              在左侧选择目标平台（抖音、今日头条、快手或微信公众号），填写主题与关键词，即可一键生成结构化爆款文案与推流建议。
-            </p>
-          </motion.div>
-        ) : (
-          <motion.div
-            key={currentResult.id}
-            initial={{ opacity: 0, y: 12, filter: "blur(4px)" }}
-            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-            exit={{ opacity: 0, y: -8, filter: "blur(4px)" }}
-            transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
-            className="space-y-4"
-          >
-            {/* Titles */}
-            <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs">
-              <div className="mb-3 flex items-center justify-between">
-                <span className="text-xs font-semibold tracking-wide text-slate-500 uppercase">
-                  备选爆款标题
-                </span>
-                <span className="text-[11px] text-slate-400">
-                  点击右侧图标可单独复制
-                </span>
-              </div>
-              <div className="space-y-2">
-                {currentResult.titles.map((title, idx) => (
-                  <div
-                    key={idx}
-                    className="flex items-center justify-between gap-3 rounded-xl border border-slate-100 bg-slate-50/70 px-3.5 py-2.5"
-                  >
-                    <div className="flex items-start gap-2.5">
-                      <span className="mt-0.5 flex h-5 w-5 shrink-0 items-center justify-center rounded-md bg-indigo-100 text-[11px] font-semibold text-indigo-700">
-                        {idx + 1}
-                      </span>
-                      <p className="text-sm font-medium text-slate-900">
-                        {title}
-                      </p>
-                    </div>
+        {/* Document Body */}
+        <div className="flex-1 p-6">
+          <AnimatePresence mode="wait">
+            {!currentResult ? (
+              <motion.div
+                key="empty"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="flex min-h-[460px] flex-col items-center justify-center text-center"
+              >
+                <Sparkles className="h-6 w-6 text-neutral-300" />
+                <p className="mt-3 text-sm font-medium text-neutral-700">
+                  等待生成文稿
+                </p>
+                <p className="mt-1 max-w-xs text-xs leading-relaxed text-neutral-400">
+                  在左侧选择平台与主题后点击生成，文稿将在此以沉浸式文档形式呈现。
+                </p>
+              </motion.div>
+            ) : (
+              <motion.div
+                key={currentResult.id}
+                initial={{ opacity: 0, y: 10, filter: "blur(4px)" }}
+                animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+                exit={{ opacity: 0, y: -6 }}
+                transition={{ duration: 0.26, ease: [0.22, 1, 0.36, 1] }}
+                className="space-y-6"
+              >
+                {/* Titles */}
+                <div>
+                  <div className="mb-2 flex items-center justify-between">
+                    <span className="text-[11px] font-semibold tracking-wider text-neutral-400 uppercase">
+                      备选标题
+                    </span>
+                  </div>
+                  <div className="divide-y divide-neutral-100 rounded-lg border border-neutral-200/80">
+                    {currentResult.titles.map((title, idx) => (
+                      <div
+                        key={idx}
+                        className="flex items-center justify-between gap-3 px-3.5 py-2.5 text-xs"
+                      >
+                        <div className="flex items-baseline gap-2.5">
+                          <span className="font-mono text-[11px] text-neutral-400">
+                            0{idx + 1}
+                          </span>
+                          <p className="font-medium text-neutral-900">
+                            {title}
+                          </p>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() => handleCopy(title, `title-${idx}`)}
+                          className="shrink-0 rounded p-1 text-neutral-400 transition hover:bg-neutral-100 hover:text-neutral-800"
+                          aria-label="复制标题"
+                        >
+                          {copiedKey === `title-${idx}` ? (
+                            <Check className="h-3.5 w-3.5 text-emerald-600" />
+                          ) : (
+                            <Copy className="h-3.5 w-3.5" />
+                          )}
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Golden Hook with left editorial rule */}
+                <div className="border-l-2 border-blue-600 pl-4">
+                  <div className="mb-1 flex items-center justify-between">
+                    <span className="text-[11px] font-semibold text-blue-600">
+                      黄金开头 / 前 3 秒钩子
+                    </span>
                     <button
                       type="button"
-                      onClick={() => handleCopy(title, `title-${idx}`)}
-                      className="shrink-0 rounded-lg p-1.5 text-slate-400 transition hover:bg-white hover:text-slate-700"
-                      aria-label="复制标题"
+                      onClick={() => handleCopy(currentResult.hook, "hook")}
+                      className="text-[11px] text-neutral-400 hover:text-neutral-800"
                     >
-                      {copiedKey === `title-${idx}` ? (
-                        <Check className="h-3.5 w-3.5 text-emerald-600" />
-                      ) : (
-                        <Copy className="h-3.5 w-3.5" />
-                      )}
+                      {copiedKey === "hook" ? "已复制" : "复制"}
                     </button>
                   </div>
-                ))}
-              </div>
-            </div>
-
-            {/* Golden Hook */}
-            <div className="rounded-2xl border border-indigo-100 bg-indigo-50/40 p-5">
-              <div className="mb-2 flex items-center justify-between">
-                <span className="text-xs font-semibold text-indigo-800">
-                  黄金开头 / 留存钩子
-                </span>
-                <button
-                  type="button"
-                  onClick={() => handleCopy(currentResult.hook, "hook")}
-                  className="text-xs text-indigo-600 hover:underline"
-                >
-                  {copiedKey === "hook" ? "已复制" : "复制开头"}
-                </button>
-              </div>
-              <p className="text-sm leading-relaxed text-slate-800">
-                {currentResult.hook}
-              </p>
-            </div>
-
-            {/* Editable Body */}
-            <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs">
-              <div className="mb-2.5 flex items-center justify-between">
-                <span className="text-xs font-semibold text-slate-700">
-                  正文内容（可直接微调编辑）
-                </span>
-                <span className="text-xs text-slate-400">
-                  {currentResult.body.length} 字
-                </span>
-              </div>
-              <textarea
-                rows={10}
-                value={currentResult.body}
-                onChange={(e) => updateCurrentBody(e.target.value)}
-                className="w-full resize-y rounded-xl border border-slate-200/80 bg-slate-50/40 p-4 text-sm leading-7 text-slate-800 outline-none transition focus:border-indigo-400 focus:bg-white"
-              />
-            </div>
-
-            {/* CTA & Tags */}
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <div className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-xs">
-                <div className="mb-2 flex items-center gap-1.5 text-xs font-semibold text-slate-700">
-                  <MessageSquareHeart className="h-3.5 w-3.5 text-indigo-600" />
-                  <span>互动引导语</span>
+                  <p className="text-sm leading-relaxed text-neutral-800">
+                    {currentResult.hook}
+                  </p>
                 </div>
-                <p className="text-xs leading-relaxed text-slate-600">
-                  {currentResult.cta}
-                </p>
-              </div>
 
-              <div className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-xs">
-                <div className="mb-2 flex items-center gap-1.5 text-xs font-semibold text-slate-700">
-                  <Hash className="h-3.5 w-3.5 text-indigo-600" />
-                  <span>推荐推流标签</span>
-                </div>
-                <div className="flex flex-wrap gap-1.5">
-                  {currentResult.tags.map((tag) => (
-                    <span
-                      key={tag}
-                      className="rounded-lg bg-slate-100 px-2.5 py-1 text-xs font-medium text-slate-700"
-                    >
-                      #{tag}
+                {/* Editable Body */}
+                <div>
+                  <div className="mb-2 flex items-center justify-between">
+                    <span className="text-[11px] font-semibold tracking-wider text-neutral-400 uppercase">
+                      正文内容（可直接编辑）
                     </span>
-                  ))}
+                    <span className="font-mono text-[11px] text-neutral-400">
+                      {currentResult.body.length} 字
+                    </span>
+                  </div>
+                  <textarea
+                    rows={11}
+                    value={currentResult.body}
+                    onChange={(e) => updateCurrentBody(e.target.value)}
+                    className="w-full resize-y rounded-lg border border-neutral-200/80 bg-[#FAFAFA] p-4 text-sm leading-7 text-neutral-800 outline-none transition focus:border-blue-600 focus:bg-white"
+                  />
                 </div>
-              </div>
-            </div>
 
-            {/* Platform Algorithm Tips */}
-            <div className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-xs">
-              <div className="mb-2.5 flex items-center gap-1.5 text-xs font-semibold text-slate-800">
-                <Lightbulb className="h-3.5 w-3.5 text-amber-500" />
-                <span>
-                  {PLATFORMS[currentResult.platform].name}推流优化建议
-                </span>
-              </div>
-              <ul className="space-y-1.5">
-                {currentResult.tips.map((tip, i) => (
-                  <li
-                    key={i}
-                    className="flex items-start gap-2 text-xs leading-relaxed text-slate-600"
-                  >
-                    <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-indigo-400" />
-                    <span>{tip}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </motion.div>
-        )}
-        </AnimatePresence>
+                {/* CTA, Tags & Tips separated by clean hairline */}
+                <div className="space-y-4 border-t border-neutral-100 pt-5">
+                  <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+                    <div>
+                      <div className="mb-1.5 flex items-center gap-1.5 text-xs font-semibold text-neutral-700">
+                        <MessageSquareHeart className="h-3.5 w-3.5 text-neutral-400" />
+                        <span>互动引导语</span>
+                      </div>
+                      <p className="text-xs leading-relaxed text-neutral-600">
+                        {currentResult.cta}
+                      </p>
+                    </div>
+
+                    <div>
+                      <div className="mb-1.5 flex items-center gap-1.5 text-xs font-semibold text-neutral-700">
+                        <Hash className="h-3.5 w-3.5 text-neutral-400" />
+                        <span>推流标签</span>
+                      </div>
+                      <div className="flex flex-wrap gap-1.5">
+                        {currentResult.tags.map((tag) => (
+                          <span
+                            key={tag}
+                            className="rounded border border-neutral-200 bg-neutral-50 px-2 py-0.5 text-[11px] font-medium text-neutral-700"
+                          >
+                            #{tag}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="rounded-lg bg-[#FAFAFA] p-3.5">
+                    <div className="mb-2 flex items-center gap-1.5 text-xs font-semibold text-neutral-800">
+                      <Lightbulb className="h-3.5 w-3.5 text-amber-500" />
+                      <span>
+                        {PLATFORMS[currentResult.platform].name}推流优化建议
+                      </span>
+                    </div>
+                    <ul className="space-y-1">
+                      {currentResult.tips.map((tip, i) => (
+                        <li
+                          key={i}
+                          className="text-xs leading-relaxed text-neutral-500"
+                        >
+                          · {tip}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
       </section>
     </div>
   );
