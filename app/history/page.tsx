@@ -8,10 +8,10 @@ import {
   Check,
   CheckCircle2,
   Copy,
-  Flame,
   History as HistoryIcon,
   Search,
   Trash2,
+  TrendingUp,
 } from "lucide-react";
 import { PLATFORMS } from "@/lib/platforms";
 import { useWorkbenchStore } from "@/store/useWorkbenchStore";
@@ -72,7 +72,7 @@ export default function HistoryPage() {
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="搜索主题、平台或正文..."
-            className="w-full rounded-lg border border-neutral-200 bg-[#FAFAFA] py-2 pl-8 pr-3 text-xs text-neutral-900 outline-none transition focus:border-blue-600 focus:bg-white"
+            className="w-full rounded-lg border border-neutral-200 bg-[#FAFAFA] py-2 pl-8 pr-3 text-xs text-neutral-900 outline-none transition focus:border-neutral-900 focus:bg-white"
           />
         </div>
       </div>
@@ -155,7 +155,7 @@ export default function HistoryPage() {
                       }`}
                       title={item.isViral ? "取消爆款标记" : "标记为爆款文案"}
                     >
-                      <Flame className="h-3.5 w-3.5" />
+                      <TrendingUp className="h-3.5 w-3.5" />
                       <span>爆款</span>
                     </button>
                     <button

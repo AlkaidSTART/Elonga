@@ -256,7 +256,7 @@ export function MosaicEditor() {
                 >
                   <Icon
                     className={`h-4 w-4 shrink-0 ${
-                      active ? "text-blue-600" : "text-neutral-500"
+                      active ? "text-neutral-900" : "text-neutral-500"
                     }`}
                   />
                   <div>

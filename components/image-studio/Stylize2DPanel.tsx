@@ -2,11 +2,11 @@
 
 import Link from "next/link";
 import {
+  Contrast,
   Download,
+  Image as ImageIcon,
+  Layers,
   Loader2,
-  Palette,
-  Sparkles,
-  Wand2,
 } from "lucide-react";
 import { stylizeImage2DLocal } from "@/lib/stylize-2d-canvas";
 import {
@@ -107,7 +107,7 @@ export function Stylize2DPanel() {
       <aside className="divide-y divide-neutral-200/70 border-b border-neutral-200 bg-[#FAFAFA] lg:col-span-4 lg:border-b-0 lg:border-r">
         <div className="p-5">
           <div className="mb-3 flex items-center gap-2">
-            <Palette className="h-4 w-4 text-neutral-700" />
+            <Layers className="h-4 w-4 text-neutral-700" />
             <h3 className="text-xs font-semibold text-neutral-900">
               选择二维画风
             </h3>
@@ -166,7 +166,7 @@ export function Stylize2DPanel() {
               value={stylePrompt}
               onChange={(e) => setStylePrompt(e.target.value)}
               placeholder="例如：保留人物神态，背景加入柔和春日光影..."
-              className="w-full resize-none rounded-lg border border-neutral-200 bg-white p-2.5 text-xs text-neutral-900 outline-none transition focus:border-blue-600"
+              className="w-full resize-none rounded-lg border border-neutral-200 bg-white p-2.5 text-xs text-neutral-900 outline-none transition focus:border-neutral-900"
             />
           </div>
 
@@ -175,7 +175,7 @@ export function Stylize2DPanel() {
               当前未配置图像大模型 API Key，将使用本地二维线稿与赛璐璐算法进行即时预览。
               <Link
                 href="/settings"
-                className="ml-1 font-semibold text-blue-600 underline underline-offset-2"
+                className="ml-1 font-semibold text-neutral-900 underline underline-offset-2"
               >
                 去配置
               </Link>
@@ -201,7 +201,7 @@ export function Stylize2DPanel() {
               </>
             ) : (
               <>
-                <Wand2 className="h-3.5 w-3.5" />
+                <Contrast className="h-3.5 w-3.5" />
                 <span>生成二维风格图片</span>
               </>
             )}
@@ -227,7 +227,7 @@ export function Stylize2DPanel() {
             <button
               type="button"
               onClick={handleDownload}
-              className="flex items-center gap-1.5 rounded-md bg-blue-600 px-3 py-1 text-xs font-medium text-white transition hover:bg-blue-700"
+              className="flex items-center gap-1.5 rounded-md bg-neutral-900 px-3 py-1 text-xs font-medium text-white transition hover:bg-neutral-800"
             >
               <Download className="h-3.5 w-3.5" />
               <span>下载二维成品图</span>
@@ -259,7 +259,7 @@ export function Stylize2DPanel() {
             <div className="flex min-h-[300px] flex-1 items-center justify-center overflow-hidden rounded bg-[#FAFAFA] p-2">
               {isStylizing ? (
                 <div className="flex flex-col items-center gap-2 text-neutral-400">
-                  <Loader2 className="h-6 w-6 animate-spin text-blue-600" />
+                  <Loader2 className="h-6 w-6 animate-spin text-neutral-700" />
                   <span className="text-xs">正在重绘二维线条与色彩...</span>
                 </div>
               ) : stylizedImage ? (
@@ -271,7 +271,7 @@ export function Stylize2DPanel() {
                 />
               ) : (
                 <div className="flex flex-col items-center gap-2 px-6 text-center text-neutral-400">
-                  <Sparkles className="h-5 w-5 text-neutral-300" />
+                  <ImageIcon className="h-5 w-5 text-neutral-300" />
                   <span className="text-xs leading-relaxed">
                     在左侧选择画风并点击生成，即可查看风格化效果
                   </span>

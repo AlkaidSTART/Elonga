@@ -3,18 +3,19 @@
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
+  ArrowRight,
   BookOpenText,
   Check,
-  Clapperboard,
   Copy,
+  FileText,
+  Film,
   Hash,
   History,
-  Lightbulb,
+  Info,
   Loader2,
-  MessageSquareHeart,
+  MessageSquare,
   Newspaper,
   RefreshCw,
-  Sparkles,
   Trash2,
   Video,
 } from "lucide-react";
@@ -27,8 +28,8 @@ import {
 } from "@/lib/platforms";
 import { useWorkbenchStore } from "@/store/useWorkbenchStore";
 
-const PLATFORM_ICONS: Record<PlatformId, typeof Clapperboard> = {
-  douyin: Clapperboard,
+const PLATFORM_ICONS: Record<PlatformId, typeof Film> = {
+  douyin: Film,
   toutiao: Newspaper,
   kuaishou: Video,
   wechat: BookOpenText,
@@ -181,7 +182,7 @@ export function CopywritingWorkspace() {
                   <div className="flex w-full items-center justify-between">
                     <Icon
                       className={`h-4 w-4 ${
-                        isSelected ? "text-blue-600" : "text-neutral-500"
+                        isSelected ? "text-neutral-900" : "text-neutral-500"
                       }`}
                     />
                     <span className="text-[10px] font-medium text-neutral-400">
@@ -241,7 +242,7 @@ export function CopywritingWorkspace() {
                     onClick={() => setTone(t.id)}
                     className={`rounded-md px-2 py-1 text-[11px] font-medium transition ${
                       tone === t.id
-                        ? "bg-blue-50 text-blue-700 ring-1 ring-blue-200"
+                        ? "bg-neutral-900 text-white ring-1 ring-neutral-900"
                         : "bg-white text-neutral-600 ring-1 ring-neutral-200/80 hover:text-neutral-900"
                     }`}
                   >
@@ -303,7 +304,7 @@ export function CopywritingWorkspace() {
               value={topic}
               onChange={(e) => setTopic(e.target.value)}
               placeholder="例如：分享一套适合上班族的极简时间管理法，强调不需要早起也能多出 2 小时..."
-              className="w-full resize-none rounded-lg border border-neutral-200 bg-white p-3 text-xs leading-relaxed text-neutral-900 outline-none transition placeholder:text-neutral-400 focus:border-blue-600 focus:ring-2 focus:ring-blue-600/10"
+              className="w-full resize-none rounded-lg border border-neutral-200 bg-white p-3 text-xs leading-relaxed text-neutral-900 outline-none transition placeholder:text-neutral-400 focus:border-neutral-900 focus:ring-2 focus:ring-neutral-900/10"
             />
             <div className="mt-2 flex flex-wrap items-center gap-1.5">
               <span className="text-[11px] text-neutral-400">示例：</span>
@@ -326,14 +327,14 @@ export function CopywritingWorkspace() {
               value={keywords}
               onChange={(e) => setKeywords(e.target.value)}
               placeholder="关键词（选填，逗号隔开）"
-              className="w-full rounded-lg border border-neutral-200 bg-white px-3 py-2 text-xs text-neutral-900 outline-none transition focus:border-blue-600"
+              className="w-full rounded-lg border border-neutral-200 bg-white px-3 py-2 text-xs text-neutral-900 outline-none transition focus:border-neutral-900"
             />
             <input
               type="text"
               value={targetAudience}
               onChange={(e) => setTargetAudience(e.target.value)}
               placeholder="目标受众（选填）"
-              className="w-full rounded-lg border border-neutral-200 bg-white px-3 py-2 text-xs text-neutral-900 outline-none transition focus:border-blue-600"
+              className="w-full rounded-lg border border-neutral-200 bg-white px-3 py-2 text-xs text-neutral-900 outline-none transition focus:border-neutral-900"
             />
           </div>
 
@@ -356,7 +357,7 @@ export function CopywritingWorkspace() {
               </>
             ) : (
               <>
-                <Sparkles className="h-3.5 w-3.5" />
+                <ArrowRight className="h-3.5 w-3.5" />
                 <span>生成{activePlatformMeta.name}推流文案</span>
               </>
             )}
@@ -407,7 +408,7 @@ export function CopywritingWorkspace() {
                 <button
                   type="button"
                   onClick={handleCopyAll}
-                  className="flex items-center gap-1.5 rounded-md bg-blue-600 px-3 py-1 text-xs font-medium text-white transition hover:bg-blue-700"
+                  className="flex items-center gap-1.5 rounded-md bg-neutral-900 px-3 py-1 text-xs font-medium text-white transition hover:bg-neutral-800"
                 >
                   {copiedKey === "all" ? (
                     <>
@@ -492,7 +493,7 @@ export function CopywritingWorkspace() {
                 transition={{ duration: 0.2 }}
                 className="flex min-h-[460px] flex-col items-center justify-center text-center"
               >
-                <Sparkles className="h-6 w-6 text-neutral-300" />
+                <FileText className="h-6 w-6 text-neutral-300" />
                 <p className="mt-3 text-sm font-medium text-neutral-700">
                   等待生成文稿
                 </p>
@@ -548,9 +549,9 @@ export function CopywritingWorkspace() {
                 </div>
 
                 {/* Golden Hook with left editorial rule */}
-                <div className="border-l-2 border-blue-600 pl-4">
+                <div className="border-l-2 border-neutral-900 pl-4">
                   <div className="mb-1 flex items-center justify-between">
-                    <span className="text-[11px] font-semibold text-blue-600">
+                    <span className="text-[11px] font-semibold text-neutral-900">
                       黄金开头 / 前 3 秒钩子
                     </span>
                     <button
@@ -580,7 +581,7 @@ export function CopywritingWorkspace() {
                     rows={11}
                     value={currentResult.body}
                     onChange={(e) => updateCurrentBody(e.target.value)}
-                    className="w-full resize-y rounded-lg border border-neutral-200/80 bg-[#FAFAFA] p-4 text-sm leading-7 text-neutral-800 outline-none transition focus:border-blue-600 focus:bg-white"
+                    className="w-full resize-y rounded-lg border border-neutral-200/80 bg-[#FAFAFA] p-4 text-sm leading-7 text-neutral-800 outline-none transition focus:border-neutral-900 focus:bg-white"
                   />
                 </div>
 
@@ -589,7 +590,7 @@ export function CopywritingWorkspace() {
                   <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <div>
                       <div className="mb-1.5 flex items-center gap-1.5 text-xs font-semibold text-neutral-700">
-                        <MessageSquareHeart className="h-3.5 w-3.5 text-neutral-400" />
+                        <MessageSquare className="h-3.5 w-3.5 text-neutral-400" />
                         <span>互动引导语</span>
                       </div>
                       <p className="text-xs leading-relaxed text-neutral-600">
@@ -617,7 +618,7 @@ export function CopywritingWorkspace() {
 
                   <div className="rounded-lg bg-[#FAFAFA] p-3.5">
                     <div className="mb-2 flex items-center gap-1.5 text-xs font-semibold text-neutral-800">
-                      <Lightbulb className="h-3.5 w-3.5 text-amber-500" />
+                      <Info className="h-3.5 w-3.5 text-neutral-500" />
                       <span>
                         {PLATFORMS[currentResult.platform].name}推流优化建议
                       </span>

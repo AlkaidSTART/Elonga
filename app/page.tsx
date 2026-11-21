@@ -7,12 +7,12 @@ import type { EChartsOption } from "echarts";
 import {
   ArrowUpRight,
   CheckCircle2,
-  Flame,
   Globe2,
+  Info,
   Layers,
   PenTool,
   Send,
-  Sparkles,
+  TrendingUp,
 } from "lucide-react";
 import { EChartBox } from "@/components/charts/EChartBox";
 import {
@@ -104,7 +104,7 @@ export default function OverviewPage() {
           name: "累计创作",
           type: "bar",
           barMaxWidth: 22,
-          itemStyle: { color: "#2563EB", borderRadius: [4, 4, 0, 0] },
+          itemStyle: { color: "#0F766E", borderRadius: [4, 4, 0, 0] },
           data: stats.platformStats.map((p) => p.createdCount),
         },
         {
@@ -215,8 +215,8 @@ export default function OverviewPage() {
           type: "line",
           smooth: true,
           symbolSize: 6,
-          lineStyle: { width: 2.5, color: "#2563EB" },
-          itemStyle: { color: "#2563EB" },
+          lineStyle: { width: 2.5, color: "#0F766E" },
+          itemStyle: { color: "#0F766E" },
           areaStyle: {
             color: {
               type: "linear",
@@ -225,8 +225,8 @@ export default function OverviewPage() {
               x2: 0,
               y2: 1,
               colorStops: [
-                { offset: 0, color: "rgba(37, 99, 235, 0.16)" },
-                { offset: 1, color: "rgba(37, 99, 235, 0.01)" },
+                { offset: 0, color: "rgba(15, 118, 110, 0.14)" },
+                { offset: 1, color: "rgba(15, 118, 110, 0.01)" },
               ],
             },
           },
@@ -281,7 +281,7 @@ export default function OverviewPage() {
         className="flex flex-col gap-4 border-b border-neutral-200/80 pb-6 sm:flex-row sm:items-end sm:justify-between"
       >
         <div className="max-w-xl">
-          <p className="text-xs font-medium tracking-wide text-blue-600 uppercase">
+          <p className="text-xs font-medium tracking-widest text-neutral-500 uppercase">
             Overview &amp; Analytics
           </p>
           <h1 className="mt-1.5 text-2xl font-semibold tracking-tight text-neutral-900 sm:text-3xl">
@@ -331,10 +331,10 @@ export default function OverviewPage() {
       {isDemoMode && (
         <motion.div
           variants={ITEM_VARIANTS}
-          className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-blue-200/70 bg-blue-50/60 px-4 py-2.5 text-xs text-blue-800"
+          className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-neutral-200 bg-[#FAFAFA] px-4 py-2.5 text-xs text-neutral-600"
         >
           <div className="flex items-center gap-2">
-            <Sparkles className="h-3.5 w-3.5 shrink-0 text-blue-600" />
+            <Info className="h-3.5 w-3.5 shrink-0 text-neutral-500" />
             <span>
               {history.length === 0
                 ? "当前本地暂无创作记录，正在展示示例统计视图。生成文案并在「创作记录」中标记已发布或爆款后，将自动汇总真实数据。"
@@ -343,7 +343,7 @@ export default function OverviewPage() {
           </div>
           <Link
             href="/history"
-            className="font-medium text-blue-700 underline-offset-2 hover:underline"
+            className="font-medium text-neutral-900 underline-offset-2 hover:underline"
           >
             前往创作记录 →
           </Link>
@@ -374,7 +374,7 @@ export default function OverviewPage() {
         <div className="p-5 sm:p-6">
           <div className="flex items-center justify-between text-xs text-neutral-500">
             <span>平台累计创作</span>
-            <Layers className="h-4 w-4 text-blue-600" />
+            <Layers className="h-4 w-4 text-neutral-700" />
           </div>
           <div className="mt-3 flex items-baseline gap-2">
             <span className="font-mono text-3xl font-semibold tracking-tight text-neutral-900">
@@ -390,7 +390,7 @@ export default function OverviewPage() {
         <div className="p-5 sm:p-6">
           <div className="flex items-center justify-between text-xs text-neutral-500">
             <span>爆款文案产出</span>
-            <Flame className="h-4 w-4 text-amber-500" />
+            <TrendingUp className="h-4 w-4 text-amber-600" />
           </div>
           <div className="mt-3 flex items-baseline gap-2">
             <span className="font-mono text-3xl font-semibold tracking-tight text-neutral-900">
@@ -567,7 +567,7 @@ export default function OverviewPage() {
                     )}
                     {item.isViral && (
                       <span className="inline-flex items-center gap-0.5 rounded bg-amber-50 px-1.5 py-0.5 text-[10px] font-medium text-amber-700">
-                        <Flame className="h-3 w-3" />
+                        <TrendingUp className="h-3 w-3" />
                         爆款
                       </span>
                     )}

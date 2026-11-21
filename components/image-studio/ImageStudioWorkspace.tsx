@@ -3,11 +3,11 @@
 import { useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
+  Contrast,
   Eraser,
   ImagePlus,
   RefreshCw,
   Upload,
-  Wand2,
 } from "lucide-react";
 import { useImageStudioStore } from "@/store/useImageStudioStore";
 import { MosaicEditor } from "./MosaicEditor";
@@ -20,18 +20,18 @@ function createSampleImageDataUrl(): string {
   const ctx = canvas.getContext("2d")!;
 
   const sky = ctx.createLinearGradient(0, 0, 0, 420);
-  sky.addColorStop(0, "#60a5fa");
-  sky.addColorStop(0.55, "#bae6fd");
+  sky.addColorStop(0, "#e5e5e5");
+  sky.addColorStop(0.55, "#f5f5f4");
   sky.addColorStop(1, "#fef3c7");
   ctx.fillStyle = sky;
   ctx.fillRect(0, 0, 960, 640);
 
-  ctx.fillStyle = "#fde047";
+  ctx.fillStyle = "#f59e0b";
   ctx.beginPath();
   ctx.arc(730, 145, 58, 0, Math.PI * 2);
   ctx.fill();
 
-  ctx.fillStyle = "#4f46e5";
+  ctx.fillStyle = "#3f3f46";
   ctx.beginPath();
   ctx.moveTo(0, 410);
   ctx.lineTo(220, 230);
@@ -123,7 +123,7 @@ export function ImageStudioWorkspace() {
         onDrop={handleDrop}
         className={`flex min-h-[460px] flex-col items-center justify-center rounded-xl border border-dashed p-10 text-center transition-colors ${
           isDragging
-            ? "border-blue-600 bg-blue-50/30"
+            ? "border-neutral-900 bg-neutral-100/70"
             : "border-neutral-300 bg-[#FAFAFA] hover:border-neutral-400"
         }`}
       >
@@ -209,7 +209,7 @@ export function ImageStudioWorkspace() {
                 className="absolute inset-0 rounded-md bg-white shadow-2xs"
               />
             )}
-            <Wand2 className="relative z-10 h-3.5 w-3.5" />
+            <Contrast className="relative z-10 h-3.5 w-3.5" />
             <span className="relative z-10">二维风格化</span>
           </button>
         </div>
