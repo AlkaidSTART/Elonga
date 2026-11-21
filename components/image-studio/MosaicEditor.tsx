@@ -231,15 +231,15 @@ export function MosaicEditor() {
   };
 
   return (
-    <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
-      {/* Left Controls */}
-      <aside className="space-y-4 lg:col-span-4">
+    <div className="grid grid-cols-1 lg:grid-cols-12">
+      {/* Left Inspector Rail */}
+      <aside className="divide-y divide-neutral-200/70 border-b border-neutral-200 bg-[#FAFAFA] lg:col-span-4 lg:border-b-0 lg:border-r">
         {/* Mosaic Mode */}
-        <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs">
-          <h3 className="mb-3 text-sm font-semibold text-slate-900">
+        <div className="p-5">
+          <h3 className="mb-3 text-xs font-semibold text-neutral-900">
             打码样式
           </h3>
-          <div className="space-y-2">
+          <div className="space-y-1.5">
             {MOSAIC_TYPES.map((item) => {
               const Icon = item.icon;
               const active = mosaicType === item.id;
@@ -248,26 +248,22 @@ export function MosaicEditor() {
                   key={item.id}
                   type="button"
                   onClick={() => setMosaicType(item.id)}
-                  className={`flex w-full items-center gap-3 rounded-xl border p-3 text-left transition ${
+                  className={`flex w-full items-center gap-3 rounded-lg border px-3 py-2.5 text-left transition ${
                     active
-                      ? "border-indigo-500 bg-indigo-50/40 ring-2 ring-indigo-500/15"
-                      : "border-slate-200/80 bg-white hover:bg-slate-50"
+                      ? "border-neutral-900 bg-white shadow-2xs"
+                      : "border-neutral-200/80 bg-white/60 hover:border-neutral-300 hover:bg-white"
                   }`}
                 >
-                  <span
-                    className={`flex h-8 w-8 items-center justify-center rounded-lg ${
-                      active
-                        ? "bg-indigo-600 text-white"
-                        : "bg-slate-100 text-slate-600"
+                  <Icon
+                    className={`h-4 w-4 shrink-0 ${
+                      active ? "text-blue-600" : "text-neutral-500"
                     }`}
-                  >
-                    <Icon className="h-4 w-4" />
-                  </span>
+                  />
                   <div>
-                    <div className="text-xs font-semibold text-slate-900">
+                    <div className="text-xs font-semibold text-neutral-900">
                       {item.label}
                     </div>
-                    <div className="text-[11px] text-slate-500">{item.desc}</div>
+                    <div className="text-[11px] text-neutral-500">{item.desc}</div>
                   </div>
                 </button>
               );
@@ -276,19 +272,19 @@ export function MosaicEditor() {
         </div>
 
         {/* Shape & Parameters */}
-        <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs space-y-4">
+        <div className="space-y-4 p-5">
           <div>
-            <h3 className="mb-2.5 text-sm font-semibold text-slate-900">
+            <h3 className="mb-2.5 text-xs font-semibold text-neutral-900">
               涂抹工具
             </h3>
             <div className="grid grid-cols-2 gap-2">
               <button
                 type="button"
                 onClick={() => setToolShape("brush")}
-                className={`flex items-center justify-center gap-2 rounded-xl border py-2.5 text-xs font-medium transition ${
+                className={`flex items-center justify-center gap-1.5 rounded-lg border py-2 text-xs font-medium transition ${
                   toolShape === "brush"
-                    ? "border-indigo-500 bg-indigo-50 text-indigo-700"
-                    : "border-slate-200 text-slate-600 hover:bg-slate-50"
+                    ? "border-neutral-900 bg-neutral-900 text-white"
+                    : "border-neutral-200 bg-white text-neutral-600 hover:bg-neutral-50"
                 }`}
               >
                 <Brush className="h-3.5 w-3.5" />
@@ -297,10 +293,10 @@ export function MosaicEditor() {
               <button
                 type="button"
                 onClick={() => setToolShape("rect")}
-                className={`flex items-center justify-center gap-2 rounded-xl border py-2.5 text-xs font-medium transition ${
+                className={`flex items-center justify-center gap-1.5 rounded-lg border py-2 text-xs font-medium transition ${
                   toolShape === "rect"
-                    ? "border-indigo-500 bg-indigo-50 text-indigo-700"
-                    : "border-slate-200 text-slate-600 hover:bg-slate-50"
+                    ? "border-neutral-900 bg-neutral-900 text-white"
+                    : "border-neutral-200 bg-white text-neutral-600 hover:bg-neutral-50"
                 }`}
               >
                 <Square className="h-3.5 w-3.5" />
@@ -312,8 +308,8 @@ export function MosaicEditor() {
           {toolShape === "brush" && (
             <div>
               <div className="mb-1.5 flex items-center justify-between text-xs">
-                <span className="font-medium text-slate-700">画笔大小</span>
-                <span className="font-mono text-slate-500">{brushSize} px</span>
+                <span className="font-medium text-neutral-700">画笔大小</span>
+                <span className="font-mono text-neutral-500">{brushSize} px</span>
               </div>
               <input
                 type="range"
@@ -321,7 +317,7 @@ export function MosaicEditor() {
                 max={96}
                 value={brushSize}
                 onChange={(e) => setBrushSize(Number(e.target.value))}
-                className="w-full accent-indigo-600"
+                className="w-full accent-neutral-900"
               />
             </div>
           )}
@@ -329,10 +325,10 @@ export function MosaicEditor() {
           {mosaicType !== "solid" && (
             <div>
               <div className="mb-1.5 flex items-center justify-between text-xs">
-                <span className="font-medium text-slate-700">
+                <span className="font-medium text-neutral-700">
                   {mosaicType === "stackblur" ? "模糊半径" : "像素颗粒度"}
                 </span>
-                <span className="font-mono text-slate-500">{intensity}</span>
+                <span className="font-mono text-neutral-500">{intensity}</span>
               </div>
               <input
                 type="range"
@@ -340,17 +336,17 @@ export function MosaicEditor() {
                 max={45}
                 value={intensity}
                 onChange={(e) => setIntensity(Number(e.target.value))}
-                className="w-full accent-indigo-600"
+                className="w-full accent-neutral-900"
               />
             </div>
           )}
 
-          <div className="pt-1 flex items-center gap-2">
+          <div className="flex items-center gap-2 pt-1">
             <button
               type="button"
               onClick={undoAction}
               disabled={actions.length === 0}
-              className="flex flex-1 items-center justify-center gap-1.5 rounded-xl border border-slate-200 py-2 text-xs font-medium text-slate-700 transition hover:bg-slate-50 disabled:opacity-40"
+              className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-neutral-200 bg-white py-2 text-xs font-medium text-neutral-700 transition hover:bg-neutral-50 disabled:opacity-40"
             >
               <Undo2 className="h-3.5 w-3.5" />
               <span>撤销</span>
@@ -359,7 +355,7 @@ export function MosaicEditor() {
               type="button"
               onClick={redoAction}
               disabled={redoStack.length === 0}
-              className="flex flex-1 items-center justify-center gap-1.5 rounded-xl border border-slate-200 py-2 text-xs font-medium text-slate-700 transition hover:bg-slate-50 disabled:opacity-40"
+              className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-neutral-200 bg-white py-2 text-xs font-medium text-neutral-700 transition hover:bg-neutral-50 disabled:opacity-40"
             >
               <Redo2 className="h-3.5 w-3.5" />
               <span>重做</span>
@@ -368,7 +364,7 @@ export function MosaicEditor() {
               type="button"
               onClick={resetActions}
               disabled={actions.length === 0}
-              className="flex items-center justify-center gap-1 rounded-xl border border-slate-200 px-3 py-2 text-xs font-medium text-slate-600 transition hover:bg-rose-50 hover:text-rose-600 disabled:opacity-40"
+              className="flex items-center justify-center rounded-lg border border-neutral-200 bg-white px-3 py-2 text-xs font-medium text-neutral-600 transition hover:bg-rose-50 hover:text-rose-600 disabled:opacity-40"
               title="清空所有打码"
             >
               <RotateCcw className="h-3.5 w-3.5" />
@@ -376,53 +372,53 @@ export function MosaicEditor() {
           </div>
         </div>
 
-        <button
-          type="button"
-          onClick={handleDownload}
-          className="flex w-full items-center justify-center gap-2 rounded-xl bg-indigo-600 py-3 text-sm font-medium text-white shadow-sm shadow-indigo-600/20 transition hover:bg-indigo-700"
-        >
-          <Download className="h-4 w-4" />
-          <span>导出打码图片</span>
-        </button>
+        <div className="p-5">
+          <button
+            type="button"
+            onClick={handleDownload}
+            className="flex w-full items-center justify-center gap-2 rounded-lg bg-neutral-900 py-2.5 text-xs font-medium text-white transition hover:bg-neutral-800"
+          >
+            <Download className="h-3.5 w-3.5" />
+            <span>导出打码图片</span>
+          </button>
+        </div>
       </aside>
 
-      {/* Right Interactive Canvas */}
-      <div className="lg:col-span-8">
-        <div className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-xs">
-          <div className="mb-3 flex items-center justify-between">
-            <div className="text-xs text-slate-500">
-              在图片上直接拖拽涂抹或框选需要打码的区域（已应用 {actions.length} 处打码）
-            </div>
-            <button
-              type="button"
-              onPointerDown={() => setShowOriginal(true)}
-              onPointerUp={() => setShowOriginal(false)}
-              onPointerLeave={() => setShowOriginal(false)}
-              className="flex items-center gap-1.5 rounded-lg border border-slate-200 bg-slate-50 px-3 py-1.5 text-xs font-medium text-slate-700 select-none transition hover:bg-slate-100"
-            >
-              <Eye className="h-3.5 w-3.5" />
-              <span>{showOriginal ? "正在查看原图" : "按住对比原图"}</span>
-            </button>
-          </div>
+      {/* Right Interactive Canvas Stage */}
+      <div className="flex flex-col bg-[#F4F5F7] p-4 lg:col-span-8">
+        <div className="mb-3 flex items-center justify-between">
+          <span className="text-xs text-neutral-500">
+            在图片上拖拽涂抹或框选（已应用 {actions.length} 处）
+          </span>
+          <button
+            type="button"
+            onPointerDown={() => setShowOriginal(true)}
+            onPointerUp={() => setShowOriginal(false)}
+            onPointerLeave={() => setShowOriginal(false)}
+            className="flex items-center gap-1.5 rounded-md border border-neutral-200 bg-white px-2.5 py-1 text-xs font-medium text-neutral-700 select-none transition hover:bg-neutral-50"
+          >
+            <Eye className="h-3.5 w-3.5" />
+            <span>{showOriginal ? "正在查看原图" : "按住对比原图"}</span>
+          </button>
+        </div>
 
-          <div className="relative flex min-h-[420px] items-center justify-center overflow-hidden rounded-xl border border-slate-100 bg-[radial-gradient(#e2e8f0_1px,transparent_1px)] [background-size:16px_16px] p-3">
-            <div className="relative inline-block max-h-[560px] max-w-full">
-              <canvas
-                ref={canvasRef}
-                className="block max-h-[540px] max-w-full rounded-lg object-contain shadow-sm"
-              />
-              <canvas
-                ref={overlayRef}
-                onPointerDown={handlePointerDown}
-                onPointerMove={handlePointerMove}
-                onPointerUp={finishStroke}
-                onPointerCancel={finishStroke}
-                onPointerLeave={() => {
-                  if (!isDrawing) clearOverlay();
-                }}
-                className="absolute inset-0 h-full w-full touch-none cursor-crosshair rounded-lg"
-              />
-            </div>
+        <div className="relative flex min-h-[440px] flex-1 items-center justify-center overflow-hidden rounded-lg border border-neutral-200/80 bg-[radial-gradient(#d4d4d8_1px,transparent_1px)] [background-size:16px_16px] p-3">
+          <div className="relative inline-block max-h-[560px] max-w-full">
+            <canvas
+              ref={canvasRef}
+              className="block max-h-[540px] max-w-full rounded object-contain shadow-sm"
+            />
+            <canvas
+              ref={overlayRef}
+              onPointerDown={handlePointerDown}
+              onPointerMove={handlePointerMove}
+              onPointerUp={finishStroke}
+              onPointerCancel={finishStroke}
+              onPointerLeave={() => {
+                if (!isDrawing) clearOverlay();
+              }}
+              className="absolute inset-0 h-full w-full touch-none cursor-crosshair rounded"
+            />
           </div>
         </div>
       </div>

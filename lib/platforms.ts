@@ -129,4 +129,7 @@ export interface CopywritingResult {
   tips: string[];
   mode: "ai" | "local";
   createdAt: string;
+  isPublished?: boolean;
+  publishedAt?: string;
+  isViral?: boolean;
 }

@@ -38,7 +38,11 @@ export async function POST(req: Request) {
     }
 
     const apiKey =
-      modelConfig?.apiKey?.trim() || process.env.OPENAI_API_KEY || "";
+      modelConfig?.apiKey?.trim() ||
+      process.env.IMAGE_API_KEY ||
+      process.env.ARK_API_KEY ||
+      process.env.OPENAI_API_KEY ||
+      "";
 
     if (!apiKey) {
       return NextResponse.json({ fallback: true, mode: "local" });
@@ -46,10 +50,14 @@ export async function POST(req: Request) {
 
     const baseUrl = (
       modelConfig?.baseUrl?.trim() ||
-      process.env.OPENAI_BASE_URL ||
-      "https://api.openai.com/v1"
+      process.env.IMAGE_BASE_URL ||
+      process.env.ARK_BASE_URL ||
+      "https://ark.cn-beijing.volces.com/api/v3"
     ).replace(/\/+$/, "");
-    const model = modelConfig?.imageModel?.trim() || "gpt-image-1";
+    const model =
+      modelConfig?.imageModel?.trim() ||
+      process.env.IMAGE_MODEL ||
+      "doubao-seedream-3-0-t2i-250415";
 
     const base64Data = imageBase64.replace(/^data:image\/\w+;base64,/, "");
     const buffer = Buffer.from(base64Data, "base64");

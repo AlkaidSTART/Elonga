@@ -11,11 +11,22 @@ import type {
 export type WorkbenchTab = "copywriting" | "image-studio";
 
 export interface ModelConfig {
-  apiKey: string;
-  baseUrl: string;
+  textApiKey: string;
+  textBaseUrl: string;
   textModel: string;
+  imageApiKey: string;
+  imageBaseUrl: string;
   imageModel: string;
 }
+
+const DEFAULT_MODEL_CONFIG: ModelConfig = {
+  textApiKey: "",
+  textBaseUrl: "https://api.deepseek.com/v1",
+  textModel: "deepseek-chat",
+  imageApiKey: "",
+  imageBaseUrl: "https://ark.cn-beijing.volces.com/api/v3",
+  imageModel: "doubao-seedream-3-0-t2i-250415",
+};
 
 interface WorkbenchState {
   activeTab: WorkbenchTab;
@@ -52,6 +63,8 @@ interface WorkbenchState {
   addToHistory: (result: CopywritingResult) => void;
   selectFromHistory: (id: string) => void;
   removeFromHistory: (id: string) => void;
+  togglePublished: (id: string) => void;
+  toggleViral: (id: string) => void;
 }
 
 export const useWorkbenchStore = create<WorkbenchState>()(
@@ -59,12 +72,7 @@ export const useWorkbenchStore = create<WorkbenchState>()(
     (set, get) => ({
       activeTab: "copywriting",
       settingsOpen: false,
-      modelConfig: {
-        apiKey: "",
-        baseUrl: "https://api.openai.com/v1",
-        textModel: "gpt-4o-mini",
-        imageModel: "gpt-image-1",
-      },
+      modelConfig: { ...DEFAULT_MODEL_CONFIG },
 
       platform: "douyin",
       contentType: "knowledge",
@@ -108,7 +116,7 @@ export const useWorkbenchStore = create<WorkbenchState>()(
         }),
       addToHistory: (result) =>
         set((state) => ({
-          history: [result, ...state.history.filter((h) => h.id !== result.id)].slice(0, 20),
+          history: [result, ...state.history.filter((h) => h.id !== result.id)].slice(0, 100),
         })),
       selectFromHistory: (id) => {
         const found = get().history.find((h) => h.id === id);
@@ -128,6 +136,37 @@ export const useWorkbenchStore = create<WorkbenchState>()(
           currentResult:
             state.currentResult?.id === id ? null : state.currentResult,
         })),
+      togglePublished: (id) =>
+        set((state) => {
+          const updateItem = (item: CopywritingResult): CopywritingResult => {
+            if (item.id !== id) return item;
+            const nextPublished = !item.isPublished;
+            return {
+              ...item,
+              isPublished: nextPublished,
+              publishedAt: nextPublished
+                ? item.publishedAt ?? new Date().toISOString()
+                : undefined,
+            };
+          };
+          return {
+            history: state.history.map(updateItem),
+            currentResult: state.currentResult
+              ? updateItem(state.currentResult)
+              : null,
+          };
+        }),
+      toggleViral: (id) =>
+        set((state) => {
+          const updateItem = (item: CopywritingResult): CopywritingResult =>
+            item.id === id ? { ...item, isViral: !item.isViral } : item;
+          return {
+            history: state.history.map(updateItem),
+            currentResult: state.currentResult
+              ? updateItem(state.currentResult)
+              : null,
+          };
+        }),
     }),
     {
       name: "jianyue-workbench-storage",
@@ -137,6 +176,48 @@ export const useWorkbenchStore = create<WorkbenchState>()(
         history: state.history,
         platform: state.platform,
       }),
+      merge: (persistedState, currentState) => {
+        const persisted = persistedState as
+          | (Partial<WorkbenchState> & {
+              modelConfig?: Partial<ModelConfig> & {
+                apiKey?: string;
+                baseUrl?: string;
+              };
+            })
+          | undefined;
+        const oldConfig = persisted?.modelConfig;
+        const legacyBaseUrl =
+          oldConfig?.baseUrl &&
+          oldConfig.baseUrl !== "https://api.openai.com/v1"
+            ? oldConfig.baseUrl
+            : undefined;
+
+        return {
+          ...currentState,
+          ...persisted,
+          modelConfig: {
+            ...DEFAULT_MODEL_CONFIG,
+            ...(oldConfig ?? {}),
+            textApiKey:
+              oldConfig?.textApiKey ?? oldConfig?.apiKey ?? "",
+            textBaseUrl:
+              oldConfig?.textBaseUrl ??
+              legacyBaseUrl ??
+              DEFAULT_MODEL_CONFIG.textBaseUrl,
+            textModel:
+              oldConfig?.textModel && oldConfig.textModel !== "gpt-4o-mini"
+                ? oldConfig.textModel
+                : DEFAULT_MODEL_CONFIG.textModel,
+            imageApiKey: oldConfig?.imageApiKey ?? "",
+            imageBaseUrl:
+              oldConfig?.imageBaseUrl ?? DEFAULT_MODEL_CONFIG.imageBaseUrl,
+            imageModel:
+              oldConfig?.imageModel && oldConfig.imageModel !== "gpt-image-1"
+                ? oldConfig.imageModel
+                : DEFAULT_MODEL_CONFIG.imageModel,
+          },
+        };
+      },
     }
   )
 );

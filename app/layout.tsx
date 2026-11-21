@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   description:
     "Elonga 创作工作台：支持抖音、今日头条、快手、微信公众号推流文案撰写，以及图片智能打码与大模型二维风格化。",
   icons: {
-    icon: "/elonga-logo.png",
+    icon: "/elonga-logo.svg",
   },
 };
 
@@ -28,7 +28,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="zh-CN"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full bg-[#F8F9FB] text-slate-900 selection:bg-indigo-100 selection:text-indigo-900">
+      <body className="min-h-full bg-white text-neutral-900 selection:bg-neutral-200 selection:text-neutral-900">
         <AppShell>{children}</AppShell>
       </body>
     </html>

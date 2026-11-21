@@ -105,8 +105,8 @@ export function CopywritingWorkspace() {
           keywords,
           targetAudience,
           modelConfig: {
-            apiKey: modelConfig.apiKey,
-            baseUrl: modelConfig.baseUrl,
+            apiKey: modelConfig.textApiKey,
+            baseUrl: modelConfig.textBaseUrl,
             textModel: modelConfig.textModel,
           },
         }),

@@ -1,18 +1,24 @@
 "use client";
 
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import type { EChartsOption } from "echarts";
 import {
   ArrowUpRight,
-  BookOpenText,
-  Clapperboard,
-  Eraser,
-  Image as ImageIcon,
-  Newspaper,
+  CheckCircle2,
+  Flame,
+  Globe2,
+  Layers,
   PenTool,
-  Video,
-  Wand2,
+  Send,
+  Sparkles,
 } from "lucide-react";
+import { EChartBox } from "@/components/charts/EChartBox";
+import {
+  buildDemoOverviewStats,
+  computeOverviewStats,
+} from "@/lib/overview-stats";
 import { PLATFORMS } from "@/lib/platforms";
 import { useWorkbenchStore } from "@/store/useWorkbenchStore";
 
@@ -35,8 +41,231 @@ const ITEM_VARIANTS = {
 
 export default function OverviewPage() {
   const history = useWorkbenchStore((s) => s.history);
-  const hasApiKey = useWorkbenchStore((s) =>
-    Boolean(s.modelConfig.apiKey.trim())
+  const [modeOverride, setModeOverride] = useState<"live" | "demo" | null>(
+    null
+  );
+
+  const isDemoMode =
+    modeOverride !== null ? modeOverride === "demo" : history.length === 0;
+
+  const stats = useMemo(
+    () =>
+      isDemoMode ? buildDemoOverviewStats() : computeOverviewStats(history),
+    [isDemoMode, history]
+  );
+
+  const platformBarOption = useMemo<EChartsOption>(
+    () => ({
+      tooltip: {
+        trigger: "axis",
+        axisPointer: { type: "shadow" },
+        backgroundColor: "#FFFFFF",
+        borderColor: "#E5E5E5",
+        borderWidth: 1,
+        textStyle: { color: "#171717", fontSize: 12 },
+      },
+      legend: {
+        top: 0,
+        right: 0,
+        itemWidth: 10,
+        itemHeight: 10,
+        icon: "roundRect",
+        textStyle: { color: "#737373", fontSize: 11 },
+      },
+      grid: {
+        left: 12,
+        right: 12,
+        top: 36,
+        bottom: 8,
+        containLabel: true,
+      },
+      xAxis: {
+        type: "category",
+        data: stats.platformStats.map((p) => p.name),
+        axisLine: { lineStyle: { color: "#E5E5E5" } },
+        axisTick: { show: false },
+        axisLabel: { color: "#525252", fontSize: 12 },
+      },
+      yAxis: {
+        type: "value",
+        minInterval: 1,
+        splitLine: { lineStyle: { color: "#F5F5F5", type: "dashed" } },
+        axisLabel: { color: "#A3A3A3", fontSize: 11 },
+      },
+      series: [
+        {
+          name: "已发布",
+          type: "bar",
+          barMaxWidth: 22,
+          itemStyle: { color: "#171717", borderRadius: [4, 4, 0, 0] },
+          data: stats.platformStats.map((p) => p.publishedCount),
+        },
+        {
+          name: "累计创作",
+          type: "bar",
+          barMaxWidth: 22,
+          itemStyle: { color: "#2563EB", borderRadius: [4, 4, 0, 0] },
+          data: stats.platformStats.map((p) => p.createdCount),
+        },
+        {
+          name: "爆款文案",
+          type: "bar",
+          barMaxWidth: 22,
+          itemStyle: { color: "#F59E0B", borderRadius: [4, 4, 0, 0] },
+          data: stats.platformStats.map((p) => p.viralCount),
+        },
+      ],
+    }),
+    [stats.platformStats]
+  );
+
+  const platformPieOption = useMemo<EChartsOption>(() => {
+    const usePublished = stats.totalPublished > 0;
+    const pieData = stats.platformStats.map((p) => ({
+      name: p.name,
+      value: usePublished ? p.publishedCount : p.createdCount,
+      itemStyle: { color: p.accentColor },
+    }));
+    const hasValues = pieData.some((d) => d.value > 0);
+
+    return {
+      tooltip: {
+        trigger: "item",
+        backgroundColor: "#FFFFFF",
+        borderColor: "#E5E5E5",
+        borderWidth: 1,
+        textStyle: { color: "#171717", fontSize: 12 },
+        formatter: "{b}: {c} 篇 ({d}%)",
+      },
+      legend: {
+        bottom: 0,
+        left: "center",
+        itemWidth: 10,
+        itemHeight: 10,
+        icon: "circle",
+        textStyle: { color: "#525252", fontSize: 11 },
+      },
+      series: [
+        {
+          name: usePublished ? "已发布平台" : "创作平台",
+          type: "pie",
+          radius: ["52%", "76%"],
+          center: ["50%", "44%"],
+          padAngle: 3,
+          itemStyle: { borderRadius: 6 },
+          label: {
+            show: hasValues,
+            formatter: "{b}\n{d}%",
+            fontSize: 11,
+            color: "#525252",
+          },
+          labelLine: {
+            length: 10,
+            length2: 8,
+            lineStyle: { color: "#D4D4D4" },
+          },
+          data: hasValues
+            ? pieData
+            : [{ name: "暂无数据", value: 1, itemStyle: { color: "#E5E5E5" } }],
+        },
+      ],
+    };
+  }, [stats.platformStats, stats.totalPublished]);
+
+  const trendOption = useMemo<EChartsOption>(
+    () => ({
+      tooltip: {
+        trigger: "axis",
+        backgroundColor: "#FFFFFF",
+        borderColor: "#E5E5E5",
+        borderWidth: 1,
+        textStyle: { color: "#171717", fontSize: 12 },
+      },
+      legend: {
+        top: 0,
+        right: 0,
+        itemWidth: 12,
+        itemHeight: 8,
+        textStyle: { color: "#737373", fontSize: 11 },
+      },
+      grid: {
+        left: 12,
+        right: 16,
+        top: 36,
+        bottom: 8,
+        containLabel: true,
+      },
+      xAxis: {
+        type: "category",
+        boundaryGap: false,
+        data: stats.dailyTrend.map((d) => d.dateLabel),
+        axisLine: { lineStyle: { color: "#E5E5E5" } },
+        axisTick: { show: false },
+        axisLabel: { color: "#525252", fontSize: 11 },
+      },
+      yAxis: {
+        type: "value",
+        minInterval: 1,
+        splitLine: { lineStyle: { color: "#F5F5F5", type: "dashed" } },
+        axisLabel: { color: "#A3A3A3", fontSize: 11 },
+      },
+      series: [
+        {
+          name: "已发布条数",
+          type: "line",
+          smooth: true,
+          symbolSize: 6,
+          lineStyle: { width: 2.5, color: "#2563EB" },
+          itemStyle: { color: "#2563EB" },
+          areaStyle: {
+            color: {
+              type: "linear",
+              x: 0,
+              y: 0,
+              x2: 0,
+              y2: 1,
+              colorStops: [
+                { offset: 0, color: "rgba(37, 99, 235, 0.16)" },
+                { offset: 1, color: "rgba(37, 99, 235, 0.01)" },
+              ],
+            },
+          },
+          data: stats.dailyTrend.map((d) => d.publishedCount),
+        },
+        {
+          name: "爆款文案",
+          type: "line",
+          smooth: true,
+          symbolSize: 6,
+          lineStyle: { width: 2, color: "#F59E0B" },
+          itemStyle: { color: "#F59E0B" },
+          areaStyle: {
+            color: {
+              type: "linear",
+              x: 0,
+              y: 0,
+              x2: 0,
+              y2: 1,
+              colorStops: [
+                { offset: 0, color: "rgba(245, 158, 11, 0.14)" },
+                { offset: 1, color: "rgba(245, 158, 11, 0.01)" },
+              ],
+            },
+          },
+          data: stats.dailyTrend.map((d) => d.viralCount),
+        },
+        {
+          name: "累计创作",
+          type: "line",
+          smooth: true,
+          symbol: "none",
+          lineStyle: { width: 1.5, type: "dashed", color: "#94A3B8" },
+          itemStyle: { color: "#94A3B8" },
+          data: stats.dailyTrend.map((d) => d.createdCount),
+        },
+      ],
+    }),
+    [stats.dailyTrend]
   );
 
   return (
@@ -44,157 +273,312 @@ export default function OverviewPage() {
       variants={CONTAINER_VARIANTS}
       initial="hidden"
       animate="show"
-      className="space-y-10"
+      className="space-y-8"
     >
-      {/* Clean Editorial Header */}
+      {/* Header */}
       <motion.section
         variants={ITEM_VARIANTS}
-        className="flex flex-col gap-5 border-b border-neutral-200/80 pb-8 sm:flex-row sm:items-end sm:justify-between"
+        className="flex flex-col gap-4 border-b border-neutral-200/80 pb-6 sm:flex-row sm:items-end sm:justify-between"
       >
         <div className="max-w-xl">
           <p className="text-xs font-medium tracking-wide text-blue-600 uppercase">
-            Elonga Workspace
+            Overview &amp; Analytics
           </p>
-          <h1 className="mt-2 text-2xl font-semibold tracking-tight text-neutral-900 sm:text-3xl">
-            内容推流与视觉创作台
+          <h1 className="mt-1.5 text-2xl font-semibold tracking-tight text-neutral-900 sm:text-3xl">
+            创作与发布数据概览
           </h1>
-          <p className="mt-2 text-sm leading-relaxed text-neutral-500">
-            以克制、高效的方式完成多平台推流文案撰写与图像隐私处理及二维风格重绘。
+          <p className="mt-1.5 text-sm leading-relaxed text-neutral-500">
+            统计你在平台的累计发布条数、爆款文案产出与各分发平台的分布情况。
           </p>
         </div>
 
-        <div className="flex shrink-0 items-center gap-2.5">
+        <div className="flex flex-wrap items-center gap-2.5">
+          <div className="inline-flex items-center rounded-lg border border-neutral-200 bg-[#FAFAFA] p-0.5 text-xs">
+            <button
+              type="button"
+              onClick={() => setModeOverride("live")}
+              className={`rounded-md px-2.5 py-1 font-medium transition ${
+                !isDemoMode
+                  ? "bg-white text-neutral-900 shadow-xs"
+                  : "text-neutral-500 hover:text-neutral-800"
+              }`}
+            >
+              实时数据
+            </button>
+            <button
+              type="button"
+              onClick={() => setModeOverride("demo")}
+              className={`rounded-md px-2.5 py-1 font-medium transition ${
+                isDemoMode
+                  ? "bg-white text-neutral-900 shadow-xs"
+                  : "text-neutral-500 hover:text-neutral-800"
+              }`}
+            >
+              示例数据
+            </button>
+          </div>
+
           <Link
             href="/copywriting"
-            className="inline-flex items-center gap-2 rounded-lg bg-neutral-900 px-4 py-2 text-xs font-medium text-white transition hover:bg-neutral-800"
+            className="inline-flex items-center gap-1.5 rounded-lg bg-neutral-900 px-3.5 py-2 text-xs font-medium text-white transition hover:bg-neutral-800"
           >
             <PenTool className="h-3.5 w-3.5" />
             <span>撰写推流文案</span>
           </Link>
-          <Link
-            href="/image-studio"
-            className="inline-flex items-center gap-2 rounded-lg border border-neutral-200 bg-white px-4 py-2 text-xs font-medium text-neutral-700 transition hover:bg-neutral-50"
-          >
-            <ImageIcon className="h-3.5 w-3.5" />
-            <span>进入图片工坊</span>
-          </Link>
         </div>
       </motion.section>
 
-      {/* Unified Two-Column Capability Panel (No card stacking) */}
+      {isDemoMode && (
+        <motion.div
+          variants={ITEM_VARIANTS}
+          className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-blue-200/70 bg-blue-50/60 px-4 py-2.5 text-xs text-blue-800"
+        >
+          <div className="flex items-center gap-2">
+            <Sparkles className="h-3.5 w-3.5 shrink-0 text-blue-600" />
+            <span>
+              {history.length === 0
+                ? "当前本地暂无创作记录，正在展示示例统计视图。生成文案并在「创作记录」中标记已发布或爆款后，将自动汇总真实数据。"
+                : "当前处于示例数据预览模式，可点击右上角「实时数据」切回你的真实统计。"}
+            </span>
+          </div>
+          <Link
+            href="/history"
+            className="font-medium text-blue-700 underline-offset-2 hover:underline"
+          >
+            前往创作记录 →
+          </Link>
+        </motion.div>
+      )}
+
+      {/* 4 Core KPI Cards */}
       <motion.section
         variants={ITEM_VARIANTS}
-        className="grid grid-cols-1 divide-y divide-neutral-200 rounded-xl border border-neutral-200 bg-white md:grid-cols-2 md:divide-x md:divide-y-0"
+        className="grid grid-cols-1 divide-y divide-neutral-200 overflow-hidden rounded-xl border border-neutral-200 bg-white sm:grid-cols-2 sm:divide-x sm:divide-y-0 lg:grid-cols-4"
       >
-        <Link
-          href="/copywriting"
-          className="group flex flex-col justify-between p-6 transition hover:bg-[#FAFAFA] sm:p-7"
-        >
-          <div>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2.5">
-                <PenTool className="h-4 w-4 text-blue-600" />
-                <span className="text-sm font-semibold text-neutral-900">
-                  多平台推流文案
-                </span>
-              </div>
-              <ArrowUpRight className="h-4 w-4 text-neutral-300 transition group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-neutral-700" />
-            </div>
-            <p className="mt-3 text-xs leading-relaxed text-neutral-500">
-              适配抖音、今日头条、快手与微信公众号的内容分发逻辑，输出备选标题、黄金开头、结构化正文与互动引导语。
-            </p>
+        <div className="p-5 sm:p-6">
+          <div className="flex items-center justify-between text-xs text-neutral-500">
+            <span>累计已发布</span>
+            <Send className="h-4 w-4 text-neutral-400" />
           </div>
+          <div className="mt-3 flex items-baseline gap-2">
+            <span className="font-mono text-3xl font-semibold tracking-tight text-neutral-900">
+              {stats.totalPublished}
+            </span>
+            <span className="text-xs text-neutral-400">条</span>
+          </div>
+          <p className="mt-2 text-[11px] text-neutral-500">
+            发布转化率 {stats.publishRate}%（占总创作）
+          </p>
+        </div>
 
-          <div className="mt-6 flex flex-wrap items-center gap-3 text-[11px] text-neutral-500">
-            <span className="inline-flex items-center gap-1">
-              <Clapperboard className="h-3 w-3 text-neutral-400" /> 抖音
-            </span>
-            <span className="text-neutral-300">/</span>
-            <span className="inline-flex items-center gap-1">
-              <Newspaper className="h-3 w-3 text-neutral-400" /> 今日头条
-            </span>
-            <span className="text-neutral-300">/</span>
-            <span className="inline-flex items-center gap-1">
-              <Video className="h-3 w-3 text-neutral-400" /> 快手
-            </span>
-            <span className="text-neutral-300">/</span>
-            <span className="inline-flex items-center gap-1">
-              <BookOpenText className="h-3 w-3 text-neutral-400" /> 微信公众号
-            </span>
+        <div className="p-5 sm:p-6">
+          <div className="flex items-center justify-between text-xs text-neutral-500">
+            <span>平台累计创作</span>
+            <Layers className="h-4 w-4 text-blue-600" />
           </div>
-        </Link>
+          <div className="mt-3 flex items-baseline gap-2">
+            <span className="font-mono text-3xl font-semibold tracking-tight text-neutral-900">
+              {stats.totalCreated}
+            </span>
+            <span className="text-xs text-neutral-400">篇</span>
+          </div>
+          <p className="mt-2 text-[11px] text-neutral-500">
+            持续沉淀于 Elonga 创作台
+          </p>
+        </div>
 
-        <Link
-          href="/image-studio"
-          className="group flex flex-col justify-between p-6 transition hover:bg-[#FAFAFA] sm:p-7"
-        >
-          <div>
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-2.5">
-                <ImageIcon className="h-4 w-4 text-blue-600" />
-                <span className="text-sm font-semibold text-neutral-900">
-                  图片工坊
-                </span>
-              </div>
-              <ArrowUpRight className="h-4 w-4 text-neutral-300 transition group-hover:translate-x-0.5 group-hover:-translate-y-0.5 group-hover:text-neutral-700" />
-            </div>
-            <p className="mt-3 text-xs leading-relaxed text-neutral-500">
-              内置 StackBlur 柔焦模糊与像素马赛克打码，同时支持调用大模型或本地算法将图片重绘为二维动漫插画风格。
-            </p>
+        <div className="p-5 sm:p-6">
+          <div className="flex items-center justify-between text-xs text-neutral-500">
+            <span>爆款文案产出</span>
+            <Flame className="h-4 w-4 text-amber-500" />
           </div>
+          <div className="mt-3 flex items-baseline gap-2">
+            <span className="font-mono text-3xl font-semibold tracking-tight text-neutral-900">
+              {stats.totalViral}
+            </span>
+            <span className="text-xs text-neutral-400">篇</span>
+          </div>
+          <p className="mt-2 text-[11px] text-neutral-500">
+            爆款率 {stats.viralRate}% · 高互动表现
+          </p>
+        </div>
 
-          <div className="mt-6 flex flex-wrap items-center gap-3 text-[11px] text-neutral-500">
-            <span className="inline-flex items-center gap-1">
-              <Eraser className="h-3 w-3 text-neutral-400" /> 隐私涂抹打码
-            </span>
-            <span className="text-neutral-300">/</span>
-            <span className="inline-flex items-center gap-1">
-              <Wand2 className="h-3 w-3 text-neutral-400" /> 二维风格重绘
-            </span>
+        <div className="p-5 sm:p-6">
+          <div className="flex items-center justify-between text-xs text-neutral-500">
+            <span>已覆盖分发平台</span>
+            <Globe2 className="h-4 w-4 text-emerald-600" />
           </div>
-        </Link>
+          <div className="mt-3 flex items-baseline gap-2">
+            <span className="font-mono text-3xl font-semibold tracking-tight text-neutral-900">
+              {stats.activePlatformsCount}
+            </span>
+            <span className="text-xs text-neutral-400">/ 4 个平台</span>
+          </div>
+          <p className="mt-2 text-[11px] text-neutral-500">
+            主力发布平台：{stats.topPlatformName}
+          </p>
+        </div>
       </motion.section>
 
-      {/* Minimalist Status & Recent Drafts List */}
-      <motion.section variants={ITEM_VARIANTS} className="space-y-3">
-        <div className="flex items-center justify-between text-xs">
-          <span className="font-medium text-neutral-500">工作台状态与最近草稿</span>
-          <div className="flex items-center gap-4 text-neutral-500">
-            <Link href="/settings" className="hover:text-neutral-900">
-              引擎：{hasApiKey ? "云端大模型" : "内置引擎"}
-            </Link>
-            <Link href="/history" className="hover:text-neutral-900">
-              全部记录 ({history.length})
-            </Link>
+      {/* ECharts Row: Platform Comparison + Platform Share */}
+      <motion.section
+        variants={ITEM_VARIANTS}
+        className="grid grid-cols-1 gap-6 lg:grid-cols-12"
+      >
+        <div className="rounded-xl border border-neutral-200 bg-white p-5 sm:p-6 lg:col-span-7">
+          <div className="mb-4 flex items-center justify-between">
+            <div>
+              <h2 className="text-sm font-semibold text-neutral-900">
+                各平台发布与爆款统计
+              </h2>
+              <p className="mt-0.5 text-xs text-neutral-500">
+                对比抖音、今日头条、快手与微信公众号的发布量、创作量及爆款数
+              </p>
+            </div>
+          </div>
+          <EChartBox option={platformBarOption} className="h-72 w-full" />
+        </div>
+
+        <div className="rounded-xl border border-neutral-200 bg-white p-5 sm:p-6 lg:col-span-5">
+          <div className="mb-4 flex items-center justify-between">
+            <div>
+              <h2 className="text-sm font-semibold text-neutral-900">
+                发布平台占比分布
+              </h2>
+              <p className="mt-0.5 text-xs text-neutral-500">
+                {stats.totalPublished > 0
+                  ? "按各平台已发布文案数量统计占比"
+                  : "按各平台累计创作文案统计占比"}
+              </p>
+            </div>
+          </div>
+          <EChartBox option={platformPieOption} className="h-72 w-full" />
+        </div>
+      </motion.section>
+
+      {/* ECharts Row: 7-Day Continuous Publishing Trend */}
+      <motion.section
+        variants={ITEM_VARIANTS}
+        className="rounded-xl border border-neutral-200 bg-white p-5 sm:p-6"
+      >
+        <div className="mb-4 flex flex-col justify-between gap-2 sm:flex-row sm:items-center">
+          <div>
+            <h2 className="text-sm font-semibold text-neutral-900">
+              近 7 日发布与爆款走势
+            </h2>
+            <p className="mt-0.5 text-xs text-neutral-500">
+              追踪持续发布节奏与爆款文案产出趋势
+            </p>
+          </div>
+          <Link
+            href="/history"
+            className="inline-flex items-center gap-1 text-xs font-medium text-neutral-600 transition hover:text-neutral-900"
+          >
+            <span>管理发布与爆款标记</span>
+            <ArrowUpRight className="h-3.5 w-3.5" />
+          </Link>
+        </div>
+        <EChartBox option={trendOption} className="h-64 w-full" />
+      </motion.section>
+
+      {/* Platform Breakdown Table & Recent Records */}
+      <motion.section
+        variants={ITEM_VARIANTS}
+        className="grid grid-cols-1 gap-6 lg:grid-cols-12"
+      >
+        {/* Platform Breakdown */}
+        <div className="overflow-hidden rounded-xl border border-neutral-200 bg-white lg:col-span-6">
+          <div className="border-b border-neutral-200/80 px-5 py-3.5">
+            <h2 className="text-sm font-semibold text-neutral-900">
+              平台明细统计
+            </h2>
+          </div>
+          <div className="divide-y divide-neutral-100">
+            {stats.platformStats.map((p) => (
+              <div
+                key={p.id}
+                className="flex items-center justify-between px-5 py-3.5 text-xs"
+              >
+                <div className="flex items-center gap-2.5">
+                  <span
+                    className="h-2.5 w-2.5 rounded-full"
+                    style={{ backgroundColor: p.accentColor }}
+                  />
+                  <span className="font-medium text-neutral-900">{p.name}</span>
+                  <span className="text-[11px] text-neutral-400">
+                    {PLATFORMS[p.id].tagline}
+                  </span>
+                </div>
+                <div className="flex items-center gap-4 font-mono text-[11px]">
+                  <span className="text-neutral-600">
+                    发布 <strong className="text-neutral-900">{p.publishedCount}</strong>
+                  </span>
+                  <span className="text-amber-600">
+                    爆款 <strong>{p.viralCount}</strong>
+                  </span>
+                  <span className="w-10 text-right text-neutral-400">
+                    {p.sharePercent}%
+                  </span>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
 
-        <div className="divide-y divide-neutral-100 rounded-xl border border-neutral-200 bg-white">
-          {history.length === 0 ? (
-            <div className="px-5 py-6 text-xs text-neutral-400">
-              暂无创作记录，前往「推流文案」生成第一篇内容后将显示于此。
-            </div>
-          ) : (
-            history.slice(0, 4).map((item) => (
-              <Link
-                key={item.id}
-                href="/history"
-                className="flex items-center justify-between px-5 py-3.5 text-xs transition hover:bg-[#FAFAFA]"
-              >
-                <div className="flex items-center gap-3 min-w-0">
-                  <span className="shrink-0 rounded border border-neutral-200 bg-neutral-50 px-2 py-0.5 text-[11px] font-medium text-neutral-700">
-                    {PLATFORMS[item.platform].name}
-                  </span>
-                  <span className="truncate font-medium text-neutral-900">
-                    {item.titles[0] || item.topic}
-                  </span>
-                </div>
-                <span className="ml-4 shrink-0 font-mono text-[11px] text-neutral-400">
-                  {new Date(item.createdAt).toLocaleDateString("zh-CN")}
-                </span>
-              </Link>
-            ))
-          )}
+        {/* Recent Records */}
+        <div className="overflow-hidden rounded-xl border border-neutral-200 bg-white lg:col-span-6">
+          <div className="flex items-center justify-between border-b border-neutral-200/80 px-5 py-3.5">
+            <h2 className="text-sm font-semibold text-neutral-900">
+              最近创作动态
+            </h2>
+            <Link
+              href="/history"
+              className="text-xs text-neutral-500 transition hover:text-neutral-900"
+            >
+              全部 ({history.length})
+            </Link>
+          </div>
+          <div className="divide-y divide-neutral-100">
+            {history.length === 0 ? (
+              <div className="px-5 py-8 text-center text-xs text-neutral-400">
+                暂无真实创作记录，前往「推流文案」生成第一篇内容吧。
+              </div>
+            ) : (
+              history.slice(0, 4).map((item) => (
+                <Link
+                  key={item.id}
+                  href="/history"
+                  className="flex items-center justify-between px-5 py-3.5 text-xs transition hover:bg-[#FAFAFA]"
+                >
+                  <div className="flex min-w-0 items-center gap-2.5">
+                    <span className="shrink-0 rounded border border-neutral-200 bg-neutral-50 px-2 py-0.5 text-[11px] font-medium text-neutral-700">
+                      {PLATFORMS[item.platform].name}
+                    </span>
+                    <span className="truncate font-medium text-neutral-900">
+                      {item.titles[0] || item.topic}
+                    </span>
+                  </div>
+                  <div className="ml-3 flex shrink-0 items-center gap-2">
+                    {item.isPublished && (
+                      <span className="inline-flex items-center gap-0.5 rounded bg-emerald-50 px-1.5 py-0.5 text-[10px] font-medium text-emerald-700">
+                        <CheckCircle2 className="h-3 w-3" />
+                        已发布
+                      </span>
+                    )}
+                    {item.isViral && (
+                      <span className="inline-flex items-center gap-0.5 rounded bg-amber-50 px-1.5 py-0.5 text-[10px] font-medium text-amber-700">
+                        <Flame className="h-3 w-3" />
+                        爆款
+                      </span>
+                    )}
+                    <span className="font-mono text-[11px] text-neutral-400">
+                      {new Date(item.createdAt).toLocaleDateString("zh-CN")}
+                    </span>
+                  </div>
+                </Link>
+              ))
+            )}
+          </div>
         </div>
       </motion.section>
     </motion.div>

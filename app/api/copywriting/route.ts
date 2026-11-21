@@ -48,7 +48,11 @@ export async function POST(req: Request) {
     }
 
     const apiKey =
-      modelConfig?.apiKey?.trim() || process.env.OPENAI_API_KEY || "";
+      modelConfig?.apiKey?.trim() ||
+      process.env.DEEPSEEK_API_KEY ||
+      process.env.TEXT_API_KEY ||
+      process.env.OPENAI_API_KEY ||
+      "";
 
     if (!apiKey) {
       const localResult = generateLocalCopywriting({
@@ -65,10 +69,14 @@ export async function POST(req: Request) {
 
     const baseUrl = (
       modelConfig?.baseUrl?.trim() ||
-      process.env.OPENAI_BASE_URL ||
-      "https://api.openai.com/v1"
+      process.env.DEEPSEEK_BASE_URL ||
+      process.env.TEXT_BASE_URL ||
+      "https://api.deepseek.com/v1"
     ).replace(/\/+$/, "");
-    const model = modelConfig?.textModel?.trim() || "gpt-4o-mini";
+    const model =
+      modelConfig?.textModel?.trim() ||
+      process.env.DEEPSEEK_MODEL ||
+      "deepseek-chat";
 
     const platformMeta = PLATFORMS[platform];
     const typeMeta = CONTENT_TYPES.find((c) => c.id === contentType);

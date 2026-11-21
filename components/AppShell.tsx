@@ -29,9 +29,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
-  const hasApiKey = useWorkbenchStore((s) =>
-    Boolean(s.modelConfig.apiKey.trim())
-  );
   const historyCount = useWorkbenchStore((s) => s.history.length);
 
   const isActive = (href: string) => {
@@ -57,7 +54,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src="/elonga-logo.png"
+                src="/elonga-logo.svg"
                 alt="Elonga Logo"
                 className="h-7 w-7 shrink-0 object-contain"
               />
@@ -122,7 +119,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                   )}
                   <Icon
                     className={`relative z-10 h-4 w-4 shrink-0 ${
-                      active ? "text-blue-600" : "text-neutral-400"
+                      active ? "text-neutral-900" : "text-neutral-400"
                     }`}
                   />
                   <AnimatePresence initial={false}>
@@ -147,25 +144,6 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               );
             })}
           </nav>
-
-          {/* Bottom Status */}
-          <div className="border-t border-neutral-200/60 p-3">
-            <Link
-              href="/settings"
-              className="flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-xs text-neutral-500 transition hover:bg-neutral-200/40 hover:text-neutral-900"
-            >
-              <span
-                className={`h-1.5 w-1.5 shrink-0 rounded-full ${
-                  hasApiKey ? "bg-emerald-500" : "bg-neutral-300"
-                }`}
-              />
-              {!collapsed && (
-                <span className="truncate font-medium">
-                  {hasApiKey ? "云端模型已连接" : "内置引擎模式"}
-                </span>
-              )}
-            </Link>
-          </div>
         </motion.aside>
 
         {/* Mobile Header & Drawer */}
@@ -174,7 +152,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <Link href="/" className="flex items-center gap-2">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src="/elonga-logo.png"
+                src="/elonga-logo.svg"
                 alt="Elonga Logo"
                 className="h-6 w-6 object-contain"
               />
@@ -213,7 +191,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                     <div className="flex items-center gap-2">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
-                        src="/elonga-logo.png"
+                        src="/elonga-logo.svg"
                         alt="Elonga Logo"
                         className="h-6 w-6 object-contain"
                       />
@@ -247,7 +225,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                         >
                           <Icon
                             className={`h-4 w-4 ${
-                              active ? "text-blue-600" : "text-neutral-400"
+                              active ? "text-neutral-900" : "text-neutral-400"
                             }`}
                           />
                           <span>{item.label}</span>
