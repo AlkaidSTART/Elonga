@@ -2,23 +2,7 @@
 
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import {
-  ArrowRight,
-  BookOpenText,
-  Check,
-  Copy,
-  FileText,
-  Film,
-  Hash,
-  History,
-  Info,
-  Loader2,
-  MessageSquare,
-  Newspaper,
-  RefreshCw,
-  Trash2,
-  Video,
-} from "lucide-react";
+import { Check, Copy, Loader2, Trash2 } from "lucide-react";
 import {
   CONTENT_TYPES,
   PLATFORMS,
@@ -27,13 +11,6 @@ import {
 } from "@/lib/platforms";
 import type { DouyinTrendInsights } from "@/lib/skills/types";
 import { useWorkbenchStore } from "@/store/useWorkbenchStore";
-
-const PLATFORM_ICONS: Record<PlatformId, typeof Film> = {
-  douyin: Film,
-  toutiao: Newspaper,
-  kuaishou: Video,
-  wechat: BookOpenText,
-};
 
 const QUICK_TOPICS = [
   "社区流浪猫绝育与领养倡议，呼吁邻里科学关爱",
@@ -193,7 +170,6 @@ export function CopywritingWorkspace() {
           <div className="grid grid-cols-2 gap-2">
             {(Object.keys(PLATFORMS) as PlatformId[]).map((pid) => {
               const meta = PLATFORMS[pid];
-              const Icon = PLATFORM_ICONS[pid];
               const isSelected = platform === pid;
               return (
                 <button
@@ -206,18 +182,11 @@ export function CopywritingWorkspace() {
                       : "border-neutral-200/80 bg-white/60 hover:border-neutral-300 hover:bg-white"
                   }`}
                 >
-                  <div className="flex w-full items-center justify-between">
-                    <Icon
-                      className={`h-4 w-4 ${
-                        isSelected ? "text-neutral-900" : "text-neutral-500"
-                      }`}
-                    />
-                    <span className="text-[10px] font-medium text-neutral-400">
-                      {meta.tagline}
-                    </span>
-                  </div>
-                  <span className="mt-2 text-xs font-semibold text-neutral-900">
+                  <span className="text-xs font-semibold text-neutral-900">
                     {meta.name}
+                  </span>
+                  <span className="mt-1 text-[10px] font-medium text-neutral-400">
+                    {meta.tagline}
                   </span>
                 </button>
               );
@@ -368,10 +337,7 @@ export function CopywritingWorkspace() {
                 </span>
               </>
             ) : (
-              <>
-                <ArrowRight className="h-3.5 w-3.5" />
-                <span>先调研抖音爆款 · 再生成{activePlatformMeta.name}文案</span>
-              </>
+              <span>先调研抖音爆款 · 再生成{activePlatformMeta.name}文案</span>
             )}
           </button>
         </div>
@@ -396,14 +362,13 @@ export function CopywritingWorkspace() {
             <button
               type="button"
               onClick={() => setShowHistory((v) => !v)}
-              className={`flex items-center gap-1.5 rounded-md border px-2.5 py-1 text-xs font-medium transition ${
+              className={`rounded-md border px-2.5 py-1 text-xs font-medium transition ${
                 showHistory
                   ? "border-neutral-900 bg-neutral-900 text-white"
                   : "border-neutral-200 bg-white text-neutral-600 hover:bg-neutral-50"
               }`}
             >
-              <History className="h-3.5 w-3.5" />
-              <span>历史 ({history.length})</span>
+              历史 ({history.length})
             </button>
 
             {currentResult && (
@@ -412,27 +377,16 @@ export function CopywritingWorkspace() {
                   type="button"
                   onClick={handleGenerate}
                   disabled={isGenerating}
-                  className="flex items-center gap-1.5 rounded-md border border-neutral-200 bg-white px-2.5 py-1 text-xs font-medium text-neutral-700 transition hover:bg-neutral-50 disabled:opacity-50"
+                  className="rounded-md border border-neutral-200 bg-white px-2.5 py-1 text-xs font-medium text-neutral-700 transition hover:bg-neutral-50 disabled:opacity-50"
                 >
-                  <RefreshCw className="h-3.5 w-3.5" />
-                  <span>重写</span>
+                  重写
                 </button>
                 <button
                   type="button"
                   onClick={handleCopyAll}
-                  className="flex items-center gap-1.5 rounded-md bg-neutral-900 px-3 py-1 text-xs font-medium text-white transition hover:bg-neutral-800"
+                  className="rounded-md bg-neutral-900 px-3 py-1 text-xs font-medium text-white transition hover:bg-neutral-800"
                 >
-                  {copiedKey === "all" ? (
-                    <>
-                      <Check className="h-3.5 w-3.5" />
-                      <span>已复制</span>
-                    </>
-                  ) : (
-                    <>
-                      <Copy className="h-3.5 w-3.5" />
-                      <span>复制全文</span>
-                    </>
-                  )}
+                  {copiedKey === "all" ? "已复制" : "复制全文"}
                 </button>
               </>
             )}
@@ -505,8 +459,7 @@ export function CopywritingWorkspace() {
                 transition={{ duration: 0.2 }}
                 className="flex min-h-[460px] flex-col items-center justify-center text-center"
               >
-                <FileText className="h-6 w-6 text-neutral-300" />
-                <p className="mt-3 text-sm font-medium text-neutral-700">
+                <p className="text-sm font-medium text-neutral-700">
                   等待生成文稿
                 </p>
                 <p className="mt-1 max-w-xs text-xs leading-relaxed text-neutral-400">
@@ -671,9 +624,8 @@ export function CopywritingWorkspace() {
                 <div className="space-y-4 border-t border-neutral-100 pt-5">
                   <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                     <div>
-                      <div className="mb-1.5 flex items-center gap-1.5 text-xs font-semibold text-neutral-700">
-                        <MessageSquare className="h-3.5 w-3.5 text-neutral-400" />
-                        <span>互动引导语</span>
+                      <div className="mb-1.5 text-xs font-semibold text-neutral-700">
+                        互动引导语
                       </div>
                       <p className="text-xs leading-relaxed text-neutral-600">
                         {currentResult.cta}
@@ -681,9 +633,8 @@ export function CopywritingWorkspace() {
                     </div>
 
                     <div>
-                      <div className="mb-1.5 flex items-center gap-1.5 text-xs font-semibold text-neutral-700">
-                        <Hash className="h-3.5 w-3.5 text-neutral-400" />
-                        <span>推流标签</span>
+                      <div className="mb-1.5 text-xs font-semibold text-neutral-700">
+                        推流标签
                       </div>
                       <div className="flex flex-wrap gap-1.5">
                         {currentResult.tags.map((tag) => (
@@ -699,11 +650,8 @@ export function CopywritingWorkspace() {
                   </div>
 
                   <div className="rounded-lg bg-[#FAFAFA] p-3.5">
-                    <div className="mb-2 flex items-center gap-1.5 text-xs font-semibold text-neutral-800">
-                      <Info className="h-3.5 w-3.5 text-neutral-500" />
-                      <span>
-                        {PLATFORMS[currentResult.platform].name}推流优化建议
-                      </span>
+                    <div className="mb-2 text-xs font-semibold text-neutral-800">
+                      {PLATFORMS[currentResult.platform].name}推流优化建议
                     </div>
                     <ul className="space-y-1">
                       {currentResult.tips.map((tip, i) => (

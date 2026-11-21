@@ -3,16 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
-import {
-  ArrowUpRight,
-  Check,
-  CheckCircle2,
-  Copy,
-  History as HistoryIcon,
-  Search,
-  Trash2,
-  TrendingUp,
-} from "lucide-react";
+import { Check, Copy, Search, Trash2 } from "lucide-react";
 import { PLATFORMS } from "@/lib/platforms";
 import { useWorkbenchStore } from "@/store/useWorkbenchStore";
 
@@ -79,8 +70,7 @@ export default function HistoryPage() {
 
       {filtered.length === 0 ? (
         <div className="flex min-h-[340px] flex-col items-center justify-center rounded-xl border border-dashed border-neutral-200 bg-[#FAFAFA] p-8 text-center">
-          <HistoryIcon className="h-6 w-6 text-neutral-300" />
-          <h2 className="mt-3 text-sm font-medium text-neutral-800">
+          <h2 className="text-sm font-medium text-neutral-800">
             {history.length === 0 ? "还没有创作记录" : "没有匹配的记录"}
           </h2>
           <p className="mt-1 text-xs text-neutral-400">
@@ -135,36 +125,43 @@ export default function HistoryPage() {
                     <button
                       type="button"
                       onClick={() => togglePublished(item.id)}
-                      className={`inline-flex items-center gap-1 rounded-lg border px-2.5 py-1.5 text-xs font-medium transition ${
+                      className={`inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs font-medium transition ${
                         item.isPublished
                           ? "border-emerald-200 bg-emerald-50 text-emerald-700"
                           : "border-neutral-200 bg-white text-neutral-500 hover:bg-neutral-50 hover:text-neutral-800"
                       }`}
                       title={item.isPublished ? "取消已发布标记" : "标记为已发布"}
                     >
-                      <CheckCircle2 className="h-3.5 w-3.5" />
+                      <span
+                        className={`h-1.5 w-1.5 rounded-full ${
+                          item.isPublished ? "bg-emerald-500" : "bg-neutral-300"
+                        }`}
+                      />
                       <span>{item.isPublished ? "已发布" : "标为发布"}</span>
                     </button>
                     <button
                       type="button"
                       onClick={() => toggleViral(item.id)}
-                      className={`inline-flex items-center gap-1 rounded-lg border px-2.5 py-1.5 text-xs font-medium transition ${
+                      className={`inline-flex items-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs font-medium transition ${
                         item.isViral
                           ? "border-amber-200 bg-amber-50 text-amber-700"
                           : "border-neutral-200 bg-white text-neutral-500 hover:bg-neutral-50 hover:text-neutral-800"
                       }`}
                       title={item.isViral ? "取消爆款标记" : "标记为爆款文案"}
                     >
-                      <TrendingUp className="h-3.5 w-3.5" />
+                      <span
+                        className={`h-1.5 w-1.5 rounded-full ${
+                          item.isViral ? "bg-amber-500" : "bg-neutral-300"
+                        }`}
+                      />
                       <span>爆款</span>
                     </button>
                     <button
                       type="button"
                       onClick={() => handleOpenInEditor(item.id)}
-                      className="inline-flex items-center gap-1 rounded-lg border border-neutral-200 bg-white px-3 py-1.5 text-xs font-medium text-neutral-700 transition hover:bg-neutral-50 hover:text-neutral-900"
+                      className="rounded-lg border border-neutral-200 bg-white px-3 py-1.5 text-xs font-medium text-neutral-700 transition hover:bg-neutral-50 hover:text-neutral-900"
                     >
-                      <span>打开编辑</span>
-                      <ArrowUpRight className="h-3.5 w-3.5" />
+                      打开编辑
                     </button>
                     <button
                       type="button"

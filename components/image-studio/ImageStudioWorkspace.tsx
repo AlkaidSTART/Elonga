@@ -2,13 +2,6 @@
 
 import { useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import {
-  Contrast,
-  Eraser,
-  ImagePlus,
-  RefreshCw,
-  Upload,
-} from "lucide-react";
 import { useImageStudioStore } from "@/store/useImageStudioStore";
 import { MosaicEditor } from "./MosaicEditor";
 import { Stylize2DPanel } from "./Stylize2DPanel";
@@ -127,10 +120,7 @@ export function ImageStudioWorkspace() {
             : "border-neutral-300 bg-[#FAFAFA] hover:border-neutral-400"
         }`}
       >
-        <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-neutral-200 bg-white text-neutral-700">
-          <ImagePlus className="h-5 w-5" />
-        </div>
-        <h2 className="mt-4 text-base font-semibold text-neutral-900">
+        <h2 className="text-base font-semibold text-neutral-900">
           上传图片开始处理
         </h2>
         <p className="mt-1.5 max-w-md text-xs leading-relaxed text-neutral-500">
@@ -152,10 +142,9 @@ export function ImageStudioWorkspace() {
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            className="flex items-center gap-2 rounded-lg bg-neutral-900 px-4 py-2 text-xs font-medium text-white transition hover:bg-neutral-800"
+            className="rounded-lg bg-neutral-900 px-4 py-2 text-xs font-medium text-white transition hover:bg-neutral-800"
           >
-            <Upload className="h-3.5 w-3.5" />
-            <span>选择本地图片</span>
+            选择本地图片
           </button>
           <button
             type="button"
@@ -177,7 +166,7 @@ export function ImageStudioWorkspace() {
           <button
             type="button"
             onClick={() => setActiveMode("mosaic")}
-            className={`relative flex items-center gap-1.5 rounded-md px-3.5 py-1.5 text-xs font-medium transition-colors ${
+            className={`relative rounded-md px-3.5 py-1.5 text-xs font-medium transition-colors ${
               activeMode === "mosaic"
                 ? "text-neutral-900"
                 : "text-neutral-500 hover:text-neutral-900"
@@ -190,13 +179,12 @@ export function ImageStudioWorkspace() {
                 className="absolute inset-0 rounded-md bg-white shadow-2xs"
               />
             )}
-            <Eraser className="relative z-10 h-3.5 w-3.5" />
             <span className="relative z-10">智能打码</span>
           </button>
           <button
             type="button"
             onClick={() => setActiveMode("stylize")}
-            className={`relative flex items-center gap-1.5 rounded-md px-3.5 py-1.5 text-xs font-medium transition-colors ${
+            className={`relative rounded-md px-3.5 py-1.5 text-xs font-medium transition-colors ${
               activeMode === "stylize"
                 ? "text-neutral-900"
                 : "text-neutral-500 hover:text-neutral-900"
@@ -209,7 +197,6 @@ export function ImageStudioWorkspace() {
                 className="absolute inset-0 rounded-md bg-white shadow-2xs"
               />
             )}
-            <Contrast className="relative z-10 h-3.5 w-3.5" />
             <span className="relative z-10">二维风格化</span>
           </button>
         </div>
@@ -223,10 +210,9 @@ export function ImageStudioWorkspace() {
           <button
             type="button"
             onClick={clearImage}
-            className="flex items-center gap-1.5 rounded-md border border-neutral-200 bg-white px-2.5 py-1 text-xs font-medium text-neutral-600 transition hover:bg-neutral-50 hover:text-neutral-900"
+            className="rounded-md border border-neutral-200 bg-white px-2.5 py-1 text-xs font-medium text-neutral-600 transition hover:bg-neutral-50 hover:text-neutral-900"
           >
-            <RefreshCw className="h-3 w-3" />
-            <span>更换图片</span>
+            更换图片
           </button>
         </div>
       </div>

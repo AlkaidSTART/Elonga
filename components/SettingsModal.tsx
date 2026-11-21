@@ -1,6 +1,6 @@
 "use client";
 
-import { KeyRound, ShieldCheck, X } from "lucide-react";
+import { X } from "lucide-react";
 import { useWorkbenchStore } from "@/store/useWorkbenchStore";
 
 export function SettingsModal() {
@@ -24,21 +24,16 @@ export function SettingsModal() {
         className="max-h-[90vh] w-full max-w-lg overflow-y-auto rounded-2xl border border-neutral-200 bg-white p-6 shadow-xl"
       >
         <div className="flex items-center justify-between border-b border-neutral-100 pb-4">
-          <div className="flex items-center gap-2.5">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-neutral-100 text-neutral-900">
-              <KeyRound className="h-4 w-4" />
-            </div>
-            <div>
-              <h2
-                id="settings-modal-title"
-                className="text-base font-semibold text-neutral-900"
-              >
-                大模型接口配置
-              </h2>
-              <p className="text-xs text-neutral-500">
-                分别配置文本模型（DeepSeek）与生图模型（Seedream 等）端点
-              </p>
-            </div>
+          <div>
+            <h2
+              id="settings-modal-title"
+              className="text-base font-semibold text-neutral-900"
+            >
+              大模型接口配置
+            </h2>
+            <p className="mt-0.5 text-xs text-neutral-500">
+              分别配置文本模型（DeepSeek）与生图模型（Seedream 等）端点
+            </p>
           </div>
           <button
             type="button"

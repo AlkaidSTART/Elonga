@@ -1,11 +1,5 @@
 "use client";
 
-import {
-  Image as ImageIcon,
-  Layers,
-  PenTool,
-  SlidersHorizontal,
-} from "lucide-react";
 import { useWorkbenchStore } from "@/store/useWorkbenchStore";
 
 export function Header() {
@@ -20,18 +14,13 @@ export function Header() {
     <header className="sticky top-0 z-30 border-b border-neutral-200/80 bg-white/90 backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Brand */}
-        <div className="flex items-center gap-3">
-          <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-neutral-900 text-white">
-            <Layers className="h-4.5 w-4.5" strokeWidth={2} />
-          </div>
-          <div className="leading-tight">
-            <h1 className="text-[15px] font-semibold tracking-tight text-neutral-900">
-              简悦创作台
-            </h1>
-            <p className="hidden text-xs text-neutral-500 sm:block">
-              多平台推流文案与视觉工坊
-            </p>
-          </div>
+        <div className="leading-tight">
+          <h1 className="text-[15px] font-semibold tracking-tight text-neutral-900">
+            简悦创作台
+          </h1>
+          <p className="hidden text-xs text-neutral-500 sm:block">
+            多平台推流文案与视觉工坊
+          </p>
         </div>
 
         {/* Center Segmented Navigation */}
@@ -42,26 +31,24 @@ export function Header() {
           <button
             type="button"
             onClick={() => setActiveTab("copywriting")}
-            className={`flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-medium transition-all ${
+            className={`rounded-full px-4 py-1.5 text-sm font-medium transition-all ${
               activeTab === "copywriting"
                 ? "bg-white text-neutral-900 shadow-sm"
                 : "text-neutral-600 hover:text-neutral-900"
             }`}
           >
-            <PenTool className="h-4 w-4" />
-            <span>推流文案</span>
+            推流文案
           </button>
           <button
             type="button"
             onClick={() => setActiveTab("image-studio")}
-            className={`flex items-center gap-2 rounded-full px-4 py-1.5 text-sm font-medium transition-all ${
+            className={`rounded-full px-4 py-1.5 text-sm font-medium transition-all ${
               activeTab === "image-studio"
                 ? "bg-white text-neutral-900 shadow-sm"
                 : "text-neutral-600 hover:text-neutral-900"
             }`}
           >
-            <ImageIcon className="h-4 w-4" />
-            <span>图片工坊</span>
+            图片工坊
           </button>
         </nav>
 
@@ -76,10 +63,7 @@ export function Header() {
               hasApiKey ? "bg-emerald-500" : "bg-neutral-300"
             }`}
           />
-          <SlidersHorizontal className="h-3.5 w-3.5 text-neutral-500" />
-          <span className="hidden sm:inline">
-            {hasApiKey ? "大模型已连接" : "模型配置"}
-          </span>
+          <span>{hasApiKey ? "大模型已连接" : "模型配置"}</span>
         </button>
       </div>
     </header>

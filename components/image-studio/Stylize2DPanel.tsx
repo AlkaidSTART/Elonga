@@ -1,13 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import {
-  Contrast,
-  Download,
-  Image as ImageIcon,
-  Layers,
-  Loader2,
-} from "lucide-react";
+import { Loader2 } from "lucide-react";
 import { stylizeImage2DLocal } from "@/lib/stylize-2d-canvas";
 import {
   useImageStudioStore,
@@ -106,12 +100,9 @@ export function Stylize2DPanel() {
       {/* Left Inspector Rail */}
       <aside className="divide-y divide-neutral-200/70 border-b border-neutral-200 bg-[#FAFAFA] lg:col-span-4 lg:border-b-0 lg:border-r">
         <div className="p-5">
-          <div className="mb-3 flex items-center gap-2">
-            <Layers className="h-4 w-4 text-neutral-700" />
-            <h3 className="text-xs font-semibold text-neutral-900">
-              选择二维画风
-            </h3>
-          </div>
+          <h3 className="mb-3 text-xs font-semibold text-neutral-900">
+            选择二维画风
+          </h3>
           <div className="grid grid-cols-2 gap-2">
             {PRESETS.map((preset) => {
               const active = stylePreset === preset.id;
@@ -200,10 +191,7 @@ export function Stylize2DPanel() {
                 <span>正在绘制二维风格...</span>
               </>
             ) : (
-              <>
-                <Contrast className="h-3.5 w-3.5" />
-                <span>生成二维风格图片</span>
-              </>
+              <span>生成二维风格图片</span>
             )}
           </button>
         </div>
@@ -227,10 +215,9 @@ export function Stylize2DPanel() {
             <button
               type="button"
               onClick={handleDownload}
-              className="flex items-center gap-1.5 rounded-md bg-neutral-900 px-3 py-1 text-xs font-medium text-white transition hover:bg-neutral-800"
+              className="rounded-md bg-neutral-900 px-3 py-1 text-xs font-medium text-white transition hover:bg-neutral-800"
             >
-              <Download className="h-3.5 w-3.5" />
-              <span>下载二维成品图</span>
+              下载二维成品图
             </button>
           )}
         </div>

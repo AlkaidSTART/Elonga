@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import { Check, ShieldCheck } from "lucide-react";
 import { useWorkbenchStore } from "@/store/useWorkbenchStore";
 
 export default function SettingsPage() {
@@ -153,7 +152,7 @@ export default function SettingsPage() {
 
         <div className="flex flex-col gap-4 bg-[#FAFAFA] px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex items-center gap-2 text-xs text-neutral-500">
-            <ShieldCheck className="h-4 w-4 shrink-0 text-emerald-600" />
+            <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-500" />
             <span>密钥仅保存在本地浏览器，未填写时自动使用内置引擎</span>
           </div>
 
@@ -171,16 +170,9 @@ export default function SettingsPage() {
             )}
             <button
               type="submit"
-              className="inline-flex items-center gap-1.5 rounded-lg bg-neutral-900 px-4 py-2 text-xs font-medium text-white transition hover:bg-neutral-800"
+              className="rounded-lg bg-neutral-900 px-4 py-2 text-xs font-medium text-white transition hover:bg-neutral-800"
             >
-              {savedToast ? (
-                <>
-                  <Check className="h-3.5 w-3.5" />
-                  <span>已保存</span>
-                </>
-              ) : (
-                <span>保存配置</span>
-              )}
+              {savedToast ? "已保存" : "保存配置"}
             </button>
           </div>
         </div>

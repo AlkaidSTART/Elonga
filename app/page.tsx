@@ -4,16 +4,6 @@ import { useMemo, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import type { EChartsOption } from "echarts";
-import {
-  ArrowUpRight,
-  CheckCircle2,
-  Globe2,
-  Info,
-  Layers,
-  PenTool,
-  Send,
-  TrendingUp,
-} from "lucide-react";
 import { EChartBox } from "@/components/charts/EChartBox";
 import {
   buildDemoOverviewStats,
@@ -342,10 +332,9 @@ export default function OverviewPage() {
 
           <Link
             href="/copywriting"
-            className="inline-flex items-center gap-1.5 rounded-lg bg-neutral-900 px-3.5 py-2 text-xs font-medium text-white transition hover:bg-neutral-800"
+            className="inline-flex items-center rounded-lg bg-neutral-900 px-3.5 py-2 text-xs font-medium text-white transition hover:bg-neutral-800"
           >
-            <PenTool className="h-3.5 w-3.5" />
-            <span>撰写推流文案</span>
+            撰写推流文案
           </Link>
         </div>
       </motion.section>
@@ -356,7 +345,9 @@ export default function OverviewPage() {
           className="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-neutral-200 bg-[#FAFAFA] px-4 py-2.5 text-xs text-neutral-600"
         >
           <div className="flex items-center gap-2">
-            <Info className="h-3.5 w-3.5 shrink-0 text-neutral-500" />
+            <span className="shrink-0 rounded border border-neutral-200 bg-white px-1.5 py-0.5 text-[10px] font-medium text-neutral-600">
+              示例模式
+            </span>
             <span>
               {history.length === 0
                 ? "当前本地暂无创作记录，正在展示示例统计视图。生成文案并在「创作记录」中标记已发布或爆款后，将自动汇总真实数据。"
@@ -378,10 +369,7 @@ export default function OverviewPage() {
         className="grid grid-cols-1 divide-y divide-neutral-200 overflow-hidden rounded-xl border border-neutral-200 bg-white sm:grid-cols-2 sm:divide-x sm:divide-y-0 lg:grid-cols-4"
       >
         <div className="p-5 sm:p-6">
-          <div className="flex items-center justify-between text-xs text-neutral-500">
-            <span>累计已发布</span>
-            <Send className="h-4 w-4 text-neutral-400" />
-          </div>
+          <div className="text-xs text-neutral-500">累计已发布</div>
           <div className="mt-3 flex items-baseline gap-2">
             <span className="font-mono text-3xl font-semibold tracking-tight text-neutral-900">
               {stats.totalPublished}
@@ -394,10 +382,7 @@ export default function OverviewPage() {
         </div>
 
         <div className="p-5 sm:p-6">
-          <div className="flex items-center justify-between text-xs text-neutral-500">
-            <span>平台累计创作</span>
-            <Layers className="h-4 w-4 text-neutral-700" />
-          </div>
+          <div className="text-xs text-neutral-500">平台累计创作</div>
           <div className="mt-3 flex items-baseline gap-2">
             <span className="font-mono text-3xl font-semibold tracking-tight text-neutral-900">
               {stats.totalCreated}
@@ -410,10 +395,7 @@ export default function OverviewPage() {
         </div>
 
         <div className="p-5 sm:p-6">
-          <div className="flex items-center justify-between text-xs text-neutral-500">
-            <span>爆款文案产出</span>
-            <TrendingUp className="h-4 w-4 text-amber-600" />
-          </div>
+          <div className="text-xs text-neutral-500">爆款文案产出</div>
           <div className="mt-3 flex items-baseline gap-2">
             <span className="font-mono text-3xl font-semibold tracking-tight text-neutral-900">
               {stats.totalViral}
@@ -426,10 +408,7 @@ export default function OverviewPage() {
         </div>
 
         <div className="p-5 sm:p-6">
-          <div className="flex items-center justify-between text-xs text-neutral-500">
-            <span>已覆盖分发平台</span>
-            <Globe2 className="h-4 w-4 text-emerald-600" />
-          </div>
+          <div className="text-xs text-neutral-500">已覆盖分发平台</div>
           <div className="mt-3 flex items-baseline gap-2">
             <span className="font-mono text-3xl font-semibold tracking-tight text-neutral-900">
               {stats.activePlatformsCount}
@@ -494,10 +473,9 @@ export default function OverviewPage() {
           </div>
           <Link
             href="/history"
-            className="inline-flex items-center gap-1 text-xs font-medium text-neutral-600 transition hover:text-neutral-900"
+            className="text-xs font-medium text-neutral-600 transition hover:text-neutral-900"
           >
-            <span>管理发布与爆款标记</span>
-            <ArrowUpRight className="h-3.5 w-3.5" />
+            管理发布与爆款标记 →
           </Link>
         </div>
         <EChartBox option={trendOption} className="h-64 w-full" />
@@ -582,14 +560,12 @@ export default function OverviewPage() {
                   </div>
                   <div className="ml-3 flex shrink-0 items-center gap-2">
                     {item.isPublished && (
-                      <span className="inline-flex items-center gap-0.5 rounded bg-emerald-50 px-1.5 py-0.5 text-[10px] font-medium text-emerald-700">
-                        <CheckCircle2 className="h-3 w-3" />
+                      <span className="rounded bg-emerald-50 px-1.5 py-0.5 text-[10px] font-medium text-emerald-700">
                         已发布
                       </span>
                     )}
                     {item.isViral && (
-                      <span className="inline-flex items-center gap-0.5 rounded bg-amber-50 px-1.5 py-0.5 text-[10px] font-medium text-amber-700">
-                        <TrendingUp className="h-3 w-3" />
+                      <span className="rounded bg-amber-50 px-1.5 py-0.5 text-[10px] font-medium text-amber-700">
                         爆款
                       </span>
                     )}
