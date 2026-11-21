@@ -162,12 +162,12 @@ export default function SettingsPage() {
               清空密钥
             </button>
           )}
-          <button
-            type="submit"
-            className="rounded-lg bg-neutral-900 px-4 py-2 text-xs font-medium text-white transition hover:bg-neutral-800"
-          >
-            {savedToast ? "已保存" : "保存配置"}
-          </button>
+            <button
+              type="submit"
+              className="rounded-xl bg-[#0F6E5D] px-4 py-2 text-xs font-medium text-white shadow-xs transition hover:bg-[#0B5649] active:scale-[0.98]"
+            >
+              {savedToast ? "已保存" : "保存配置"}
+            </button>
         </div>
       </form>
     </div>

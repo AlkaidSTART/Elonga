@@ -40,17 +40,17 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <MotionConfig reducedMotion="user">
-      <div className="flex min-h-screen bg-white text-neutral-900">
+      <div className="flex min-h-screen bg-[#F7F7F5] text-zinc-900">
         {/* Desktop Sidebar */}
         <motion.aside
           initial={false}
           animate={{ width: collapsed ? 72 : 232 }}
           transition={{ type: "spring", stiffness: 340, damping: 34 }}
-          className="sticky top-0 hidden h-screen shrink-0 flex-col overflow-hidden border-r border-neutral-200/80 bg-[#FAFAFA] lg:flex"
+          className="sticky top-0 hidden h-screen shrink-0 flex-col overflow-hidden border-r border-[#E7E5DF] bg-[#F3F2EE] lg:flex"
         >
           {/* Brand Header */}
           <div
-            className={`flex h-14 items-center border-b border-neutral-200/60 ${
+            className={`flex h-14 items-center border-b border-[#E7E5DF]/80 ${
               collapsed ? "justify-center px-2" : "justify-between px-4"
             }`}
           >
@@ -108,10 +108,10 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                   key={item.href}
                   href={item.href}
                   title={collapsed ? item.label : undefined}
-                  className={`relative flex items-center gap-2.5 rounded-lg px-3 py-2 text-[13px] font-medium transition-colors ${
+                  className={`relative flex items-center gap-2.5 rounded-xl px-3 py-2 text-[13px] font-medium transition-colors ${
                     active
-                      ? "text-neutral-950"
-                      : "text-neutral-500 hover:bg-neutral-200/40 hover:text-neutral-900"
+                      ? "text-zinc-950"
+                      : "text-zinc-500 hover:bg-black/[0.035] hover:text-zinc-900"
                   }`}
                 >
                   {active && (
@@ -122,12 +122,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                         stiffness: 420,
                         damping: 34,
                       }}
-                      className="absolute inset-0 rounded-lg bg-white shadow-[0_1px_2px_rgba(0,0,0,0.05)] ring-1 ring-neutral-200/80"
+                      className="absolute inset-0 rounded-xl bg-white shadow-[0_1px_3px_rgba(24,24,27,0.06)] ring-1 ring-[#E8E6E1]"
                     />
                   )}
                   <Icon
-                    className={`relative z-10 h-4 w-4 shrink-0 ${
-                      active ? "text-neutral-900" : "text-neutral-400"
+                    className={`relative z-10 h-4 w-4 shrink-0 transition-colors ${
+                      active ? "text-[#0F6E5D]" : "text-zinc-400"
                     }`}
                   />
                   <AnimatePresence initial={false}>
@@ -155,8 +155,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </motion.aside>
 
         {/* Mobile Header & Drawer */}
-        <div className="flex flex-1 flex-col min-w-0 bg-white">
-          <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-neutral-200/80 bg-white/90 px-4 backdrop-blur-md lg:hidden">
+        <div className="flex flex-1 flex-col min-w-0 bg-[#F7F7F5]">
+          <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-[#E7E5DF] bg-[#F7F7F5]/90 px-4 backdrop-blur-md lg:hidden">
             <Link href="/" className="flex items-center gap-2">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img

@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Check, Copy, Loader2, Trash2 } from "lucide-react";
+import { Check, ChevronDown, Copy, Loader2, Trash2 } from "lucide-react";
 import {
   CONTENT_TYPES,
   PLATFORMS,
@@ -48,6 +48,7 @@ export function CopywritingWorkspace() {
 
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
   const [showHistory, setShowHistory] = useState(false);
+  const [showMoreOptions, setShowMoreOptions] = useState(false);
   const [generationStage, setGenerationStage] = useState<
     "idle" | "researching" | "writing"
   >("idle");
@@ -153,9 +154,9 @@ export function CopywritingWorkspace() {
   const activePlatformMeta = PLATFORMS[platform];
 
   return (
-    <div className="grid grid-cols-1 overflow-hidden rounded-xl border border-neutral-200 bg-white lg:grid-cols-12">
+    <div className="grid grid-cols-1 overflow-hidden rounded-2xl border border-[#E8E6E1] bg-white shadow-[0_1px_3px_rgba(24,24,27,0.04)] lg:grid-cols-12">
       {/* Left Unified Parameter Rail */}
-      <aside className="divide-y divide-neutral-200/70 border-b border-neutral-200 bg-[#FAFAFA] lg:col-span-5 lg:border-b-0 lg:border-r">
+      <aside className="divide-y divide-[#E8E6E1] border-b border-[#E8E6E1] bg-[#F9F8F6] lg:col-span-5 lg:border-b-0 lg:border-r">
         {/* 1. Platform Selection */}
         <div className="p-5">
           <div className="mb-3 flex items-center justify-between">
@@ -176,10 +177,10 @@ export function CopywritingWorkspace() {
                   key={pid}
                   type="button"
                   onClick={() => setPlatform(pid)}
-                  className={`flex flex-col items-start rounded-lg border p-3 text-left transition ${
+                  className={`flex flex-col items-start rounded-xl border p-3 text-left transition ${
                     isSelected
-                      ? "border-neutral-900 bg-white shadow-2xs"
-                      : "border-neutral-200/80 bg-white/60 hover:border-neutral-300 hover:bg-white"
+                      ? "border-[#0F6E5D] bg-white shadow-xs ring-1 ring-[#0F6E5D]/20"
+                      : "border-[#E8E6E1] bg-white/70 hover:border-[#D6D3CD] hover:bg-white"
                   }`}
                 >
                   <span className="text-xs font-semibold text-neutral-900">
@@ -200,12 +201,9 @@ export function CopywritingWorkspace() {
         {/* 2. Charity Scenario & Length (Simplified for non-profit workflow) */}
         <div className="space-y-4 p-5">
           <div>
-            <div className="mb-2 flex items-center justify-between">
+            <div className="mb-2">
               <span className="text-xs font-semibold text-neutral-900">
                 2. 公益场景
-              </span>
-              <span className="text-[11px] text-neutral-400">
-                精简模式 · 自动匹配真诚公益语气
               </span>
             </div>
             <div className="grid grid-cols-3 gap-1.5">
@@ -217,10 +215,10 @@ export function CopywritingWorkspace() {
                     type="button"
                     onClick={() => setContentType(ct.id)}
                     title={ct.hint}
-                    className={`rounded-md border px-2.5 py-1.5 text-xs font-medium transition ${
+                    className={`rounded-lg border px-2.5 py-1.5 text-xs font-medium transition ${
                       active
-                        ? "border-neutral-900 bg-neutral-900 text-white"
-                        : "border-neutral-200 bg-white text-neutral-600 hover:border-neutral-300 hover:text-neutral-900"
+                        ? "border-[#0F6E5D] bg-[#0F6E5D] text-white shadow-xs"
+                        : "border-[#E8E6E1] bg-white text-zinc-600 hover:border-[#D6D3CD] hover:text-zinc-900"
                     }`}
                   >
                     {ct.label}
@@ -266,12 +264,9 @@ export function CopywritingWorkspace() {
 
         {/* 3. Topic & Submit */}
         <div className="space-y-3.5 p-5">
-          <div className="flex items-center justify-between">
+          <div>
             <span className="text-xs font-semibold text-neutral-900">
               3. 公益主题与活动内容
-            </span>
-            <span className="text-[11px] text-neutral-400">
-              撰写前自动调研抖音爆款文案
             </span>
           </div>
 
@@ -298,21 +293,46 @@ export function CopywritingWorkspace() {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-2.5">
-            <input
-              type="text"
-              value={keywords}
-              onChange={(e) => setKeywords(e.target.value)}
-              placeholder="关键词（选填，逗号隔开）"
-              className="w-full rounded-lg border border-neutral-200 bg-white px-3 py-2 text-xs text-neutral-900 outline-none transition focus:border-neutral-900"
-            />
-            <input
-              type="text"
-              value={targetAudience}
-              onChange={(e) => setTargetAudience(e.target.value)}
-              placeholder="面向人群（选填，如社区居民）"
-              className="w-full rounded-lg border border-neutral-200 bg-white px-3 py-2 text-xs text-neutral-900 outline-none transition focus:border-neutral-900"
-            />
+          <div>
+            <button
+              type="button"
+              onClick={() => setShowMoreOptions((v) => !v)}
+              className="flex items-center gap-1 text-[11px] font-medium text-neutral-500 transition hover:text-neutral-800"
+            >
+              <span>更多选项（关键词 / 受众）</span>
+              <ChevronDown
+                className={`h-3.5 w-3.5 transition-transform ${
+                  showMoreOptions ? "rotate-180" : ""
+                }`}
+              />
+            </button>
+
+            <AnimatePresence initial={false}>
+              {showMoreOptions && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ duration: 0.16 }}
+                  className="mt-2.5 grid grid-cols-2 gap-2.5 overflow-hidden"
+                >
+                  <input
+                    type="text"
+                    value={keywords}
+                    onChange={(e) => setKeywords(e.target.value)}
+                    placeholder="关键词（选填，逗号隔开）"
+                    className="w-full rounded-lg border border-neutral-200 bg-white px-3 py-2 text-xs text-neutral-900 outline-none transition focus:border-neutral-900"
+                  />
+                  <input
+                    type="text"
+                    value={targetAudience}
+                    onChange={(e) => setTargetAudience(e.target.value)}
+                    placeholder="面向人群（选填，如社区居民）"
+                    className="w-full rounded-lg border border-neutral-200 bg-white px-3 py-2 text-xs text-neutral-900 outline-none transition focus:border-neutral-900"
+                  />
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
 
           {generationError && (
@@ -325,7 +345,7 @@ export function CopywritingWorkspace() {
             type="button"
             disabled={isGenerating}
             onClick={handleGenerate}
-            className="flex w-full items-center justify-center gap-2 rounded-lg bg-neutral-900 py-2.5 text-xs font-medium text-white transition hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-60"
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#0F6E5D] py-2.5 text-xs font-semibold text-white shadow-xs transition hover:bg-[#0B5649] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
           >
             {isGenerating ? (
               <>
@@ -351,11 +371,6 @@ export function CopywritingWorkspace() {
             <span className="text-xs font-semibold text-neutral-900">
               文稿画布
             </span>
-            {currentResult && (
-              <span className="rounded border border-neutral-200 bg-neutral-50 px-2 py-0.5 text-[11px] font-medium text-neutral-600">
-                {currentResult.mode === "ai" ? "大模型生成" : "内置推流引擎"}
-              </span>
-            )}
           </div>
 
           <div className="flex items-center gap-2">

@@ -80,7 +80,7 @@ export default function HistoryPage() {
           </p>
         </div>
       ) : (
-        <div className="divide-y divide-neutral-200/80 overflow-hidden rounded-xl border border-neutral-200 bg-white">
+        <div className="divide-y divide-[#E8E6E1] overflow-hidden rounded-2xl border border-[#E8E6E1] bg-white shadow-[0_1px_3px_rgba(24,24,27,0.04)]">
           <AnimatePresence>
             {filtered.map((item) => {
               const p = PLATFORMS[item.platform];
@@ -98,9 +98,6 @@ export default function HistoryPage() {
                     <div className="flex items-center gap-2">
                       <span className="rounded border border-neutral-200 bg-neutral-50 px-2 py-0.5 text-[11px] font-medium text-neutral-700">
                         {p.name}
-                      </span>
-                      <span className="text-[11px] text-neutral-400">
-                        {item.mode === "ai" ? "大模型" : "内置引擎"}
                       </span>
                       <span className="text-neutral-300">·</span>
                       <span className="font-mono text-[11px] text-neutral-400">

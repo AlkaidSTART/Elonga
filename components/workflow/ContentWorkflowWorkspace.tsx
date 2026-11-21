@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { Loader2, Trash2 } from "lucide-react";
+import { ChevronDown, Loader2, Trash2 } from "lucide-react";
 import {
   CONTENT_TYPES,
   PLATFORMS,
@@ -171,6 +171,11 @@ export function ContentWorkflowWorkspace() {
   const [isExportingDocx, setIsExportingDocx] = useState(false);
   const [copiedFull, setCopiedFull] = useState(false);
 
+  // Collapsible sections (收纳)
+  const [imagesExpanded, setImagesExpanded] = useState(false);
+  const [optionsExpanded, setOptionsExpanded] = useState(false);
+  const [insightsExpanded, setInsightsExpanded] = useState(false);
+
   const handleFiles = (fileList: FileList | null) => {
     if (!fileList) return;
     Array.from(fileList).forEach((file) => {
@@ -196,6 +201,7 @@ export function ContentWorkflowWorkspace() {
             status: "idle",
           };
           setImages((prev) => [...prev, item]);
+          setImagesExpanded(true);
         };
         img.src = dataUrl;
       };
@@ -483,29 +489,47 @@ export function ContentWorkflowWorkspace() {
     <div className="grid grid-cols-1 gap-6 lg:grid-cols-12">
       {/* Left Column: Images + Topic & Platform Config */}
       <div className="space-y-5 lg:col-span-5">
-        {/* Step 1: Image Upload & Processing */}
-        <section className="rounded-2xl border border-neutral-200/80 bg-white p-5 shadow-2xs">
-          <div className="mb-3 flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-neutral-900 text-[11px] font-bold text-white">
-                1
-              </span>
-              <h2 className="text-sm font-semibold text-neutral-900">
-                上传图片与视觉处理
+        {/* Step 1: Image Upload & Processing (Collapsible) */}
+        <section className="overflow-hidden rounded-2xl border border-[#E8E6E1] bg-white shadow-[0_1px_3px_rgba(24,24,27,0.04)] transition-shadow hover:shadow-[0_4px_12px_rgba(24,24,27,0.05)]">
+          <div className="flex items-center justify-between px-5 py-3.5 transition-colors hover:bg-[#F9F8F6]/60">
+            <button
+              type="button"
+              onClick={() => setImagesExpanded((v) => !v)}
+              className="flex flex-1 items-center gap-2.5 text-left"
+            >
+              <h2 className="text-sm font-semibold text-zinc-900">
+                配图处理
               </h2>
-            </div>
+              <span
+                className={`rounded-full px-2.5 py-0.5 text-[11px] font-medium ${
+                  images.length > 0
+                    ? "bg-[#0F6E5D]/10 text-[#0F6E5D]"
+                    : "bg-zinc-100 text-zinc-500"
+                }`}
+              >
+                {images.length > 0 ? `已选 ${images.length} 张` : "可选"}
+              </span>
+              <ChevronDown
+                className={`h-4 w-4 text-zinc-400 transition-transform duration-200 ${
+                  imagesExpanded ? "rotate-180 text-[#0F6E5D]" : ""
+                }`}
+              />
+            </button>
             <div className="flex items-center gap-2">
               <button
                 type="button"
-                onClick={handleLoadSamples}
-                className="text-xs font-medium text-neutral-500 transition hover:text-neutral-900"
+                onClick={() => {
+                  handleLoadSamples();
+                  setImagesExpanded(true);
+                }}
+                className="rounded-lg px-2 py-1 text-xs font-medium text-zinc-500 transition hover:bg-zinc-100 hover:text-zinc-900"
               >
-                加载示例图
+                示例图
               </button>
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="rounded-lg bg-neutral-100 px-2.5 py-1 text-xs font-medium text-neutral-700 transition hover:bg-neutral-200"
+                className="rounded-lg bg-[#0F6E5D]/10 px-2.5 py-1 text-xs font-medium text-[#0F6E5D] transition hover:bg-[#0F6E5D]/15"
               >
                 添加图片
               </button>
@@ -523,7 +547,16 @@ export function ContentWorkflowWorkspace() {
             />
           </div>
 
-          {images.length === 0 ? (
+          <AnimatePresence initial={false}>
+            {imagesExpanded && (
+              <motion.div
+                initial={{ opacity: 0, height: 0 }}
+                animate={{ opacity: 1, height: "auto" }}
+                exit={{ opacity: 0, height: 0 }}
+                transition={{ duration: 0.2 }}
+                className="overflow-hidden border-t border-neutral-100 px-5 py-4"
+              >
+                {images.length === 0 ? (
             <div
               onDragOver={(e) => {
                 e.preventDefault();
@@ -693,23 +726,21 @@ export function ContentWorkflowWorkspace() {
               </div>
             </div>
           )}
+              </motion.div>
+            )}
+          </AnimatePresence>
         </section>
 
         {/* Step 2: Topic & Platform Config */}
-        <section className="rounded-2xl border border-neutral-200/80 bg-white p-5 shadow-2xs space-y-4">
+        <section className="space-y-4 rounded-2xl border border-[#E8E6E1] bg-white p-5 shadow-[0_1px_3px_rgba(24,24,27,0.04)]">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-neutral-900 text-[11px] font-bold text-white">
-                2
-              </span>
-              <h2 className="text-sm font-semibold text-neutral-900">
-                主题选择与推流配置
-              </h2>
-            </div>
+            <h2 className="text-sm font-semibold text-zinc-900">
+              主题与平台
+            </h2>
             <button
               type="button"
               onClick={handleAutoSelectTopic}
-              className="rounded-lg border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-700 transition hover:bg-emerald-100"
+              className="rounded-lg bg-[#0F6E5D]/10 px-2.5 py-1 text-xs font-medium text-[#0F6E5D] transition hover:bg-[#0F6E5D]/15 active:scale-[0.98]"
             >
               自动匹配主题
             </button>
@@ -717,40 +748,21 @@ export function ContentWorkflowWorkspace() {
 
           {/* Topic Input */}
           <div>
-            <label className="mb-1.5 block text-xs font-medium text-neutral-700">
-              文章主题 / 核心内容
-            </label>
             <textarea
               rows={2}
               value={topic}
               onChange={(e) => setTopic(e.target.value)}
               placeholder="输入你想写的主题，或点击右上角「自动匹配主题」..."
-              className="w-full rounded-xl border border-neutral-200 bg-neutral-50/50 px-3 py-2 text-xs text-neutral-900 placeholder:text-neutral-400 focus:border-neutral-400 focus:bg-white focus:outline-none"
+              className="w-full rounded-xl border border-[#E8E6E1] bg-[#F9F8F6] px-3.5 py-2.5 text-xs leading-relaxed text-zinc-900 transition placeholder:text-zinc-400 focus:border-[#0F6E5D] focus:bg-white focus:ring-2 focus:ring-[#0F6E5D]/12 focus:outline-none"
             />
-            <div className="mt-2 flex flex-wrap gap-1.5">
-              {AUTO_TOPIC_PRESETS.slice(0, 3).map((preset, idx) => (
-                <button
-                  key={idx}
-                  type="button"
-                  onClick={() => {
-                    setTopic(preset.topic);
-                    setKeywords(preset.keywords);
-                    setContentType(preset.contentType);
-                  }}
-                  className="max-w-full truncate rounded-full border border-neutral-200 bg-neutral-50 px-2.5 py-1 text-[11px] text-neutral-600 transition hover:border-neutral-300 hover:bg-neutral-100"
-                >
-                  {preset.topic.split("：")[0]}
-                </button>
-              ))}
-            </div>
           </div>
 
-          {/* Platform Selector */}
+          {/* Platform Selector (Compact 4-pill row) */}
           <div>
-            <label className="mb-1.5 block text-xs font-medium text-neutral-700">
+            <label className="mb-1.5 block text-xs font-medium text-zinc-600">
               分发平台
             </label>
-            <div className="grid grid-cols-2 gap-2">
+            <div className="grid grid-cols-4 gap-1.5 rounded-xl bg-[#F4F3EF] p-1">
               {(Object.keys(PLATFORMS) as PlatformId[]).map((pid) => {
                 const meta = PLATFORMS[pid];
                 const active = platform === pid;
@@ -759,98 +771,135 @@ export function ContentWorkflowWorkspace() {
                     key={pid}
                     type="button"
                     onClick={() => setPlatform(pid)}
-                    className={`rounded-xl border px-3 py-2 text-left transition ${
+                    className={`relative rounded-lg px-2 py-2 text-center text-xs font-medium transition-colors ${
                       active
-                        ? "border-neutral-900 bg-neutral-900 text-white"
-                        : "border-neutral-200 bg-white text-neutral-700 hover:bg-neutral-50"
+                        ? "text-white"
+                        : "text-zinc-600 hover:text-zinc-900"
                     }`}
                   >
-                    <div className="min-w-0">
-                      <div className="text-xs font-medium">{meta.name}</div>
-                      <div
-                        className={`truncate text-[10px] ${
-                          active ? "text-neutral-300" : "text-neutral-400"
-                        }`}
-                      >
-                        {meta.tagline}
-                      </div>
-                    </div>
+                    {active && (
+                      <motion.div
+                        layoutId="workflowPlatformPill"
+                        transition={{
+                          type: "spring",
+                          stiffness: 440,
+                          damping: 32,
+                        }}
+                        className="absolute inset-0 rounded-lg bg-[#0F6E5D] shadow-xs"
+                      />
+                    )}
+                    <span className="relative z-10">{meta.name}</span>
                   </button>
                 );
               })}
             </div>
           </div>
 
-          {/* Content Type, Tone, Word Count */}
-          <div className="grid grid-cols-3 gap-2">
-            <div>
-              <label className="mb-1 block text-[11px] font-medium text-neutral-600">
-                内容类型
-              </label>
-              <select
-                value={contentType}
-                onChange={(e) =>
-                  setContentType(e.target.value as ContentTypeId)
-                }
-                className="w-full rounded-lg border border-neutral-200 bg-white px-2 py-1.5 text-xs text-neutral-800 focus:outline-none"
-              >
-                {CONTENT_TYPES.map((ct) => (
-                  <option key={ct.id} value={ct.id}>
-                    {ct.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="mb-1 block text-[11px] font-medium text-neutral-600">
-                语气调性
-              </label>
-              <select
-                value={tone}
-                onChange={(e) => setTone(e.target.value as ToneId)}
-                className="w-full rounded-lg border border-neutral-200 bg-white px-2 py-1.5 text-xs text-neutral-800 focus:outline-none"
-              >
-                {TONES.map((t) => (
-                  <option key={t.id} value={t.id}>
-                    {t.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-            <div>
-              <label className="mb-1 block text-[11px] font-medium text-neutral-600">
-                文章篇幅
-              </label>
-              <select
-                value={wordCount}
-                onChange={(e) => setWordCount(e.target.value as WordCountId)}
-                className="w-full rounded-lg border border-neutral-200 bg-white px-2 py-1.5 text-xs text-neutral-800 focus:outline-none"
-              >
-                {WORD_COUNTS.map((wc) => (
-                  <option key={wc.id} value={wc.id}>
-                    {wc.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
+          {/* Collapsible Advanced Options */}
+          <div className="overflow-hidden rounded-xl border border-[#E8E6E1] bg-[#F9F8F6]">
+            <button
+              type="button"
+              onClick={() => setOptionsExpanded((v) => !v)}
+              className="flex w-full items-center justify-between px-3.5 py-2.5 text-left text-xs transition-colors hover:bg-[#F3F2EE]"
+            >
+              <span className="font-medium text-zinc-700">更多参数</span>
+              <div className="flex items-center gap-2 text-[11px] text-zinc-500">
+                <span>
+                  {CONTENT_TYPES.find((c) => c.id === contentType)?.label} ·{" "}
+                  {TONES.find((t) => t.id === tone)?.label} ·{" "}
+                  {WORD_COUNTS.find((w) => w.id === wordCount)?.label}
+                </span>
+                <ChevronDown
+                  className={`h-3.5 w-3.5 transition-transform duration-200 ${
+                    optionsExpanded ? "rotate-180 text-[#0F6E5D]" : ""
+                  }`}
+                />
+              </div>
+            </button>
 
-          {/* Keywords & Audience */}
-          <div className="grid grid-cols-2 gap-2">
-            <input
-              type="text"
-              value={keywords}
-              onChange={(e) => setKeywords(e.target.value)}
-              placeholder="关键词（逗号分隔，可选）"
-              className="rounded-lg border border-neutral-200 bg-neutral-50/50 px-2.5 py-1.5 text-xs text-neutral-800 placeholder:text-neutral-400 focus:border-neutral-400 focus:bg-white focus:outline-none"
-            />
-            <input
-              type="text"
-              value={targetAudience}
-              onChange={(e) => setTargetAudience(e.target.value)}
-              placeholder="目标受众（可选）"
-              className="rounded-lg border border-neutral-200 bg-neutral-50/50 px-2.5 py-1.5 text-xs text-neutral-800 placeholder:text-neutral-400 focus:border-neutral-400 focus:bg-white focus:outline-none"
-            />
+            <AnimatePresence initial={false}>
+              {optionsExpanded && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ duration: 0.18 }}
+                  className="space-y-3 overflow-hidden border-t border-neutral-200/70 bg-white p-3.5"
+                >
+                  <div className="grid grid-cols-3 gap-2">
+                    <div>
+                      <label className="mb-1 block text-[11px] font-medium text-neutral-600">
+                        内容类型
+                      </label>
+                      <select
+                        value={contentType}
+                        onChange={(e) =>
+                          setContentType(e.target.value as ContentTypeId)
+                        }
+                        className="w-full rounded-lg border border-neutral-200 bg-white px-2 py-1.5 text-xs text-neutral-800 focus:outline-none"
+                      >
+                        {CONTENT_TYPES.map((ct) => (
+                          <option key={ct.id} value={ct.id}>
+                            {ct.label}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-[11px] font-medium text-neutral-600">
+                        语气调性
+                      </label>
+                      <select
+                        value={tone}
+                        onChange={(e) => setTone(e.target.value as ToneId)}
+                        className="w-full rounded-lg border border-neutral-200 bg-white px-2 py-1.5 text-xs text-neutral-800 focus:outline-none"
+                      >
+                        {TONES.map((t) => (
+                          <option key={t.id} value={t.id}>
+                            {t.label}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    <div>
+                      <label className="mb-1 block text-[11px] font-medium text-neutral-600">
+                        文章篇幅
+                      </label>
+                      <select
+                        value={wordCount}
+                        onChange={(e) =>
+                          setWordCount(e.target.value as WordCountId)
+                        }
+                        className="w-full rounded-lg border border-neutral-200 bg-white px-2 py-1.5 text-xs text-neutral-800 focus:outline-none"
+                      >
+                        {WORD_COUNTS.map((wc) => (
+                          <option key={wc.id} value={wc.id}>
+                            {wc.label}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-2">
+                    <input
+                      type="text"
+                      value={keywords}
+                      onChange={(e) => setKeywords(e.target.value)}
+                      placeholder="关键词（逗号分隔，可选）"
+                      className="rounded-lg border border-neutral-200 bg-neutral-50/50 px-2.5 py-1.5 text-xs text-neutral-800 placeholder:text-neutral-400 focus:border-neutral-400 focus:bg-white focus:outline-none"
+                    />
+                    <input
+                      type="text"
+                      value={targetAudience}
+                      onChange={(e) => setTargetAudience(e.target.value)}
+                      placeholder="目标受众（可选）"
+                      className="rounded-lg border border-neutral-200 bg-neutral-50/50 px-2.5 py-1.5 text-xs text-neutral-800 placeholder:text-neutral-400 focus:border-neutral-400 focus:bg-white focus:outline-none"
+                    />
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
           </div>
 
           {errorMsg && (
@@ -864,7 +913,7 @@ export function ContentWorkflowWorkspace() {
             type="button"
             onClick={() => void handleRunWorkflow()}
             disabled={isRunning}
-            className="flex w-full items-center justify-center gap-2 rounded-xl bg-neutral-900 px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-neutral-800 disabled:cursor-not-allowed disabled:opacity-60"
+            className="flex w-full items-center justify-center gap-2 rounded-xl bg-[#0F6E5D] px-4 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-[#0B5649] active:scale-[0.99] disabled:cursor-not-allowed disabled:opacity-60"
           >
             {isRunning ? (
               <>
@@ -887,36 +936,17 @@ export function ContentWorkflowWorkspace() {
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="flex h-full min-h-[520px] flex-col items-center justify-center rounded-2xl border border-dashed border-neutral-200 bg-neutral-50/40 p-8 text-center"
+              className="flex h-full min-h-[520px] flex-col items-center justify-center rounded-2xl border border-[#E8E6E1] bg-white p-8 text-center shadow-[0_1px_3px_rgba(24,24,27,0.04)]"
             >
-              <h3 className="text-base font-semibold text-neutral-900">
-                完整图文文档工作区
-              </h3>
-              <p className="mt-2 max-w-md text-xs leading-relaxed text-neutral-500">
-                在左侧上传图片并选择主题后，点击「一键执行图文工作流」。系统将自动完成图片打码/风格化、抖音爆款文案检索、推流文章撰写，并组装为可导出为{" "}
-                <span className="font-medium text-neutral-700">
-                  Word (.docx) / PDF / Markdown (.md)
-                </span>{" "}
-                的完整文档。
-              </p>
-              <div className="mt-6 grid w-full max-w-md grid-cols-4 gap-2 text-[11px] text-neutral-500">
-                <div className="rounded-xl border border-neutral-200/80 bg-white p-2.5">
-                  <div className="font-semibold text-neutral-800">1. 图片处理</div>
-                  <div className="mt-0.5">打码 / 二维</div>
-                </div>
-                <div className="rounded-xl border border-neutral-200/80 bg-white p-2.5">
-                  <div className="font-semibold text-neutral-800">2. 抖音检索</div>
-                  <div className="mt-0.5">爆款与热词</div>
-                </div>
-                <div className="rounded-xl border border-neutral-200/80 bg-white p-2.5">
-                  <div className="font-semibold text-neutral-800">3. 文案撰写</div>
-                  <div className="mt-0.5">平台推流体</div>
-                </div>
-                <div className="rounded-xl border border-neutral-200/80 bg-white p-2.5">
-                  <div className="font-semibold text-neutral-800">4. 文档导出</div>
-                  <div className="mt-0.5">DOCX/PDF/MD</div>
-                </div>
+              <div className="mb-3 h-10 w-10 rounded-xl bg-[#0F6E5D]/10 flex items-center justify-center">
+                <span className="h-2.5 w-2.5 rounded-full bg-[#0F6E5D]" />
               </div>
+              <h3 className="text-base font-semibold text-zinc-900">
+                图文文档工作区
+              </h3>
+              <p className="mt-2 max-w-sm text-xs leading-relaxed text-zinc-500">
+                填写主题并选择平台后点击「一键执行图文工作流」，生成后支持导出 Word、PDF 与 Markdown。
+              </p>
             </motion.div>
           ) : (
             <motion.div
@@ -988,72 +1018,103 @@ export function ContentWorkflowWorkspace() {
                 </div>
               </div>
 
-              {/* Douyin Trend Insights Strip */}
-              {assembledDoc.trendInsights && (
-                <div className="rounded-2xl border border-amber-200/70 bg-amber-50/40 p-4">
-                  <div className="flex flex-wrap items-center justify-between gap-2">
-                    <div className="flex items-center gap-1.5 text-xs font-semibold text-amber-900">
-                      <span>抖音爆款检索摘要</span>
-                      <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-normal text-amber-800">
-                        {assembledDoc.trendInsights.sourceLabel}
-                      </span>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => void handleRunWorkflow()}
-                      disabled={isRunning}
-                      className="text-[11px] font-medium text-amber-800 hover:underline"
-                    >
-                      重新检索生成
-                    </button>
-                  </div>
-                  <p className="mt-1.5 text-xs text-amber-900/80">
-                    {assembledDoc.trendInsights.summary}
-                  </p>
-                  {assembledDoc.trendInsights.hotKeywords.length > 0 && (
-                    <div className="mt-2 flex flex-wrap gap-1.5">
-                      {assembledDoc.trendInsights.hotKeywords.map((kw) => (
-                        <span
-                          key={kw}
-                          className="rounded-md bg-white/80 px-2 py-0.5 text-[11px] text-amber-900 ring-1 ring-amber-200/60"
-                        >
-                          {kw}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              )}
+              {/* Collapsible Insights & Candidate Titles */}
+              {(assembledDoc.trendInsights || candidateTitles.length > 0) && (
+                <div className="overflow-hidden rounded-2xl border border-neutral-200/80 bg-white shadow-2xs">
+                  <button
+                    type="button"
+                    onClick={() => setInsightsExpanded((v) => !v)}
+                    className="flex w-full items-center justify-between px-4 py-3 text-left text-xs"
+                  >
+                    <span className="font-semibold text-neutral-800">
+                      爆款参考 &amp; 备选标题
+                      {candidateTitles.length > 0 && ` (${candidateTitles.length})`}
+                    </span>
+                    <ChevronDown
+                      className={`h-4 w-4 text-neutral-400 transition-transform ${
+                        insightsExpanded ? "rotate-180" : ""
+                      }`}
+                    />
+                  </button>
 
-              {/* Candidate Titles Picker */}
-              {candidateTitles.length > 0 && (
-                <div className="rounded-2xl border border-neutral-200/80 bg-white p-4 shadow-2xs">
-                  <div className="mb-2 text-xs font-semibold text-neutral-700">
-                    备选爆款标题（点击切换）
-                  </div>
-                  <div className="flex flex-wrap gap-1.5">
-                    {candidateTitles.map((t, i) => {
-                      const active = assembledDoc.title === t;
-                      return (
-                        <button
-                          key={i}
-                          type="button"
-                          onClick={() =>
-                            setAssembledDoc((prev) =>
-                              prev ? { ...prev, title: t } : prev
-                            )
-                          }
-                          className={`rounded-lg px-2.5 py-1.5 text-left text-xs transition ${
-                            active
-                              ? "bg-neutral-900 font-medium text-white"
-                              : "bg-neutral-100 text-neutral-700 hover:bg-neutral-200"
-                          }`}
-                        >
-                          {t}
-                        </button>
-                      );
-                    })}
-                  </div>
+                  <AnimatePresence initial={false}>
+                    {insightsExpanded && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: "auto" }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ duration: 0.18 }}
+                        className="space-y-4 overflow-hidden border-t border-neutral-100 p-4"
+                      >
+                        {assembledDoc.trendInsights && (
+                          <div className="rounded-xl border border-amber-200/70 bg-amber-50/40 p-3.5">
+                            <div className="flex flex-wrap items-center justify-between gap-2">
+                              <div className="flex items-center gap-1.5 text-xs font-semibold text-amber-900">
+                                <span>抖音爆款检索摘要</span>
+                                <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-normal text-amber-800">
+                                  {assembledDoc.trendInsights.sourceLabel}
+                                </span>
+                              </div>
+                              <button
+                                type="button"
+                                onClick={() => void handleRunWorkflow()}
+                                disabled={isRunning}
+                                className="text-[11px] font-medium text-amber-800 hover:underline"
+                              >
+                                重新检索生成
+                              </button>
+                            </div>
+                            <p className="mt-1.5 text-xs text-amber-900/80">
+                              {assembledDoc.trendInsights.summary}
+                            </p>
+                            {assembledDoc.trendInsights.hotKeywords.length > 0 && (
+                              <div className="mt-2 flex flex-wrap gap-1.5">
+                                {assembledDoc.trendInsights.hotKeywords.map((kw) => (
+                                  <span
+                                    key={kw}
+                                    className="rounded-md bg-white/80 px-2 py-0.5 text-[11px] text-amber-900 ring-1 ring-amber-200/60"
+                                  >
+                                    {kw}
+                                  </span>
+                                ))}
+                              </div>
+                            )}
+                          </div>
+                        )}
+
+                        {candidateTitles.length > 0 && (
+                          <div>
+                            <div className="mb-2 text-xs font-semibold text-neutral-700">
+                              备选爆款标题（点击切换）
+                            </div>
+                            <div className="flex flex-wrap gap-1.5">
+                              {candidateTitles.map((t, i) => {
+                                const active = assembledDoc.title === t;
+                                return (
+                                  <button
+                                    key={i}
+                                    type="button"
+                                    onClick={() =>
+                                      setAssembledDoc((prev) =>
+                                        prev ? { ...prev, title: t } : prev
+                                      )
+                                    }
+                                    className={`rounded-lg px-2.5 py-1.5 text-left text-xs transition ${
+                                      active
+                                        ? "bg-neutral-900 font-medium text-white"
+                                        : "bg-neutral-100 text-neutral-700 hover:bg-neutral-200"
+                                    }`}
+                                  >
+                                    {t}
+                                  </button>
+                                );
+                              })}
+                            </div>
+                          </div>
+                        )}
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
               )}
 
