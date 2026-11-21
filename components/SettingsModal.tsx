@@ -152,12 +152,6 @@ export function SettingsModal() {
             </div>
           </div>
 
-          <div className="flex items-start gap-2 rounded-xl bg-[#FAFAFA] p-3 text-xs text-neutral-600">
-            <ShieldCheck className="mt-0.5 h-4 w-4 shrink-0 text-emerald-600" />
-            <span>
-              密钥仅保存在您的本地浏览器中，请求时直连您指定的接口地址，不会上传至第三方存储。
-            </span>
-          </div>
         </div>
 
         <div className="mt-6 flex items-center justify-end gap-2.5">

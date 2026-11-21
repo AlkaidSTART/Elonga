@@ -2,30 +2,7 @@
 
 import { useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import {
-  BookOpenText,
-  Check,
-  Copy,
-  Download,
-  Edit3,
-  Eye,
-  FileDown,
-  FileText,
-  Film,
-  Flame,
-  Hash,
-  ImagePlus,
-  Loader2,
-  Newspaper,
-  Printer,
-  RefreshCw,
-  ShieldAlert,
-  Sparkles,
-  Trash2,
-  Upload,
-  Video,
-  Wand2,
-} from "lucide-react";
+import { Loader2, Trash2 } from "lucide-react";
 import {
   CONTENT_TYPES,
   PLATFORMS,
@@ -65,13 +42,6 @@ interface WorkflowImageItem {
   status: "idle" | "processing" | "done" | "error";
   processNote?: string;
 }
-
-const PLATFORM_ICONS: Record<PlatformId, typeof Film> = {
-  douyin: Film,
-  toutiao: Newspaper,
-  kuaishou: Video,
-  wechat: BookOpenText,
-};
 
 const STYLE_PRESETS: { id: Style2DPreset; label: string }[] = [
   { id: "anime", label: "日漫" },
@@ -535,9 +505,8 @@ export function ContentWorkflowWorkspace() {
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="inline-flex items-center gap-1 rounded-lg bg-neutral-100 px-2.5 py-1 text-xs font-medium text-neutral-700 transition hover:bg-neutral-200"
+                className="rounded-lg bg-neutral-100 px-2.5 py-1 text-xs font-medium text-neutral-700 transition hover:bg-neutral-200"
               >
-                <ImagePlus className="h-3.5 w-3.5" />
                 添加图片
               </button>
             </div>
@@ -573,7 +542,6 @@ export function ContentWorkflowWorkspace() {
                   : "border-neutral-300 bg-neutral-50/60 hover:border-neutral-400 hover:bg-neutral-50"
               }`}
             >
-              <Upload className="mb-2 h-6 w-6 text-neutral-400" />
               <p className="text-xs font-medium text-neutral-700">
                 拖拽或点击上传多张配图（可选）
               </p>
@@ -618,9 +586,8 @@ export function ContentWorkflowWorkspace() {
                     type="button"
                     onClick={() => void processAllImages()}
                     disabled={isRunning}
-                    className="inline-flex items-center gap-1 rounded bg-neutral-900 px-2 py-0.5 font-medium text-white hover:bg-neutral-800 disabled:opacity-50"
+                    className="rounded bg-neutral-900 px-2 py-0.5 font-medium text-white hover:bg-neutral-800 disabled:opacity-50"
                   >
-                    <Wand2 className="h-3 w-3" />
                     立即预览处理
                   </button>
                 </div>
@@ -670,13 +637,12 @@ export function ContentWorkflowWorkspace() {
                               enableRedact: !item.enableRedact,
                             })
                           }
-                          className={`inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[11px] font-medium transition ${
+                          className={`rounded-md px-2 py-0.5 text-[11px] font-medium transition ${
                             item.enableRedact
                               ? "bg-neutral-900 text-white"
                               : "bg-neutral-100 text-neutral-600 hover:bg-neutral-200"
                           }`}
                         >
-                          <ShieldAlert className="h-3 w-3" />
                           智能打码
                         </button>
 
@@ -687,13 +653,12 @@ export function ContentWorkflowWorkspace() {
                               enableStylize: !item.enableStylize,
                             })
                           }
-                          className={`inline-flex items-center gap-1 rounded-md px-2 py-0.5 text-[11px] font-medium transition ${
+                          className={`rounded-md px-2 py-0.5 text-[11px] font-medium transition ${
                             item.enableStylize
                               ? "bg-emerald-600 text-white"
                               : "bg-neutral-100 text-neutral-600 hover:bg-neutral-200"
                           }`}
                         >
-                          <Sparkles className="h-3 w-3" />
                           二维风格化
                         </button>
 
@@ -744,9 +709,8 @@ export function ContentWorkflowWorkspace() {
             <button
               type="button"
               onClick={handleAutoSelectTopic}
-              className="inline-flex items-center gap-1 rounded-lg border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-700 transition hover:bg-emerald-100"
+              className="rounded-lg border border-emerald-200 bg-emerald-50 px-2.5 py-1 text-xs font-medium text-emerald-700 transition hover:bg-emerald-100"
             >
-              <Sparkles className="h-3.5 w-3.5" />
               自动匹配主题
             </button>
           </div>
@@ -789,20 +753,18 @@ export function ContentWorkflowWorkspace() {
             <div className="grid grid-cols-2 gap-2">
               {(Object.keys(PLATFORMS) as PlatformId[]).map((pid) => {
                 const meta = PLATFORMS[pid];
-                const Icon = PLATFORM_ICONS[pid];
                 const active = platform === pid;
                 return (
                   <button
                     key={pid}
                     type="button"
                     onClick={() => setPlatform(pid)}
-                    className={`flex items-center gap-2 rounded-xl border px-3 py-2 text-left transition ${
+                    className={`rounded-xl border px-3 py-2 text-left transition ${
                       active
                         ? "border-neutral-900 bg-neutral-900 text-white"
                         : "border-neutral-200 bg-white text-neutral-700 hover:bg-neutral-50"
                     }`}
                   >
-                    <Icon className="h-3.5 w-3.5 shrink-0" />
                     <div className="min-w-0">
                       <div className="text-xs font-medium">{meta.name}</div>
                       <div
@@ -910,10 +872,7 @@ export function ContentWorkflowWorkspace() {
                 <span>{stageLabel[stage]}</span>
               </>
             ) : (
-              <>
-                <Wand2 className="h-4 w-4" />
-                <span>一键执行图文工作流</span>
-              </>
+              <span>一键执行图文工作流</span>
             )}
           </button>
         </section>
@@ -930,9 +889,6 @@ export function ContentWorkflowWorkspace() {
               exit={{ opacity: 0 }}
               className="flex h-full min-h-[520px] flex-col items-center justify-center rounded-2xl border border-dashed border-neutral-200 bg-neutral-50/40 p-8 text-center"
             >
-              <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-2xl bg-neutral-900 text-white">
-                <FileText className="h-6 w-6" />
-              </div>
               <h3 className="text-base font-semibold text-neutral-900">
                 完整图文文档工作区
               </h3>
@@ -975,25 +931,23 @@ export function ContentWorkflowWorkspace() {
                   <button
                     type="button"
                     onClick={() => setDocViewMode("preview")}
-                    className={`inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium transition ${
+                    className={`rounded-md px-2.5 py-1 text-xs font-medium transition ${
                       docViewMode === "preview"
                         ? "bg-white text-neutral-900 shadow-2xs"
                         : "text-neutral-500 hover:text-neutral-800"
                     }`}
                   >
-                    <Eye className="h-3.5 w-3.5" />
                     图文预览
                   </button>
                   <button
                     type="button"
                     onClick={() => setDocViewMode("edit")}
-                    className={`inline-flex items-center gap-1.5 rounded-md px-2.5 py-1 text-xs font-medium transition ${
+                    className={`rounded-md px-2.5 py-1 text-xs font-medium transition ${
                       docViewMode === "edit"
                         ? "bg-white text-neutral-900 shadow-2xs"
                         : "text-neutral-500 hover:text-neutral-800"
                     }`}
                   >
-                    <Edit3 className="h-3.5 w-3.5" />
                     编辑正文
                   </button>
                 </div>
@@ -1005,45 +959,31 @@ export function ContentWorkflowWorkspace() {
                     disabled={isExportingDocx}
                     className="inline-flex items-center gap-1.5 rounded-lg border border-neutral-200 bg-white px-3 py-1.5 text-xs font-medium text-neutral-800 transition hover:bg-neutral-50 disabled:opacity-50"
                   >
-                    {isExportingDocx ? (
+                    {isExportingDocx && (
                       <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                    ) : (
-                      <FileDown className="h-3.5 w-3.5 text-blue-600" />
                     )}
                     导出 DOCX
                   </button>
                   <button
                     type="button"
                     onClick={() => exportDocumentAsPdf(assembledDoc)}
-                    className="inline-flex items-center gap-1.5 rounded-lg border border-neutral-200 bg-white px-3 py-1.5 text-xs font-medium text-neutral-800 transition hover:bg-neutral-50"
+                    className="rounded-lg border border-neutral-200 bg-white px-3 py-1.5 text-xs font-medium text-neutral-800 transition hover:bg-neutral-50"
                   >
-                    <Printer className="h-3.5 w-3.5 text-rose-600" />
                     导出 PDF
                   </button>
                   <button
                     type="button"
                     onClick={() => exportDocumentAsMarkdown(assembledDoc)}
-                    className="inline-flex items-center gap-1.5 rounded-lg border border-neutral-200 bg-white px-3 py-1.5 text-xs font-medium text-neutral-800 transition hover:bg-neutral-50"
+                    className="rounded-lg border border-neutral-200 bg-white px-3 py-1.5 text-xs font-medium text-neutral-800 transition hover:bg-neutral-50"
                   >
-                    <Download className="h-3.5 w-3.5 text-emerald-600" />
                     导出 MD
                   </button>
                   <button
                     type="button"
                     onClick={() => void handleCopyFullText()}
-                    className="inline-flex items-center gap-1.5 rounded-lg bg-neutral-900 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-neutral-800"
+                    className="rounded-lg bg-neutral-900 px-3 py-1.5 text-xs font-medium text-white transition hover:bg-neutral-800"
                   >
-                    {copiedFull ? (
-                      <>
-                        <Check className="h-3.5 w-3.5" />
-                        已复制
-                      </>
-                    ) : (
-                      <>
-                        <Copy className="h-3.5 w-3.5" />
-                        复制全文
-                      </>
-                    )}
+                    {copiedFull ? "已复制" : "复制全文"}
                   </button>
                 </div>
               </div>
@@ -1053,7 +993,6 @@ export function ContentWorkflowWorkspace() {
                 <div className="rounded-2xl border border-amber-200/70 bg-amber-50/40 p-4">
                   <div className="flex flex-wrap items-center justify-between gap-2">
                     <div className="flex items-center gap-1.5 text-xs font-semibold text-amber-900">
-                      <Flame className="h-3.5 w-3.5 text-amber-600" />
                       <span>抖音爆款检索摘要</span>
                       <span className="rounded-full bg-amber-100 px-2 py-0.5 text-[10px] font-normal text-amber-800">
                         {assembledDoc.trendInsights.sourceLabel}
@@ -1063,9 +1002,8 @@ export function ContentWorkflowWorkspace() {
                       type="button"
                       onClick={() => void handleRunWorkflow()}
                       disabled={isRunning}
-                      className="inline-flex items-center gap-1 text-[11px] font-medium text-amber-800 hover:underline"
+                      className="text-[11px] font-medium text-amber-800 hover:underline"
                     >
-                      <RefreshCw className="h-3 w-3" />
                       重新检索生成
                     </button>
                   </div>
@@ -1207,7 +1145,6 @@ export function ContentWorkflowWorkspace() {
 
                     {assembledDoc.tags.length > 0 && (
                       <footer className="flex flex-wrap items-center gap-1.5 border-t border-neutral-100 pt-4">
-                        <Hash className="h-3.5 w-3.5 text-emerald-600" />
                         {assembledDoc.tags.map((tag) => (
                           <span
                             key={tag}

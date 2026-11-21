@@ -257,11 +257,8 @@ export function Stylize2DPanel() {
                   className="max-h-[420px] w-auto rounded object-contain"
                 />
               ) : (
-                <div className="flex flex-col items-center gap-2 px-6 text-center text-neutral-400">
-                  <ImageIcon className="h-5 w-5 text-neutral-300" />
-                  <span className="text-xs leading-relaxed">
-                    在左侧选择画风并点击生成，即可查看风格化效果
-                  </span>
+                <div className="px-6 text-center text-xs leading-relaxed text-neutral-400">
+                  在左侧选择画风并点击生成，即可查看风格化效果
                 </div>
               )}
             </div>

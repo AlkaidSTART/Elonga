@@ -150,31 +150,24 @@ export default function SettingsPage() {
           </div>
         </div>
 
-        <div className="flex flex-col gap-4 bg-[#FAFAFA] px-6 py-4 sm:flex-row sm:items-center sm:justify-between">
-          <div className="flex items-center gap-2 text-xs text-neutral-500">
-            <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-emerald-500" />
-            <span>密钥仅保存在本地浏览器，未填写时自动使用内置引擎</span>
-          </div>
-
-          <div className="flex items-center gap-2.5 self-end sm:self-auto">
-            {hasAnyKey && (
-              <button
-                type="button"
-                onClick={() =>
-                  updateModelConfig({ textApiKey: "", imageApiKey: "" })
-                }
-                className="rounded-lg px-3 py-1.5 text-xs font-medium text-neutral-500 transition hover:bg-neutral-200/60 hover:text-neutral-900"
-              >
-                清空密钥
-              </button>
-            )}
+        <div className="flex items-center justify-end gap-2.5 bg-[#FAFAFA] px-6 py-4">
+          {hasAnyKey && (
             <button
-              type="submit"
-              className="rounded-lg bg-neutral-900 px-4 py-2 text-xs font-medium text-white transition hover:bg-neutral-800"
+              type="button"
+              onClick={() =>
+                updateModelConfig({ textApiKey: "", imageApiKey: "" })
+              }
+              className="rounded-lg px-3 py-1.5 text-xs font-medium text-neutral-500 transition hover:bg-neutral-200/60 hover:text-neutral-900"
             >
-              {savedToast ? "已保存" : "保存配置"}
+              清空密钥
             </button>
-          </div>
+          )}
+          <button
+            type="submit"
+            className="rounded-lg bg-neutral-900 px-4 py-2 text-xs font-medium text-white transition hover:bg-neutral-800"
+          >
+            {savedToast ? "已保存" : "保存配置"}
+          </button>
         </div>
       </form>
     </div>
