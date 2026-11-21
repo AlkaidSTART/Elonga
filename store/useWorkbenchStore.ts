@@ -75,8 +75,8 @@ export const useWorkbenchStore = create<WorkbenchState>()(
       modelConfig: { ...DEFAULT_MODEL_CONFIG },
 
       platform: "douyin",
-      contentType: "knowledge",
-      tone: "authentic",
+      contentType: "story",
+      tone: "warm",
       wordCount: "medium",
       topic: "",
       keywords: "",

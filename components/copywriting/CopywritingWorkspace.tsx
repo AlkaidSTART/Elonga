@@ -22,10 +22,10 @@ import {
 import {
   CONTENT_TYPES,
   PLATFORMS,
-  TONES,
   WORD_COUNTS,
   type PlatformId,
 } from "@/lib/platforms";
+import type { DouyinTrendInsights } from "@/lib/skills/types";
 import { useWorkbenchStore } from "@/store/useWorkbenchStore";
 
 const PLATFORM_ICONS: Record<PlatformId, typeof Film> = {
@@ -36,16 +36,15 @@ const PLATFORM_ICONS: Record<PlatformId, typeof Film> = {
 };
 
 const QUICK_TOPICS = [
-  "普通人下班后如何用 AI 提升副业效率",
-  "装修避坑：过来人总结的5个最容易后悔的细节",
-  "为什么越自律的人，反而越懂得适度偷懒",
+  "社区流浪猫绝育与领养倡议，呼吁邻里科学关爱",
+  "乡村小学图书角募捐：一本书点亮孩子的阅读梦",
+  "周末河道净滩环保志愿活动招募，一起守护身边绿水",
 ];
 
 export function CopywritingWorkspace() {
   const {
     platform,
     contentType,
-    tone,
     wordCount,
     topic,
     keywords,
@@ -57,7 +56,6 @@ export function CopywritingWorkspace() {
     modelConfig,
     setPlatform,
     setContentType,
-    setTone,
     setWordCount,
     setTopic,
     setKeywords,
@@ -73,6 +71,9 @@ export function CopywritingWorkspace() {
 
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
   const [showHistory, setShowHistory] = useState(false);
+  const [generationStage, setGenerationStage] = useState<
+    "idle" | "researching" | "writing"
+  >("idle");
 
   const handleCopy = async (text: string, key: string) => {
     try {
@@ -86,30 +87,55 @@ export function CopywritingWorkspace() {
 
   const handleGenerate = async () => {
     if (!topic.trim()) {
-      setGenerationError("请先输入你想创作的文案主题或核心内容");
+      setGenerationError("请先输入你想创作的公益主题或活动内容");
       return;
     }
 
     setGenerationError(null);
     setIsGenerating(true);
 
+    const requestModelConfig = {
+      apiKey: modelConfig.textApiKey,
+      baseUrl: modelConfig.textBaseUrl,
+      textModel: modelConfig.textModel,
+    };
+
     try {
+      // 第一步：先调用抖音爆款调研接口，分析当前抖音同类爆款文案规律
+      setGenerationStage("researching");
+      let trendInsights: DouyinTrendInsights | undefined;
+      try {
+        const trendRes = await fetch("/api/douyin-trends", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            topic,
+            keywords,
+            modelConfig: requestModelConfig,
+          }),
+        });
+        if (trendRes.ok) {
+          const trendData = await trendRes.json();
+          trendInsights = trendData.insights;
+        }
+      } catch {
+        // 若前端预调研异常，后端工作流会自动兜底补齐调研
+      }
+
+      // 第二步：结合抖音爆款调研结果，调用封装好的公益推流 Skills 创作文案
+      setGenerationStage("writing");
       const res = await fetch("/api/copywriting", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           platform,
           contentType,
-          tone,
           wordCount,
           topic,
           keywords,
           targetAudience,
-          modelConfig: {
-            apiKey: modelConfig.textApiKey,
-            baseUrl: modelConfig.textBaseUrl,
-            textModel: modelConfig.textModel,
-          },
+          trendInsights,
+          modelConfig: requestModelConfig,
         }),
       });
 
@@ -126,6 +152,7 @@ export function CopywritingWorkspace() {
       );
     } finally {
       setIsGenerating(false);
+      setGenerationStage("idle");
     }
   };
 
@@ -201,13 +228,18 @@ export function CopywritingWorkspace() {
           </p>
         </div>
 
-        {/* 2. Content Type, Tone & Length */}
+        {/* 2. Charity Scenario & Length (Simplified for non-profit workflow) */}
         <div className="space-y-4 p-5">
           <div>
-            <span className="mb-2 block text-xs font-semibold text-neutral-900">
-              2. 内容类型
-            </span>
-            <div className="flex flex-wrap gap-1.5">
+            <div className="mb-2 flex items-center justify-between">
+              <span className="text-xs font-semibold text-neutral-900">
+                2. 公益场景
+              </span>
+              <span className="text-[11px] text-neutral-400">
+                精简模式 · 自动匹配真诚公益语气
+              </span>
+            </div>
+            <div className="grid grid-cols-3 gap-1.5">
               {CONTENT_TYPES.map((ct) => {
                 const active = contentType === ct.id;
                 return (
@@ -216,7 +248,7 @@ export function CopywritingWorkspace() {
                     type="button"
                     onClick={() => setContentType(ct.id)}
                     title={ct.hint}
-                    className={`rounded-md border px-2.5 py-1 text-xs font-medium transition ${
+                    className={`rounded-md border px-2.5 py-1.5 text-xs font-medium transition ${
                       active
                         ? "border-neutral-900 bg-neutral-900 text-white"
                         : "border-neutral-200 bg-white text-neutral-600 hover:border-neutral-300 hover:text-neutral-900"
@@ -229,60 +261,36 @@ export function CopywritingWorkspace() {
             </div>
           </div>
 
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <div>
-              <span className="mb-2 block text-[11px] font-medium text-neutral-500">
-                表达语气
-              </span>
-              <div className="flex flex-wrap gap-1">
-                {TONES.map((t) => (
-                  <button
-                    key={t.id}
-                    type="button"
-                    onClick={() => setTone(t.id)}
-                    className={`rounded-md px-2 py-1 text-[11px] font-medium transition ${
-                      tone === t.id
-                        ? "bg-neutral-900 text-white ring-1 ring-neutral-900"
-                        : "bg-white text-neutral-600 ring-1 ring-neutral-200/80 hover:text-neutral-900"
-                    }`}
-                  >
-                    {t.label}
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <span className="mb-2 block text-[11px] font-medium text-neutral-500">
-                目标篇幅
-              </span>
-              <div className="grid grid-cols-3 rounded-lg border border-neutral-200/80 bg-neutral-100/80 p-0.5">
-                {WORD_COUNTS.map((wc) => (
-                  <button
-                    key={wc.id}
-                    type="button"
-                    onClick={() => setWordCount(wc.id)}
-                    className={`relative rounded-md py-1 text-[11px] font-medium transition-colors ${
-                      wordCount === wc.id
-                        ? "text-neutral-900"
-                        : "text-neutral-500 hover:text-neutral-800"
-                    }`}
-                  >
-                    {wordCount === wc.id && (
-                      <motion.div
-                        layoutId="wordCountPill"
-                        transition={{
-                          type: "spring",
-                          stiffness: 420,
-                          damping: 32,
-                        }}
-                        className="absolute inset-0 rounded-md bg-white shadow-2xs"
-                      />
-                    )}
-                    <span className="relative z-10">{wc.label}</span>
-                  </button>
-                ))}
-              </div>
+          <div>
+            <span className="mb-2 block text-[11px] font-medium text-neutral-500">
+              目标篇幅
+            </span>
+            <div className="grid grid-cols-3 rounded-lg border border-neutral-200/80 bg-neutral-100/80 p-0.5">
+              {WORD_COUNTS.map((wc) => (
+                <button
+                  key={wc.id}
+                  type="button"
+                  onClick={() => setWordCount(wc.id)}
+                  className={`relative rounded-md py-1 text-[11px] font-medium transition-colors ${
+                    wordCount === wc.id
+                      ? "text-neutral-900"
+                      : "text-neutral-500 hover:text-neutral-800"
+                  }`}
+                >
+                  {wordCount === wc.id && (
+                    <motion.div
+                      layoutId="wordCountPill"
+                      transition={{
+                        type: "spring",
+                        stiffness: 420,
+                        damping: 32,
+                      }}
+                      className="absolute inset-0 rounded-md bg-white shadow-2xs"
+                    />
+                  )}
+                  <span className="relative z-10">{wc.label}</span>
+                </button>
+              ))}
             </div>
           </div>
         </div>
@@ -291,10 +299,10 @@ export function CopywritingWorkspace() {
         <div className="space-y-3.5 p-5">
           <div className="flex items-center justify-between">
             <span className="text-xs font-semibold text-neutral-900">
-              3. 创作主题
+              3. 公益主题与活动内容
             </span>
             <span className="text-[11px] text-neutral-400">
-              支持一句话概述或详细大纲
+              撰写前自动调研抖音爆款文案
             </span>
           </div>
 
@@ -303,7 +311,7 @@ export function CopywritingWorkspace() {
               rows={3}
               value={topic}
               onChange={(e) => setTopic(e.target.value)}
-              placeholder="例如：分享一套适合上班族的极简时间管理法，强调不需要早起也能多出 2 小时..."
+              placeholder="例如：这个周末我们在社区组织了流浪猫科学绝育与领养日活动，希望吸引更多周边居民来现场了解或转发支持..."
               className="w-full resize-none rounded-lg border border-neutral-200 bg-white p-3 text-xs leading-relaxed text-neutral-900 outline-none transition placeholder:text-neutral-400 focus:border-neutral-900 focus:ring-2 focus:ring-neutral-900/10"
             />
             <div className="mt-2 flex flex-wrap items-center gap-1.5">
@@ -333,7 +341,7 @@ export function CopywritingWorkspace() {
               type="text"
               value={targetAudience}
               onChange={(e) => setTargetAudience(e.target.value)}
-              placeholder="目标受众（选填）"
+              placeholder="面向人群（选填，如社区居民）"
               className="w-full rounded-lg border border-neutral-200 bg-white px-3 py-2 text-xs text-neutral-900 outline-none transition focus:border-neutral-900"
             />
           </div>
@@ -353,12 +361,16 @@ export function CopywritingWorkspace() {
             {isGenerating ? (
               <>
                 <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                <span>正在生成{activePlatformMeta.name}文案...</span>
+                <span>
+                  {generationStage === "researching"
+                    ? "1/2 正在调研抖音爆款文案..."
+                    : `2/2 正在创作${activePlatformMeta.name}公益推流文案...`}
+                </span>
               </>
             ) : (
               <>
                 <ArrowRight className="h-3.5 w-3.5" />
-                <span>生成{activePlatformMeta.name}推流文案</span>
+                <span>先调研抖音爆款 · 再生成{activePlatformMeta.name}文案</span>
               </>
             )}
           </button>
@@ -510,6 +522,76 @@ export function CopywritingWorkspace() {
                 transition={{ duration: 0.26, ease: [0.22, 1, 0.36, 1] }}
                 className="space-y-6"
               >
+                {/* Pre-writing Douyin Trend Research & Skills Trace */}
+                {currentResult.trendInsights && (
+                  <div className="rounded-lg border border-neutral-200/80 bg-[#FAFAFA] p-4">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xs font-semibold text-neutral-900">
+                          前置抖音爆款调研参考
+                        </span>
+                        <span className="rounded border border-neutral-200 bg-white px-2 py-0.5 text-[10px] font-medium text-neutral-600">
+                          {currentResult.trendInsights.sourceLabel}
+                        </span>
+                      </div>
+                      {currentResult.skillTraces &&
+                        currentResult.skillTraces.length > 0 && (
+                          <div className="flex flex-wrap items-center gap-1">
+                            {currentResult.skillTraces.map((trace) => (
+                              <span
+                                key={trace.skillId}
+                                title={trace.summary}
+                                className="rounded bg-neutral-200/70 px-1.5 py-0.5 text-[10px] font-medium text-neutral-700"
+                              >
+                                {trace.skillName}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+                    </div>
+
+                    <p className="mt-2 text-xs leading-relaxed text-neutral-600">
+                      {currentResult.trendInsights.summary}
+                    </p>
+
+                    {currentResult.trendInsights.viralHooks.length > 0 && (
+                      <div className="mt-2.5 space-y-1">
+                        <span className="text-[11px] font-medium text-neutral-500">
+                          借鉴的抖音爆款切入点：
+                        </span>
+                        <ul className="space-y-0.5">
+                          {currentResult.trendInsights.viralHooks
+                            .slice(0, 2)
+                            .map((h, i) => (
+                              <li
+                                key={i}
+                                className="text-[11px] leading-relaxed text-neutral-600"
+                              >
+                                · {h}
+                              </li>
+                            ))}
+                        </ul>
+                      </div>
+                    )}
+
+                    {currentResult.trendInsights.hotKeywords.length > 0 && (
+                      <div className="mt-2.5 flex flex-wrap items-center gap-1.5">
+                        <span className="text-[11px] text-neutral-400">
+                          调研热词：
+                        </span>
+                        {currentResult.trendInsights.hotKeywords.map((kw) => (
+                          <span
+                            key={kw}
+                            className="rounded border border-neutral-200/80 bg-white px-1.5 py-0.5 text-[10px] text-neutral-600"
+                          >
+                            {kw}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                )}
+
                 {/* Titles */}
                 <div>
                   <div className="mb-2 flex items-center justify-between">
