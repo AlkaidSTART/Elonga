@@ -13,6 +13,7 @@ import {
   Menu,
   PenTool,
   SlidersHorizontal,
+  Workflow,
   X,
 } from "lucide-react";
 import { useWorkbenchStore } from "@/store/useWorkbenchStore";
@@ -21,6 +22,7 @@ const NAV_ITEMS = [
   { href: "/", label: "概览", icon: LayoutDashboard },
   { href: "/copywriting", label: "推流文案", icon: PenTool },
   { href: "/image-studio", label: "图片工坊", icon: ImageIcon },
+  { href: "/workflow", label: "图文工作流", icon: Workflow },
   { href: "/history", label: "创作记录", icon: History },
   { href: "/settings", label: "模型配置", icon: SlidersHorizontal },
 ] as const;
@@ -44,34 +46,40 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           initial={false}
           animate={{ width: collapsed ? 72 : 232 }}
           transition={{ type: "spring", stiffness: 340, damping: 34 }}
-          className="sticky top-0 hidden h-screen shrink-0 flex-col border-r border-neutral-200/80 bg-[#FAFAFA] lg:flex"
+          className="sticky top-0 hidden h-screen shrink-0 flex-col overflow-hidden border-r border-neutral-200/80 bg-[#FAFAFA] lg:flex"
         >
           {/* Brand Header */}
-          <div className="flex h-14 items-center justify-between px-4 border-b border-neutral-200/60">
-            <Link
-              href="/"
-              className="flex items-center gap-2.5 overflow-hidden"
-            >
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="/elonga-logo.png"
-                alt="Elonga Logo"
-                className="h-7 w-7 shrink-0 object-contain"
-              />
-              <AnimatePresence initial={false}>
-                {!collapsed && (
-                  <motion.span
-                    initial={{ opacity: 0, x: -4 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: -4 }}
-                    transition={{ duration: 0.16 }}
-                    className="text-[17px] font-bold tracking-tight text-neutral-900"
+          <div
+            className={`flex h-14 items-center border-b border-neutral-200/60 ${
+              collapsed ? "justify-center px-2" : "justify-between px-4"
+            }`}
+          >
+            <AnimatePresence initial={false}>
+              {!collapsed && (
+                <motion.div
+                  initial={{ opacity: 0, width: 0 }}
+                  animate={{ opacity: 1, width: "auto" }}
+                  exit={{ opacity: 0, width: 0 }}
+                  transition={{ duration: 0.16 }}
+                  className="overflow-hidden"
+                >
+                  <Link
+                    href="/"
+                    className="flex items-center gap-2.5 whitespace-nowrap"
                   >
-                    Elonga
-                  </motion.span>
-                )}
-              </AnimatePresence>
-            </Link>
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src="/elonga-logo.png"
+                      alt="Elonga Logo"
+                      className="h-7 w-7 shrink-0 object-contain"
+                    />
+                    <span className="text-[17px] font-bold tracking-tight text-neutral-900">
+                      Elonga
+                    </span>
+                  </Link>
+                </motion.div>
+              )}
+            </AnimatePresence>
 
             <button
               type="button"

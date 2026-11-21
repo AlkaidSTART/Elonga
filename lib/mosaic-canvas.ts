@@ -2,7 +2,8 @@ import * as StackBlur from "stackblur-canvas";
 import type { RedactionAction } from "@/store/useImageStudioStore";
 
 function getBoundingBox(action: RedactionAction, canvasW: number, canvasH: number) {
-  const pad = Math.ceil(action.brushSize / 2 + action.intensity * 1.5 + 8);
+  const strokePad = action.shape === "brush" ? action.brushSize / 2 : 0;
+  const pad = Math.ceil(strokePad + action.intensity * 1.5 + 8);
   if (action.shape === "rect" && action.rect) {
     const x1 = Math.max(0, Math.floor(Math.min(action.rect.x, action.rect.x + action.rect.w) - pad));
     const y1 = Math.max(0, Math.floor(Math.min(action.rect.y, action.rect.y + action.rect.h) - pad));
@@ -56,6 +57,18 @@ function drawActionMask(
   const pts = action.points ?? [];
   if (pts.length === 0) return;
 
+  if (action.shape === "lasso") {
+    if (pts.length < 3) return;
+    maskCtx.beginPath();
+    maskCtx.moveTo(pts[0].x - offsetX, pts[0].y - offsetY);
+    for (let i = 1; i < pts.length; i++) {
+      maskCtx.lineTo(pts[i].x - offsetX, pts[i].y - offsetY);
+    }
+    maskCtx.closePath();
+    maskCtx.fill();
+    return;
+  }
+
   maskCtx.lineCap = "round";
   maskCtx.lineJoin = "round";
   maskCtx.lineWidth = action.brushSize;
@@ -95,6 +108,14 @@ export function applyRedactionAction(
       const rx = action.rect.w >= 0 ? action.rect.x : action.rect.x + action.rect.w;
       const ry = action.rect.h >= 0 ? action.rect.y : action.rect.y + action.rect.h;
       ctx.fillRect(rx, ry, Math.abs(action.rect.w), Math.abs(action.rect.h));
+    } else if (action.shape === "lasso" && action.points && action.points.length >= 3) {
+      ctx.beginPath();
+      ctx.moveTo(action.points[0].x, action.points[0].y);
+      for (let i = 1; i < action.points.length; i++) {
+        ctx.lineTo(action.points[i].x, action.points[i].y);
+      }
+      ctx.closePath();
+      ctx.fill();
     } else if (action.points && action.points.length > 0) {
       ctx.lineCap = "round";
       ctx.lineJoin = "round";

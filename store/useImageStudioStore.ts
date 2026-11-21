@@ -1,8 +1,9 @@
 import { create } from "zustand";
+import type { AutoRedactCategory } from "@/lib/auto-redact";
 
 export type ImageStudioMode = "mosaic" | "stylize";
 export type MosaicType = "stackblur" | "pixelate" | "solid";
-export type ToolShape = "brush" | "rect";
+export type ToolShape = "lasso" | "rect" | "brush";
 export type Style2DPreset = "anime" | "ghibli" | "cel" | "watercolor";
 
 export interface Point {
@@ -18,6 +19,9 @@ export interface RedactionAction {
   brushSize: number;
   points?: Point[];
   rect?: { x: number; y: number; w: number; h: number };
+  source?: "auto" | "manual";
+  label?: string;
+  category?: AutoRedactCategory;
 }
 
 export interface ImageMeta {
@@ -38,6 +42,11 @@ interface ImageStudioState {
   actions: RedactionAction[];
   redoStack: RedactionAction[];
 
+  autoCategories: AutoRedactCategory[];
+  isAutoDetecting: boolean;
+  autoDetectMode: "ai" | "local" | null;
+  manualEnabled: boolean;
+
   stylePreset: Style2DPreset;
   stylePrompt: string;
   stylizeStrength: number;
@@ -55,9 +64,18 @@ interface ImageStudioState {
   setBrushSize: (size: number) => void;
   setIntensity: (intensity: number) => void;
   pushAction: (action: RedactionAction) => void;
+  replaceAutoActions: (autoActions: RedactionAction[]) => void;
+  removeActionById: (id: string) => void;
   undoAction: () => void;
   redoAction: () => void;
   resetActions: () => void;
+
+  toggleAutoCategory: (category: AutoRedactCategory) => void;
+  setAutoDetectStatus: (
+    loading: boolean,
+    mode?: "ai" | "local" | null
+  ) => void;
+  setManualEnabled: (enabled: boolean) => void;
 
   setStylePreset: (preset: Style2DPreset) => void;
   setStylePrompt: (prompt: string) => void;
@@ -76,11 +94,16 @@ export const useImageStudioStore = create<ImageStudioState>((set) => ({
   imageMeta: null,
 
   mosaicType: "stackblur",
-  toolShape: "brush",
+  toolShape: "lasso",
   brushSize: 32,
   intensity: 18,
   actions: [],
   redoStack: [],
+
+  autoCategories: ["text", "face", "qrcode"],
+  isAutoDetecting: false,
+  autoDetectMode: null,
+  manualEnabled: true,
 
   stylePreset: "anime",
   stylePrompt: "",
@@ -97,6 +120,7 @@ export const useImageStudioStore = create<ImageStudioState>((set) => ({
       imageMeta,
       actions: [],
       redoStack: [],
+      autoDetectMode: null,
       stylizedImage: null,
       stylizeMode: null,
       stylizeError: null,
@@ -107,20 +131,45 @@ export const useImageStudioStore = create<ImageStudioState>((set) => ({
       imageMeta: null,
       actions: [],
       redoStack: [],
+      autoDetectMode: null,
       stylizedImage: null,
       stylizeMode: null,
       stylizeError: null,
     }),
 
-  setMosaicType: (mosaicType) => set({ mosaicType }),
+  setMosaicType: (mosaicType) =>
+    set((state) => ({
+      mosaicType,
+      actions: state.actions.map((a) =>
+        a.source === "auto" ? { ...a, type: mosaicType } : a
+      ),
+    })),
   setToolShape: (toolShape) => set({ toolShape }),
   setBrushSize: (brushSize) => set({ brushSize }),
-  setIntensity: (intensity) => set({ intensity }),
+  setIntensity: (intensity) =>
+    set((state) => ({
+      intensity,
+      actions: state.actions.map((a) =>
+        a.source === "auto" ? { ...a, intensity } : a
+      ),
+    })),
 
   pushAction: (action) =>
     set((state) => ({
       actions: [...state.actions, action],
       redoStack: [],
+    })),
+  replaceAutoActions: (autoActions) =>
+    set((state) => ({
+      actions: [
+        ...autoActions,
+        ...state.actions.filter((a) => a.source === "manual"),
+      ],
+      redoStack: [],
+    })),
+  removeActionById: (id) =>
+    set((state) => ({
+      actions: state.actions.filter((a) => a.id !== id),
     })),
   undoAction: () =>
     set((state) => {
@@ -141,6 +190,22 @@ export const useImageStudioStore = create<ImageStudioState>((set) => ({
       };
     }),
   resetActions: () => set({ actions: [], redoStack: [] }),
+
+  toggleAutoCategory: (category) =>
+    set((state) => {
+      const exists = state.autoCategories.includes(category);
+      const next = exists
+        ? state.autoCategories.filter((c) => c !== category)
+        : [...state.autoCategories, category];
+      return { autoCategories: next };
+    }),
+  setAutoDetectStatus: (isAutoDetecting, autoDetectMode) =>
+    set((state) => ({
+      isAutoDetecting,
+      autoDetectMode:
+        autoDetectMode !== undefined ? autoDetectMode : state.autoDetectMode,
+    })),
+  setManualEnabled: (manualEnabled) => set({ manualEnabled }),
 
   setStylePreset: (stylePreset) => set({ stylePreset }),
   setStylePrompt: (stylePrompt) => set({ stylePrompt }),
