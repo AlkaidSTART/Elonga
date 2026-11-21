@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import {
   BookOpenText,
   Check,
@@ -270,13 +271,24 @@ export function CopywritingWorkspace() {
                     key={wc.id}
                     type="button"
                     onClick={() => setWordCount(wc.id)}
-                    className={`rounded-lg py-1.5 text-xs font-medium transition ${
+                    className={`relative rounded-lg py-1.5 text-xs font-medium transition-colors ${
                       wordCount === wc.id
-                        ? "bg-white text-slate-900 shadow-xs"
+                        ? "text-slate-900"
                         : "text-slate-500 hover:text-slate-800"
                     }`}
                   >
-                    {wc.label}
+                    {wordCount === wc.id && (
+                      <motion.div
+                        layoutId="wordCountPill"
+                        transition={{
+                          type: "spring",
+                          stiffness: 420,
+                          damping: 32,
+                        }}
+                        className="absolute inset-0 rounded-lg bg-white shadow-xs"
+                      />
+                    )}
+                    <span className="relative z-10">{wc.label}</span>
                   </button>
                 ))}
               </div>
@@ -440,61 +452,79 @@ export function CopywritingWorkspace() {
         </div>
 
         {/* History Drawer */}
-        {showHistory && (
-          <div className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-xs">
-            <h3 className="mb-3 text-xs font-semibold text-slate-700">
-              最近生成记录
-            </h3>
-            {history.length === 0 ? (
-              <p className="py-4 text-center text-xs text-slate-400">
-                暂无历史记录，生成一次文案后将自动保存于此
-              </p>
-            ) : (
-              <div className="max-h-52 space-y-2 overflow-y-auto pr-1">
-                {history.map((item) => (
-                  <div
-                    key={item.id}
-                    className={`flex items-center justify-between rounded-xl border p-2.5 transition ${
-                      currentResult?.id === item.id
-                        ? "border-indigo-300 bg-indigo-50/40"
-                        : "border-slate-100 bg-slate-50/60 hover:border-slate-200"
-                    }`}
-                  >
-                    <button
-                      type="button"
-                      onClick={() => {
-                        selectFromHistory(item.id);
-                        setShowHistory(false);
-                      }}
-                      className="flex flex-1 flex-col items-start text-left"
-                    >
-                      <div className="flex items-center gap-2">
-                        <span className="rounded bg-white px-1.5 py-0.5 text-[10px] font-medium text-slate-600 shadow-2xs">
-                          {PLATFORMS[item.platform].name}
-                        </span>
-                        <span className="line-clamp-1 text-xs font-medium text-slate-800">
-                          {item.topic}
-                        </span>
+        <AnimatePresence>
+          {showHistory && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+              className="overflow-hidden"
+            >
+              <div className="rounded-2xl border border-slate-200/80 bg-white p-4 shadow-xs">
+                <h3 className="mb-3 text-xs font-semibold text-slate-700">
+                  最近生成记录
+                </h3>
+                {history.length === 0 ? (
+                  <p className="py-4 text-center text-xs text-slate-400">
+                    暂无历史记录，生成一次文案后将自动保存于此
+                  </p>
+                ) : (
+                  <div className="max-h-52 space-y-2 overflow-y-auto pr-1">
+                    {history.map((item) => (
+                      <div
+                        key={item.id}
+                        className={`flex items-center justify-between rounded-xl border p-2.5 transition ${
+                          currentResult?.id === item.id
+                            ? "border-indigo-300 bg-indigo-50/40"
+                            : "border-slate-100 bg-slate-50/60 hover:border-slate-200"
+                        }`}
+                      >
+                        <button
+                          type="button"
+                          onClick={() => {
+                            selectFromHistory(item.id);
+                            setShowHistory(false);
+                          }}
+                          className="flex flex-1 flex-col items-start text-left"
+                        >
+                          <div className="flex items-center gap-2">
+                            <span className="rounded bg-white px-1.5 py-0.5 text-[10px] font-medium text-slate-600 shadow-2xs">
+                              {PLATFORMS[item.platform].name}
+                            </span>
+                            <span className="line-clamp-1 text-xs font-medium text-slate-800">
+                              {item.topic}
+                            </span>
+                          </div>
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => removeFromHistory(item.id)}
+                          className="ml-2 rounded-lg p-1.5 text-slate-400 hover:bg-rose-50 hover:text-rose-600"
+                          aria-label="删除记录"
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
                       </div>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => removeFromHistory(item.id)}
-                      className="ml-2 rounded-lg p-1.5 text-slate-400 hover:bg-rose-50 hover:text-rose-600"
-                      aria-label="删除记录"
-                    >
-                      <Trash2 className="h-3.5 w-3.5" />
-                    </button>
+                    ))}
                   </div>
-                ))}
+                )}
               </div>
-            )}
-          </div>
-        )}
+            </motion.div>
+          )}
+        </AnimatePresence>
 
         {/* Empty State or Generated Result */}
-        {!currentResult ? (
-          <div className="flex min-h-[480px] flex-col items-center justify-center rounded-2xl border border-dashed border-slate-200 bg-white/70 p-8 text-center">
+        <AnimatePresence mode="wait">
+          {!currentResult ? (
+            <motion.div
+              key="empty"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -8 }}
+              transition={{ duration: 0.24 }}
+              className="flex min-h-[480px] flex-col items-center justify-center rounded-2xl border border-dashed border-slate-200 bg-white/70 p-8 text-center"
+            >
             <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-indigo-50 text-indigo-600">
               <Sparkles className="h-6 w-6" />
             </div>
@@ -504,9 +534,16 @@ export function CopywritingWorkspace() {
             <p className="mt-1.5 max-w-sm text-xs leading-relaxed text-slate-500">
               在左侧选择目标平台（抖音、今日头条、快手或微信公众号），填写主题与关键词，即可一键生成结构化爆款文案与推流建议。
             </p>
-          </div>
+          </motion.div>
         ) : (
-          <div className="space-y-4">
+          <motion.div
+            key={currentResult.id}
+            initial={{ opacity: 0, y: 12, filter: "blur(4px)" }}
+            animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+            exit={{ opacity: 0, y: -8, filter: "blur(4px)" }}
+            transition={{ duration: 0.28, ease: [0.22, 1, 0.36, 1] }}
+            className="space-y-4"
+          >
             {/* Titles */}
             <div className="rounded-2xl border border-slate-200/80 bg-white p-5 shadow-xs">
               <div className="mb-3 flex items-center justify-between">
@@ -635,8 +672,9 @@ export function CopywritingWorkspace() {
                 ))}
               </ul>
             </div>
-          </div>
+          </motion.div>
         )}
+        </AnimatePresence>
       </section>
     </div>
   );

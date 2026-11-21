@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import {
   Download,
   Loader2,
@@ -40,7 +41,6 @@ export function Stylize2DPanel() {
   } = useImageStudioStore();
 
   const modelConfig = useWorkbenchStore((s) => s.modelConfig);
-  const setSettingsOpen = useWorkbenchStore((s) => s.setSettingsOpen);
 
   const handleStylize = async () => {
     if (!originalImage) return;
@@ -173,13 +173,12 @@ export function Stylize2DPanel() {
           {!modelConfig.apiKey.trim() && (
             <div className="rounded-xl border border-amber-200/70 bg-amber-50/60 p-3 text-xs leading-relaxed text-amber-800">
               当前未配置云端图像大模型 API Key，将使用本地二维线稿与赛璐璐算法进行即时预览。
-              <button
-                type="button"
-                onClick={() => setSettingsOpen(true)}
+              <Link
+                href="/settings"
                 className="ml-1 font-semibold text-indigo-700 underline underline-offset-2"
               >
                 去配置 API Key
-              </button>
+              </Link>
             </div>
           )}
 

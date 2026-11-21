@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { AnimatePresence, motion } from "framer-motion";
 import {
   Eraser,
   ImagePlus,
@@ -179,30 +180,44 @@ export function ImageStudioWorkspace() {
     <div className="space-y-5">
       {/* Studio Sub-Toolbar */}
       <div className="flex flex-wrap items-center justify-between gap-3 rounded-2xl border border-slate-200/80 bg-white px-5 py-3.5 shadow-xs">
-        <div className="flex items-center gap-2 rounded-xl bg-slate-100 p-1">
+        <div className="flex items-center gap-1 rounded-xl bg-slate-100 p-1">
           <button
             type="button"
             onClick={() => setActiveMode("mosaic")}
-            className={`flex items-center gap-2 rounded-lg px-4 py-1.5 text-xs font-semibold transition ${
+            className={`relative flex items-center gap-2 rounded-lg px-4 py-1.5 text-xs font-semibold transition-colors ${
               activeMode === "mosaic"
-                ? "bg-white text-slate-900 shadow-xs"
+                ? "text-slate-900"
                 : "text-slate-600 hover:text-slate-900"
             }`}
           >
-            <Eraser className="h-3.5 w-3.5" />
-            <span>智能打码</span>
+            {activeMode === "mosaic" && (
+              <motion.div
+                layoutId="imageStudioModePill"
+                transition={{ type: "spring", stiffness: 420, damping: 32 }}
+                className="absolute inset-0 rounded-lg bg-white shadow-xs"
+              />
+            )}
+            <Eraser className="relative z-10 h-3.5 w-3.5" />
+            <span className="relative z-10">智能打码</span>
           </button>
           <button
             type="button"
             onClick={() => setActiveMode("stylize")}
-            className={`flex items-center gap-2 rounded-lg px-4 py-1.5 text-xs font-semibold transition ${
+            className={`relative flex items-center gap-2 rounded-lg px-4 py-1.5 text-xs font-semibold transition-colors ${
               activeMode === "stylize"
-                ? "bg-white text-slate-900 shadow-xs"
+                ? "text-slate-900"
                 : "text-slate-600 hover:text-slate-900"
             }`}
           >
-            <Wand2 className="h-3.5 w-3.5" />
-            <span>二维风格化</span>
+            {activeMode === "stylize" && (
+              <motion.div
+                layoutId="imageStudioModePill"
+                transition={{ type: "spring", stiffness: 420, damping: 32 }}
+                className="absolute inset-0 rounded-lg bg-white shadow-xs"
+              />
+            )}
+            <Wand2 className="relative z-10 h-3.5 w-3.5" />
+            <span className="relative z-10">二维风格化</span>
           </button>
         </div>
 
@@ -223,7 +238,17 @@ export function ImageStudioWorkspace() {
         </div>
       </div>
 
-      {activeMode === "mosaic" ? <MosaicEditor /> : <Stylize2DPanel />}
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={activeMode}
+          initial={{ opacity: 0, y: 8, filter: "blur(4px)" }}
+          animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
+          exit={{ opacity: 0, y: -8, filter: "blur(4px)" }}
+          transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
+        >
+          {activeMode === "mosaic" ? <MosaicEditor /> : <Stylize2DPanel />}
+        </motion.div>
+      </AnimatePresence>
     </div>
   );
 }
