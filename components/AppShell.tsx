@@ -247,7 +247,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </AnimatePresence>
 
           {/* Main Route Viewport */}
-          <main className="mx-auto w-full max-w-6xl flex-1 px-5 py-7 sm:px-8 lg:px-10">
+          <main className="mx-auto w-full max-w-[1380px] flex-1 px-5 py-6 sm:px-8 lg:px-11 lg:py-8">
             {children}
           </main>
         </div>

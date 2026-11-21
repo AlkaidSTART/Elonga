@@ -1,11 +1,11 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f7f7f5;
-  --foreground: #18181b;
+  --background: #f6f4ef;
+  --foreground: #141413;
   --surface: #ffffff;
-  --surface-muted: #f9f8f6;
-  --border-subtle: #e8e6e1;
+  --surface-muted: #f2efe8;
+  --border-subtle: #e5e2d9;
   --accent: #0f6e5d;
   --accent-hover: #0b5649;
 }
@@ -15,6 +15,7 @@
   --color-foreground: var(--foreground);
   --font-sans: var(--font-geist-sans), "PingFang SC", "Hiragino Sans GB", "Microsoft YaHei", -apple-system, BlinkMacSystemFont, sans-serif;
   --font-mono: var(--font-geist-mono), ui-monospace, SFMono-Regular, Menlo, monospace;
+  --font-serif: "Songti SC", "STSong", "Noto Serif SC", "Source Han Serif SC", Georgia, serif;
 }
 
 body {
@@ -23,6 +24,10 @@ body {
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+.font-editorial {
+  font-family: var(--font-serif);
 }
 
 /* Subtle minimalist scrollbars */
