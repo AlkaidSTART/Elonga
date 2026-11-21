@@ -1,11 +1,15 @@
+import type { DouyinTrendInsights, SkillTraceItem } from "./skills/types";
+
 export type PlatformId = "douyin" | "toutiao" | "kuaishou" | "wechat";
 
+export type CharityScenarioId = "story" | "activity" | "science";
+
 export type ContentTypeId =
+  | CharityScenarioId
   | "knowledge"
   | "emotion"
   | "hotspot"
   | "review"
-  | "story"
   | "opinion";
 
 export type ToneId =
@@ -92,21 +96,29 @@ export const PLATFORMS: Record<PlatformId, PlatformMeta> = {
   },
 };
 
-export const CONTENT_TYPES: { id: ContentTypeId; label: string; hint: string }[] = [
-  { id: "knowledge", label: "干货科普", hint: "拆解方法论与实用技巧" },
-  { id: "emotion", label: "情绪共鸣", hint: "切中日常焦虑与温暖瞬间" },
-  { id: "hotspot", label: "热点解读", hint: "借势热门话题输出新视角" },
-  { id: "review", label: "好物种草", hint: "痛点场景切入+真实体验" },
-  { id: "story", label: "故事叙事", hint: "真实经历起承转合抓人" },
-  { id: "opinion", label: "观点输出", hint: "鲜明立场引发评论区讨论" },
+export const CONTENT_TYPES: { id: CharityScenarioId; label: string; hint: string }[] = [
+  { id: "story", label: "公益故事", hint: "真实人物与救助日常，用真实细节打动人心" },
+  { id: "activity", label: "活动倡议", hint: "志愿招募、物资募捐或公益行动号召" },
+  { id: "science", label: "公益科普", hint: "环保、助学、健康等通俗易懂的公益常识" },
 ];
 
+export const LEGACY_CONTENT_TYPE_LABELS: Record<ContentTypeId, string> = {
+  story: "公益故事",
+  activity: "活动倡议",
+  science: "公益科普",
+  knowledge: "公益科普",
+  emotion: "公益故事",
+  hotspot: "活动倡议",
+  review: "活动倡议",
+  opinion: "公益科普",
+};
+
 export const TONES: { id: ToneId; label: string }[] = [
-  { id: "authentic", label: "真诚自然" },
-  { id: "sharp", label: "犀利干练" },
-  { id: "warm", label: "温暖治愈" },
-  { id: "humorous", label: "幽默风趣" },
-  { id: "professional", label: "专业严谨" },
+  { id: "warm", label: "温暖真诚" },
+  { id: "authentic", label: "平实自然" },
+  { id: "sharp", label: "直击痛点" },
+  { id: "humorous", label: "轻松亲切" },
+  { id: "professional", label: "客观清晰" },
 ];
 
 export const WORD_COUNTS: { id: WordCountId; label: string; desc: string }[] = [
@@ -132,4 +144,6 @@ export interface CopywritingResult {
   isPublished?: boolean;
   publishedAt?: string;
   isViral?: boolean;
+  trendInsights?: DouyinTrendInsights;
+  skillTraces?: SkillTraceItem[];
 }

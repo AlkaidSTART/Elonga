@@ -1,22 +1,23 @@
 import {
-  CONTENT_TYPES,
+  LEGACY_CONTENT_TYPE_LABELS,
   PLATFORMS,
-  TONES,
   type ContentTypeId,
   type CopywritingResult,
   type PlatformId,
   type ToneId,
   type WordCountId,
 } from "./platforms";
+import type { DouyinTrendInsights } from "./skills/types";
 
 export interface CopywritingRequest {
   platform: PlatformId;
   contentType: ContentTypeId;
-  tone: ToneId;
+  tone?: ToneId;
   wordCount: WordCountId;
   topic: string;
   keywords?: string;
   targetAudience?: string;
+  trendInsights?: DouyinTrendInsights;
 }
 
 function parseKeywords(raw?: string): string[] {
@@ -32,24 +33,25 @@ export function generateLocalCopywriting(
   req: CopywritingRequest
 ): CopywritingResult {
   const platformMeta = PLATFORMS[req.platform];
-  const typeLabel =
-    CONTENT_TYPES.find((c) => c.id === req.contentType)?.label ?? "干货分享";
-  const toneLabel = TONES.find((t) => t.id === req.tone)?.label ?? "真诚自然";
-  const topic = req.topic.trim() || "高效工作与内容创作";
+  const scenarioLabel =
+    LEGACY_CONTENT_TYPE_LABELS[req.contentType] ?? "公益故事";
+  const tone: ToneId = req.tone ?? "warm";
+  const topic = req.topic.trim() || "社区公益微光行动";
   const kwList = parseKeywords(req.keywords);
-  const audience = req.targetAudience?.trim() || "正在寻找突破的创作者与职场人";
+  const audience =
+    req.targetAudience?.trim() || "关注公益、愿意顺手传递善意的普通人";
 
-  const titles = buildTitles(req.platform, topic, req.contentType);
-  const hook = buildHook(req.platform, topic, req.tone, audience);
-  const body = buildBody(req, topic, audience, kwList, typeLabel, toneLabel);
-  const cta = buildCta(req.platform, topic);
-  const tags = buildTags(req.platform, topic, kwList, typeLabel);
+  const titles = buildCharityTitles(req.platform, topic, req.contentType, req.trendInsights);
+  const hook = buildCharityHook(req.platform, topic, req.trendInsights);
+  const body = buildCharityBody(req, topic, audience, kwList, scenarioLabel);
+  const cta = buildCharityCta(req.platform, topic);
+  const tags = buildCharityTags(req.platform, topic, kwList, scenarioLabel, req.trendInsights);
 
   return {
     id: `draft_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
     platform: req.platform,
     contentType: req.contentType,
-    tone: req.tone,
+    tone,
     topic,
     titles,
     hook,
@@ -59,102 +61,104 @@ export function generateLocalCopywriting(
     tips: platformMeta.algorithmTips,
     mode: "local",
     createdAt: new Date().toISOString(),
+    trendInsights: req.trendInsights,
   };
 }
 
-function buildTitles(
+function buildCharityTitles(
   platform: PlatformId,
   topic: string,
-  contentType: ContentTypeId
+  contentType: ContentTypeId,
+  trendInsights?: DouyinTrendInsights
 ): string[] {
+  const sampleTitle = trendInsights?.samples?.[0]?.title;
+
   if (platform === "douyin") {
     return [
-      `别再盲目试错了！关于「${topic}」，这3个底层动作直接拉开差距`,
-      `为什么同样做${topic}，别人总能稳稳起量？看懂这一步就够了`,
-      `建议收藏：把「${topic}」做透的真实经验，普通人也能直接套用`,
+      sampleTitle
+        ? `参考爆款切入：${sampleTitle}`
+        : `关于「${topic}」，现场传回来的这一幕让所有人破防了`,
+      `别小看这一次顺手转发，它真的在帮「${topic}」带来改变`,
+      `很多人问我们做「${topic}」图什么，看完这几十秒你就懂了`,
     ];
   }
   if (platform === "toutiao") {
     return [
-      `深度拆解「${topic}」：大多数人忽略的3个关键细节，越早看清越受益`,
-      `为什么越来越多人开始重视${topic}？内行人总结的实战规律全在这里`,
-      `从0到1理清「${topic}」：避开这4个常见误区，效率至少提升一倍`,
+      `走近「${topic}」一线：那些容易被忽略的真实需求与温暖变化`,
+      `为什么越来越多人开始关注${topic}？一线志愿者记录下这些细节`,
+      `透明回访「${topic}」：每一份微小善意，最终都落到了实处`,
     ];
   }
   if (platform === "kuaishou") {
     return [
-      `说句实在话，做「${topic}」千万别走弯路，老铁们看这一条就明白了`,
-      `实打实分享！我摸索了很久的「${topic}」笨办法，反而最管用`,
-      `真心建议：如果你也在琢磨${topic}，这几个土办法一定要试试`,
+      `咱今天说点实在的，关于「${topic}」，一线现场真挺不容易`,
+      `实打实记录「${topic}」的进展，感谢每一位默默帮忙的家人`,
+      `不喊口号，带大家看看「${topic}」这几天的真实变化`,
     ];
   }
+
   const angle =
-    contentType === "emotion"
-      ? "治愈与清醒"
-      : contentType === "opinion"
-        ? "深度思考"
-        : "实战复盘";
+    contentType === "activity"
+      ? "行动倡议"
+      : contentType === "science"
+        ? "公益科普"
+        : "温暖记录";
+
   return [
-    `关于「${topic}」的${angle}：真正拉开差距的，从来不是努力程度`,
-    `写给所有关注${topic}的人：慢下来，把核心问题一次想透`,
-    `在「${topic}」这件事上，我花了一年才验证出的3条长期原则`,
+    `「${topic}」${angle}：微光聚在一起，真的可以照亮很远的地方`,
+    `写给所有关心${topic}的人：我们不需要完美英雄，只需要多一点行动`,
+    `在「${topic}」的现场，我们看到了普通人善意最动人的样子`,
   ];
 }
 
-function buildHook(
+function buildCharityHook(
   platform: PlatformId,
   topic: string,
-  tone: ToneId,
-  audience: string
+  trendInsights?: DouyinTrendInsights
 ): string {
-  const tonePrefix =
-    tone === "sharp"
-      ? "先说一个反直觉的结论："
-      : tone === "warm"
-        ? "不知道你有没有过这样的时刻："
-        : tone === "humorous"
-          ? "说出来你可能不信，之前我也在这件事上交了不少学费："
-          : "今天不绕弯子，直接聊透一件事：";
+  const sampleHook = trendInsights?.samples?.[0]?.hook;
 
   if (platform === "douyin") {
-    return `${tonePrefix}很多${audience}做「${topic}」之所以一直卡住，不是不够拼，而是从第一步的发力方向就错了。停下来听完这 30 秒，你至少能省下两周的无效摸索。`;
+    if (sampleHook) {
+      return `${sampleHook} 今天想跟大家聊聊「${topic}」，花 30 秒看完，也许你的一个关注或转发就能帮到现场。`;
+    }
+    return `很多人以为做公益门槛很高，其实关于「${topic}」，真正改变现状的往往只是普通人顺手的一点微光。停下来看这 30 秒，带你看最真实的现场。`;
   }
   if (platform === "toutiao") {
-    return `最近「${topic}」成了不少人讨论的焦点。对于${audience}而言，真正决定结果上限的往往不是信息量，而是你能否识别出其中的关键变量。下面把核心逻辑拆开讲清楚。`;
+    return `最近「${topic}」牵动了不少热心网友的心。在一线开展工作时，我们发现大家最关心的不仅是故事本身，更是“真实需求在哪里、善意如何落地”。下面把最新情况如实分享给大家。`;
   }
   if (platform === "kuaishou") {
-    return `老铁们，今天咱掏心窝子聊聊「${topic}」。外面讲得天花乱坠的套路咱不整，就说说咱们普通人平时真能用得上的实在经验。`;
+    return `家人们，今天不讲虚头巴脑的大道理，直接带大家看看「${topic}」这边的真实情况。每一分关心都特别珍贵，咱有啥说啥。`;
   }
-  return `在和许多${audience}交流后，我发现一个共性问题：大家在面对「${topic}」时，往往投入了大量时间，却始终觉得缺少一点确定性。今天这篇文章，我们试着把这件事的底层脉络理顺。`;
+  return `在推进「${topic}」的过程中，我们越来越确信一件事：公益从来不是少数人做很多，而是大多数人顺手做一点点。今天这篇文章，想把现场最真实的故事与行动方式分享给你。`;
 }
 
-function buildBody(
+function buildCharityBody(
   req: CopywritingRequest,
   topic: string,
   audience: string,
   kwList: string[],
-  typeLabel: string,
-  toneLabel: string
+  scenarioLabel: string
 ): string {
   const kwNote =
-    kwList.length > 0 ? `（重点聚焦：${kwList.join("、")}）` : "";
+    kwList.length > 0 ? `（本次重点关注：${kwList.join("、")}）` : "";
 
   if (req.platform === "douyin") {
     const base = [
-      `第一，先做减法，再谈放大。`,
-      `在「${topic}」里${kwNote}，80% 的人败在贪多求全。与其同时追十个热点，不如先把最核心的一个动作打磨到极致。`,
+      `第一，把真实需求摆在台面上。`,
+      `在「${topic}」的日常推进里${kwNote}，我们发现大家最怕看到空喊口号。真正需要被看见的，是一线正在发生的具体困难，以及哪怕很小的一步能带来什么改变。`,
       ``,
-      `第二，用结果倒推过程，别自嗨。`,
-      `很多${audience}容易陷入“我觉得不错”的误区。真正有效的做法是先看用户到底为什么停下来、为什么愿意转发，把每一个关键节点做成可复制的标准动作。`,
+      `第二，降低每一个普通人的参与门槛。`,
+      `面对${audience}，不需要一上来就做惊天动地的大事。一次科普转发、一条友善留言、或者一次力所能及的志愿参与，都是在帮这件事被更多人看见。`,
       ``,
-      `第三，建立最小正反馈闭环。`,
-      `不要等全部完美再开始。今天先跑通一个最小样本，看数据反馈，保留有效部分，砍掉冗余环节，下一轮就会明显顺畅很多。`,
+      `第三，把每一次进展都透明地反馈出来。`,
+      `善意需要回响。后续我们也会持续更新「${topic}」的实际落地情况，让每一份关注都有迹可循、有处可依。`,
     ];
     if (req.wordCount === "long") {
       base.push(
         ``,
-        `第四，保持稳定输出节奏。`,
-        `推流算法偏爱持续且垂直的创作者。把「${topic}」拆成系列选题，用${toneLabel}的表达方式连续输出，系统自然会为你匹配更精准的人群。`
+        `第四，让善意成为可延续的日常。`,
+        `推流不是为了博眼球，而是为了让真正需要帮助的人和资源尽快相遇。如果你也认同「${topic}」的意义，欢迎一起把这份温暖接力下去。`
       );
     }
     return base.join("\n");
@@ -162,19 +166,19 @@ function buildBody(
 
   if (req.platform === "toutiao") {
     const sections = [
-      `一、为什么「${topic}」容易陷入低效循环？`,
-      `对于${audience}来说，常见的问题并不是缺少资料，而是缺乏一套稳定的判断框架${kwNote}。当信息碎片化堆叠时，越努力反而越容易焦虑。`,
+      `一、一线观察：为什么「${topic}」值得被更多人看见？`,
+      `对于${audience}而言，很多公益议题平时离日常生活似乎很远，但走进现场就会发现，其实只需要一点点关注与资源倾斜${kwNote}，就能实实在在改善很多人的处境。`,
       ``,
-      `二、破局的三个核心步骤（${typeLabel}视角）`,
-      `1. 明确核心目标：先界定清楚当前阶段最需要解决的单一问题，避免战线拉得过长。`,
-      `2. 抓住关键杠杆：在「${topic}」中，真正产生 80% 价值的是结构化复盘与高频迭代，而不是机械重复。`,
-      `3. 建立验证清单：每次实践后记录关键数据与体感变化，用客观反馈替代主观猜测。`,
+      `二、我们正在做的三件实事（${scenarioLabel}）`,
+      `1. 精准摸排真实需求：深入一线核实情况，确保每一份帮助都用在最紧迫的地方。`,
+      `2. 凝聚社会微小力量：通过通俗易懂的传播，让更多普通人了解并参与进来。`,
+      `3. 坚持透明公开反馈：定期同步项目进展与落地成果，不辜负每一份信任。`,
     ];
     if (req.wordCount !== "short") {
       sections.push(
         ``,
-        `三、给当下实践者的具体建议`,
-        `采用${toneLabel}的沟通与执行节奏，从今天就能落地的小切口开始。哪怕每天只优化一个环节，一个月后的复利效应也会非常明显。`
+        `三、普通人可以如何轻松参与？`,
+        `即使暂时无法亲临现场，动动手指点赞、转发让信息进入更大的推荐流量池，本身就是非常重要的一次公益助力。`
       );
     }
     return sections.join("\n");
@@ -182,74 +186,80 @@ function buildBody(
 
   if (req.platform === "kuaishou") {
     return [
-      `一说「${topic}」${kwNote}，很多老铁第一反应就是觉得门槛高、太复杂。其实真上手干过就知道，核心就三句话：`,
+      `说起「${topic}」${kwNote}，其实咱一线工作人员每天都在琢磨怎么把事办实、办透明：`,
       ``,
-      `第一句：别光看不练，先干起来再说。`,
-      `咱${audience}最实在的优势就是行动力。不用等什么万事俱备，把手头现成的条件用起来，边做边调比在脑子里空想一百遍都强。`,
+      `第一，不整虚的，只看实际效果。`,
+      `咱面向${audience}做公益，最看重的是真真切切帮到需要帮助的对象，每一笔物资和每一次行动都要落到实处。`,
       ``,
-      `第二句：哪里卡壳补哪里，别硬扛。`,
-      `遇到不懂的环节，多看看同行做得好的地方，拆解一下人家的节奏和细节，拿过来结合自己的实际情况改一改，立马就能见效。`,
+      `第二，人多力量大，顺手转发也是帮忙。`,
+      `很多老铁问自己能做点啥，其实点个赞、转给身边的朋友看看，让更多人知道「${topic}」，就已经帮了大忙了。`,
       ``,
-      `第三句：耐住性子，把口碑做出来。`,
-      `好东西都是磨出来的。只要咱内容实在、不忽悠人，信任攒起来了，后面的流量和机会自然就水到渠成。`,
+      `第三，持续汇报进展，对得起大家的信任。`,
+      `后面有新的好消息，咱第一时间在账号里向大家汇报，让每一份热心肠都不落空。`,
     ].join("\n");
   }
 
   const paragraphs = [
-    `01  为什么我们总在「${topic}」上感到用力过猛？`,
-    `很多时候，${audience}之所以觉得推进困难，是因为把注意力全放在了“动作数量”上，却忽略了“结构质量”${kwNote}。没有清晰主线的努力，往往只是一种消耗。`,
+    `01  为什么我们想把「${topic}」讲给更多人听`,
+    `很多时候，公益传播的难点不在于缺少感人的故事，而在于如何让${audience}真正理解这件事与我们的关联${kwNote}。`,
     ``,
-    `真正成熟的创作者，懂得在关键节点上做克制的选择。`,
+    `真正的公益，从来不是居高临下的苦情渲染，而是人与人之间平等、有尊严的互相照亮。`,
     ``,
-    `02  换个思路：把复杂问题拆解为可感知的日常`,
-    `在「${topic}」的实践中，不妨试着用${toneLabel}的视角重新审视手头的工作：`,
-    `首先，找到那个能带来长期复利的支点；其次，允许自己有一个不完美但可持续的起步阶段；最后，定期清理无效动作，把精力留给真正重要的事。`,
+    `02  在「${topic}」中，每一份微光都在算数`,
+    `无论是志愿者的奔走、专业力量的支持，还是屏幕前你的一次阅读与转发，都在共同推动改变的发生。把复杂的问题拆解成普通人能看懂、能参与的日常小事，正是我们坚持记录与发声的原因。`,
   ];
 
   if (req.wordCount !== "short") {
     paragraphs.push(
       ``,
-      `03  写在最后`,
-      `所有看似突然的突破，背后都是无数次微小校准的叠加。愿你在「${topic}」的探索中，既能保持向前走的锐气，也拥有不被短期波动裹挟的定力。`
+      `03  期待与你同行`,
+      `一个人的力量有限，但当越来越多关注「${topic}」的人聚在一起，微光就能汇聚成实实在在的温暖。感谢你看到这里，也欢迎把这份关注传递给身边更多朋友。`
     );
   }
   return paragraphs.join("\n");
 }
 
-function buildCta(platform: PlatformId, topic: string): string {
+function buildCharityCta(platform: PlatformId, topic: string): string {
   if (platform === "douyin") {
-    return `你在「${topic}」上遇到过最大的卡点是什么？打在评论区，点赞最高的问题我下期专门拍一条拆解！`;
+    return `如果你也支持「${topic}」，请在评论区打出一句鼓励，或者转给身边同样热心的朋友，让这条视频被更多人刷到！`;
   }
   if (platform === "toutiao") {
-    return `关于「${topic}」，你更认同哪一种做法？欢迎在评论区分享你的真实经历，大家一起交流参考。`;
+    return `关于「${topic}」，你有什么建议或想了解的现场细节？欢迎在评论区留言，我们会持续跟进解答。`;
   }
   if (platform === "kuaishou") {
-    return `觉得今天分享实在的老铁，点个小红心加关注，有啥想了解的「${topic}」问题直接打在公屏上，咱下期接着唠！`;
+    return `觉得这件事有意义的家人们，点个小红心支持一下，有想参与「${topic}」或了解进展的欢迎打在评论区！`;
   }
-  return `如果这篇文章对你有启发，欢迎点亮「在看」或转发给身边同样关注「${topic}」的朋友。你在实践中有哪些心得？欢迎在留言区聊聊。`;
+  return `如果这篇文章让你对「${topic}」多了一点了解，欢迎点亮「在看」或转发给身边的朋友。每一份关注，都是推动改变的开始。`;
 }
 
-function buildTags(
+function buildCharityTags(
   platform: PlatformId,
   topic: string,
   kwList: string[],
-  typeLabel: string
+  scenarioLabel: string,
+  trendInsights?: DouyinTrendInsights
 ): string[] {
   const cleanTopic = topic.replace(/[#\s]/g, "").slice(0, 12);
+  const trendTags = (trendInsights?.hotKeywords ?? [])
+    .map((k) => k.replace(/[#\s]/g, ""))
+    .filter(Boolean)
+    .slice(0, 2);
+
   const base = [
     cleanTopic,
-    typeLabel,
+    scenarioLabel,
     ...kwList.map((k) => k.replace(/[#\s]/g, "")),
+    ...trendTags,
   ].filter(Boolean);
 
   if (platform === "douyin") {
-    base.push("干货分享", "创作灵感");
+    base.push("微光公益", "传递正能量");
   } else if (platform === "toutiao") {
-    base.push("深度思考", "实用技巧");
+    base.push("公益行动", "温暖记录");
   } else if (platform === "kuaishou") {
-    base.push("真实分享", "生活经验");
+    base.push("凡人善举", "公益日常");
   } else {
-    base.push("自我成长", "深度阅读");
+    base.push("公益传播", "社会关爱");
   }
 
   return Array.from(new Set(base)).slice(0, 5);

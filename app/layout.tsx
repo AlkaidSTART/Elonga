@@ -18,7 +18,7 @@ export const metadata: Metadata = {
   description:
     "Elonga 创作工作台：支持抖音、今日头条、快手、微信公众号推流文案撰写，以及图片智能打码与大模型二维风格化。",
   icons: {
-    icon: "/elonga-logo.svg",
+    icon: "/elonga-logo.png",
   },
 };
 

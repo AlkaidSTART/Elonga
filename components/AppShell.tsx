@@ -54,7 +54,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src="/elonga-logo.svg"
+                src="/elonga-logo.png"
                 alt="Elonga Logo"
                 className="h-7 w-7 shrink-0 object-contain"
               />
@@ -152,7 +152,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             <Link href="/" className="flex items-center gap-2">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
-                src="/elonga-logo.svg"
+                src="/elonga-logo.png"
                 alt="Elonga Logo"
                 className="h-6 w-6 object-contain"
               />
@@ -191,7 +191,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                     <div className="flex items-center gap-2">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
-                        src="/elonga-logo.svg"
+                        src="/elonga-logo.png"
                         alt="Elonga Logo"
                         className="h-6 w-6 object-contain"
                       />

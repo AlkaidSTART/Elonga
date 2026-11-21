@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import type { EChartsOption } from "echarts";
@@ -39,19 +39,41 @@ const ITEM_VARIANTS = {
   },
 };
 
+const emptySubscribe = () => () => {};
+const getClientTodayKey = () => {
+  const now = new Date();
+  const y = now.getFullYear();
+  const m = String(now.getMonth() + 1).padStart(2, "0");
+  const d = String(now.getDate()).padStart(2, "0");
+  return `${y}-${m}-${d}`;
+};
+const getServerTodayKey = () => null;
+
 export default function OverviewPage() {
   const history = useWorkbenchStore((s) => s.history);
   const [modeOverride, setModeOverride] = useState<"live" | "demo" | null>(
     null
   );
+  const todayKey = useSyncExternalStore(
+    emptySubscribe,
+    getClientTodayKey,
+    getServerTodayKey
+  );
+  const today = useMemo(() => {
+    if (!todayKey) return null;
+    const [y, m, d] = todayKey.split("-").map(Number);
+    return new Date(y, m - 1, d);
+  }, [todayKey]);
 
   const isDemoMode =
     modeOverride !== null ? modeOverride === "demo" : history.length === 0;
 
   const stats = useMemo(
     () =>
-      isDemoMode ? buildDemoOverviewStats() : computeOverviewStats(history),
-    [isDemoMode, history]
+      isDemoMode
+        ? buildDemoOverviewStats(today)
+        : computeOverviewStats(history, today),
+    [isDemoMode, history, today]
   );
 
   const platformBarOption = useMemo<EChartsOption>(

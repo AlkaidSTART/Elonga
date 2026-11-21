@@ -37,7 +37,7 @@ function formatShortDate(date: Date): string {
   return `${month}/${day}`;
 }
 
-export function buildDemoOverviewStats(): OverviewStats {
+export function buildDemoOverviewStats(today: Date | null): OverviewStats {
   const platformStats: PlatformStat[] = [
     {
       id: "douyin",
@@ -81,7 +81,6 @@ export function buildDemoOverviewStats(): OverviewStats {
   const totalPublished = platformStats.reduce((sum, p) => sum + p.publishedCount, 0);
   const totalViral = platformStats.reduce((sum, p) => sum + p.viralCount, 0);
 
-  const today = new Date();
   const sampleSeries = [
     { created: 16, published: 13, viral: 4 },
     { created: 20, published: 17, viral: 5 },
@@ -92,16 +91,18 @@ export function buildDemoOverviewStats(): OverviewStats {
     { created: 24, published: 19, viral: 6 },
   ];
 
-  const dailyTrend: DailyTrendPoint[] = sampleSeries.map((pt, idx) => {
-    const d = new Date(today);
-    d.setDate(today.getDate() - (6 - idx));
-    return {
-      dateLabel: formatShortDate(d),
-      createdCount: pt.created,
-      publishedCount: pt.published,
-      viralCount: pt.viral,
-    };
-  });
+  const dailyTrend: DailyTrendPoint[] = today
+    ? sampleSeries.map((pt, idx) => {
+        const d = new Date(today);
+        d.setDate(today.getDate() - (6 - idx));
+        return {
+          dateLabel: formatShortDate(d),
+          createdCount: pt.created,
+          publishedCount: pt.published,
+          viralCount: pt.viral,
+        };
+      })
+    : [];
 
   return {
     totalCreated,
@@ -116,7 +117,10 @@ export function buildDemoOverviewStats(): OverviewStats {
   };
 }
 
-export function computeOverviewStats(history: CopywritingResult[]): OverviewStats {
+export function computeOverviewStats(
+  history: CopywritingResult[],
+  today: Date | null
+): OverviewStats {
   const totalCreated = history.length;
   const totalPublished = history.filter((item) => item.isPublished).length;
   const totalViral = history.filter((item) => item.isViral).length;
@@ -167,31 +171,32 @@ export function computeOverviewStats(history: CopywritingResult[]): OverviewStat
       ? sortedByMain[0].name
       : "暂无";
 
-  const today = new Date();
-  const dailyTrend: DailyTrendPoint[] = Array.from({ length: 7 }, (_, idx) => {
-    const d = new Date(today);
-    d.setDate(today.getDate() - (6 - idx));
-    const dateKey = d.toISOString().slice(0, 10);
+  const dailyTrend: DailyTrendPoint[] = today
+    ? Array.from({ length: 7 }, (_, idx) => {
+        const d = new Date(today);
+        d.setDate(today.getDate() - (6 - idx));
+        const dateKey = d.toISOString().slice(0, 10);
 
-    const createdCount = history.filter(
-      (item) => item.createdAt.slice(0, 10) === dateKey
-    ).length;
-    const publishedCount = history.filter(
-      (item) =>
-        item.isPublished &&
-        (item.publishedAt ?? item.createdAt).slice(0, 10) === dateKey
-    ).length;
-    const viralCount = history.filter(
-      (item) => item.isViral && item.createdAt.slice(0, 10) === dateKey
-    ).length;
+        const createdCount = history.filter(
+          (item) => item.createdAt.slice(0, 10) === dateKey
+        ).length;
+        const publishedCount = history.filter(
+          (item) =>
+            item.isPublished &&
+            (item.publishedAt ?? item.createdAt).slice(0, 10) === dateKey
+        ).length;
+        const viralCount = history.filter(
+          (item) => item.isViral && item.createdAt.slice(0, 10) === dateKey
+        ).length;
 
-    return {
-      dateLabel: formatShortDate(d),
-      createdCount,
-      publishedCount,
-      viralCount,
-    };
-  });
+        return {
+          dateLabel: formatShortDate(d),
+          createdCount,
+          publishedCount,
+          viralCount,
+        };
+      })
+    : [];
 
   return {
     totalCreated,
