@@ -3,6 +3,7 @@
 import { useMemo, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
+import { ArrowUpRight } from "lucide-react";
 import type { EChartsOption } from "echarts";
 import { EChartBox } from "@/components/charts/EChartBox";
 import { buildDemoOverviewStats } from "@/lib/overview-stats";
@@ -11,16 +12,16 @@ const CONTAINER_VARIANTS = {
   hidden: { opacity: 0 },
   show: {
     opacity: 1,
-    transition: { staggerChildren: 0.05 },
+    transition: { staggerChildren: 0.06 },
   },
 };
 
 const ITEM_VARIANTS = {
-  hidden: { opacity: 0, y: 8 },
+  hidden: { opacity: 0, y: 10 },
   show: {
     opacity: 1,
     y: 0,
-    transition: { duration: 0.28, ease: [0.22, 1, 0.36, 1] as const },
+    transition: { duration: 0.32, ease: [0.22, 1, 0.36, 1] as const },
   },
 };
 
@@ -53,59 +54,59 @@ export default function OverviewPage() {
       tooltip: {
         trigger: "axis",
         axisPointer: { type: "shadow" },
-        backgroundColor: "#FFFFFF",
-        borderColor: "#E8E6E1",
+        backgroundColor: "#161715",
+        borderColor: "#2A2B28",
         borderWidth: 1,
-        textStyle: { color: "#18181B", fontSize: 12 },
+        textStyle: { color: "#F5F3EE", fontSize: 12 },
       },
       legend: {
         top: 0,
         right: 0,
-        itemWidth: 10,
-        itemHeight: 10,
-        icon: "roundRect",
-        textStyle: { color: "#71717A", fontSize: 11 },
+        itemWidth: 8,
+        itemHeight: 8,
+        icon: "circle",
+        textStyle: { color: "#71716A", fontSize: 11 },
       },
       grid: {
-        left: 12,
-        right: 12,
-        top: 36,
-        bottom: 8,
+        left: 6,
+        right: 8,
+        top: 34,
+        bottom: 4,
         containLabel: true,
       },
       xAxis: {
         type: "category",
         data: stats.platformStats.map((p) => p.name),
-        axisLine: { lineStyle: { color: "#E8E6E1" } },
+        axisLine: { lineStyle: { color: "#D6D2C8" } },
         axisTick: { show: false },
-        axisLabel: { color: "#52525B", fontSize: 12 },
+        axisLabel: { color: "#44433E", fontSize: 11 },
       },
       yAxis: {
         type: "value",
         minInterval: 1,
-        splitLine: { lineStyle: { color: "#F4F3EF", type: "dashed" } },
-        axisLabel: { color: "#A1A1AA", fontSize: 11 },
+        splitLine: { lineStyle: { color: "#DFDCD2", type: "dashed" } },
+        axisLabel: { color: "#8C897F", fontSize: 11 },
       },
       series: [
         {
           name: "已发布",
           type: "bar",
-          barMaxWidth: 20,
-          itemStyle: { color: "#0F6E5D", borderRadius: [5, 5, 0, 0] },
+          barMaxWidth: 16,
+          itemStyle: { color: "#0F6E5D", borderRadius: [4, 4, 0, 0] },
           data: stats.platformStats.map((p) => p.publishedCount),
         },
         {
-          name: "累计创作",
+          name: "创作",
           type: "bar",
-          barMaxWidth: 20,
-          itemStyle: { color: "#94A3B8", borderRadius: [5, 5, 0, 0] },
+          barMaxWidth: 16,
+          itemStyle: { color: "#161715", borderRadius: [4, 4, 0, 0] },
           data: stats.platformStats.map((p) => p.createdCount),
         },
         {
-          name: "爆款文案",
+          name: "爆款",
           type: "bar",
-          barMaxWidth: 20,
-          itemStyle: { color: "#D97706", borderRadius: [5, 5, 0, 0] },
+          barMaxWidth: 16,
+          itemStyle: { color: "#D97706", borderRadius: [4, 4, 0, 0] },
           data: stats.platformStats.map((p) => p.viralCount),
         },
       ],
@@ -117,42 +118,42 @@ export default function OverviewPage() {
     () => ({
       tooltip: {
         trigger: "axis",
-        backgroundColor: "#FFFFFF",
-        borderColor: "#E8E6E1",
+        backgroundColor: "#161715",
+        borderColor: "#2A2B28",
         borderWidth: 1,
-        textStyle: { color: "#18181B", fontSize: 12 },
+        textStyle: { color: "#F5F3EE", fontSize: 12 },
       },
       legend: {
         top: 0,
         right: 0,
-        itemWidth: 12,
-        itemHeight: 8,
-        textStyle: { color: "#71717A", fontSize: 11 },
+        itemWidth: 10,
+        itemHeight: 6,
+        textStyle: { color: "#71716A", fontSize: 11 },
       },
       grid: {
-        left: 12,
-        right: 16,
-        top: 36,
-        bottom: 8,
+        left: 6,
+        right: 12,
+        top: 34,
+        bottom: 4,
         containLabel: true,
       },
       xAxis: {
         type: "category",
         boundaryGap: false,
         data: stats.dailyTrend.map((d) => d.dateLabel),
-        axisLine: { lineStyle: { color: "#E8E6E1" } },
+        axisLine: { lineStyle: { color: "#E2DFD7" } },
         axisTick: { show: false },
-        axisLabel: { color: "#52525B", fontSize: 11 },
+        axisLabel: { color: "#57554E", fontSize: 11 },
       },
       yAxis: {
         type: "value",
         minInterval: 1,
-        splitLine: { lineStyle: { color: "#F4F3EF", type: "dashed" } },
-        axisLabel: { color: "#A1A1AA", fontSize: 11 },
+        splitLine: { lineStyle: { color: "#E9E6DE", type: "dashed" } },
+        axisLabel: { color: "#9C9990", fontSize: 11 },
       },
       series: [
         {
-          name: "已发布条数",
+          name: "已发布",
           type: "line",
           smooth: true,
           symbolSize: 6,
@@ -167,14 +168,14 @@ export default function OverviewPage() {
               y2: 1,
               colorStops: [
                 { offset: 0, color: "rgba(15, 110, 93, 0.16)" },
-                { offset: 1, color: "rgba(15, 110, 93, 0.01)" },
+                { offset: 1, color: "rgba(15, 110, 93, 0.0)" },
               ],
             },
           },
           data: stats.dailyTrend.map((d) => d.publishedCount),
         },
         {
-          name: "爆款文案",
+          name: "爆款",
           type: "line",
           smooth: true,
           symbolSize: 6,
@@ -188,20 +189,20 @@ export default function OverviewPage() {
               x2: 0,
               y2: 1,
               colorStops: [
-                { offset: 0, color: "rgba(217, 119, 6, 0.14)" },
-                { offset: 1, color: "rgba(217, 119, 6, 0.01)" },
+                { offset: 0, color: "rgba(217, 119, 6, 0.12)" },
+                { offset: 1, color: "rgba(217, 119, 6, 0.0)" },
               ],
             },
           },
           data: stats.dailyTrend.map((d) => d.viralCount),
         },
         {
-          name: "累计创作",
+          name: "创作",
           type: "line",
           smooth: true,
           symbol: "none",
-          lineStyle: { width: 1.5, type: "dashed", color: "#94A3B8" },
-          itemStyle: { color: "#94A3B8" },
+          lineStyle: { width: 1.5, type: "dashed", color: "#8C897F" },
+          itemStyle: { color: "#8C897F" },
           data: stats.dailyTrend.map((d) => d.createdCount),
         },
       ],
@@ -214,130 +215,123 @@ export default function OverviewPage() {
       variants={CONTAINER_VARIANTS}
       initial="hidden"
       animate="show"
-      className="space-y-7"
+      className="space-y-10"
     >
-      {/* Header */}
+      {/* Top Asymmetric Architectural Band */}
       <motion.section
         variants={ITEM_VARIANTS}
-        className="flex flex-col gap-4 border-b border-[#E8E6E1] pb-6 sm:flex-row sm:items-end sm:justify-between"
+        className="grid grid-cols-1 items-stretch gap-8 lg:grid-cols-12"
       >
-        <div className="max-w-xl">
-          <p className="text-[11px] font-semibold tracking-widest text-[#0F6E5D] uppercase">
-            Overview &amp; Analytics
-          </p>
-          <h1 className="mt-1.5 text-2xl font-semibold tracking-tight text-zinc-900 sm:text-3xl">
-            创作与发布数据概览
-          </h1>
-          <p className="mt-1.5 text-sm leading-relaxed text-zinc-500">
-            统计平台累计发布条数、爆款文案产出与各分发平台的分布趋势。
-          </p>
-        </div>
-
-        <Link
-          href="/workflow"
-          className="inline-flex items-center justify-center rounded-xl bg-[#0F6E5D] px-4 py-2.5 text-xs font-medium text-white shadow-sm transition hover:bg-[#0B5649] active:scale-[0.98]"
-        >
-          开始图文创作
-        </Link>
-      </motion.section>
-
-      {/* 4 Core KPI Strip */}
-      <motion.section
-        variants={ITEM_VARIANTS}
-        className="grid grid-cols-1 divide-y divide-[#E8E6E1] overflow-hidden rounded-2xl border border-[#E8E6E1] bg-white shadow-[0_1px_3px_rgba(24,24,27,0.04)] sm:grid-cols-2 sm:divide-x sm:divide-y-0 lg:grid-cols-4"
-      >
-        <div className="p-5 sm:p-6">
-          <div className="flex items-center gap-2 text-xs font-medium text-zinc-500">
-            <span className="h-1.5 w-1.5 rounded-full bg-[#0F6E5D]" />
-            <span>累计已发布</span>
+        {/* Left: Deep Ink Sculptural Focal Surface */}
+        <div className="relative flex flex-col justify-between overflow-hidden rounded-3xl bg-[#161715] p-7 text-[#F5F3EE] sm:p-9 lg:col-span-7">
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-2 text-xs text-zinc-400">
+              <span className="h-2 w-2 rounded-full bg-[#15A085]" />
+              <span>累计已发布</span>
+            </div>
+            <Link
+              href="/workflow"
+              className="group inline-flex items-center gap-1.5 rounded-full bg-[#0F6E5D] px-4 py-2 text-xs font-medium text-white transition hover:bg-[#13836F]"
+            >
+              <span>开始创作</span>
+              <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+            </Link>
           </div>
-          <div className="mt-3 flex items-baseline gap-2">
-            <span className="font-mono text-3xl font-semibold tracking-tight text-zinc-900">
+
+          <div className="my-8 flex items-baseline gap-3">
+            <span className="font-mono text-6xl font-semibold tracking-tighter tabular-nums sm:text-7xl">
               {stats.totalPublished}
             </span>
-            <span className="text-xs text-zinc-400">条</span>
+            <span className="text-sm text-zinc-400">条</span>
           </div>
-          <p className="mt-2 text-[11px] text-zinc-500">
-            发布转化率 <span className="font-medium text-[#0F6E5D]">{stats.publishRate}%</span>
-          </p>
+
+          <div className="flex flex-wrap items-center gap-8 border-t border-white/10 pt-5 text-xs">
+            <div>
+              <span className="text-zinc-500">转化率</span>
+              <span className="ml-2.5 font-mono text-sm font-medium text-[#34D399]">
+                {stats.publishRate}%
+              </span>
+            </div>
+            <div>
+              <span className="text-zinc-500">爆款率</span>
+              <span className="ml-2.5 font-mono text-sm font-medium text-amber-400">
+                {stats.viralRate}%
+              </span>
+            </div>
+            <div>
+              <span className="text-zinc-500">覆盖平台</span>
+              <span className="ml-2.5 font-mono text-sm font-medium text-zinc-200">
+                {stats.activePlatformsCount}/4
+              </span>
+            </div>
+          </div>
         </div>
 
-        <div className="p-5 sm:p-6">
-          <div className="flex items-center gap-2 text-xs font-medium text-zinc-500">
-            <span className="h-1.5 w-1.5 rounded-full bg-slate-400" />
-            <span>平台累计创作</span>
+        {/* Right: Open Hairline Typographic Ledger (No Cards) */}
+        <div className="flex flex-col justify-between divide-y divide-[#DFDCD2] border-y border-[#DFDCD2] lg:col-span-5">
+          <div className="flex items-baseline justify-between py-6">
+            <div className="flex items-center gap-2.5">
+              <span className="h-1.5 w-1.5 rounded-full bg-zinc-400" />
+              <span className="text-xs font-medium text-zinc-500">累计创作</span>
+            </div>
+            <div className="flex items-baseline gap-1.5">
+              <span className="font-mono text-4xl font-semibold tracking-tight tabular-nums text-[#141413]">
+                {stats.totalCreated}
+              </span>
+              <span className="text-xs text-zinc-400">篇</span>
+            </div>
           </div>
-          <div className="mt-3 flex items-baseline gap-2">
-            <span className="font-mono text-3xl font-semibold tracking-tight text-zinc-900">
-              {stats.totalCreated}
-            </span>
-            <span className="text-xs text-zinc-400">篇</span>
-          </div>
-          <p className="mt-2 text-[11px] text-zinc-500">
-            持续沉淀于 Elonga 创作台
-          </p>
-        </div>
 
-        <div className="p-5 sm:p-6">
-          <div className="flex items-center gap-2 text-xs font-medium text-zinc-500">
-            <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />
-            <span>爆款文案产出</span>
+          <div className="flex items-baseline justify-between py-6">
+            <div className="flex items-center gap-2.5">
+              <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />
+              <span className="text-xs font-medium text-zinc-500">爆款产出</span>
+            </div>
+            <div className="flex items-baseline gap-1.5">
+              <span className="font-mono text-4xl font-semibold tracking-tight tabular-nums text-[#141413]">
+                {stats.totalViral}
+              </span>
+              <span className="text-xs text-zinc-400">篇</span>
+            </div>
           </div>
-          <div className="mt-3 flex items-baseline gap-2">
-            <span className="font-mono text-3xl font-semibold tracking-tight text-zinc-900">
-              {stats.totalViral}
-            </span>
-            <span className="text-xs text-zinc-400">篇</span>
-          </div>
-          <p className="mt-2 text-[11px] text-zinc-500">
-            爆款率 <span className="font-medium text-amber-600">{stats.viralRate}%</span>
-          </p>
-        </div>
 
-        <div className="p-5 sm:p-6">
-          <div className="flex items-center gap-2 text-xs font-medium text-zinc-500">
-            <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-            <span>覆盖分发平台</span>
-          </div>
-          <div className="mt-3 flex items-baseline gap-2">
-            <span className="font-mono text-3xl font-semibold tracking-tight text-zinc-900">
-              {stats.activePlatformsCount}
+          <div className="flex items-baseline justify-between py-6">
+            <div className="flex items-center gap-2.5">
+              <span className="h-1.5 w-1.5 rounded-full bg-[#0F6E5D]" />
+              <span className="text-xs font-medium text-zinc-500">主力渠道</span>
+            </div>
+            <span className="text-2xl font-semibold tracking-tight text-[#141413]">
+              {stats.topPlatformName}
             </span>
-            <span className="text-xs text-zinc-400">/ 4 个平台</span>
           </div>
-          <p className="mt-2 text-[11px] text-zinc-500">
-            主力平台：<span className="font-medium text-zinc-700">{stats.topPlatformName}</span>
-          </p>
         </div>
       </motion.section>
 
-      {/* ECharts Row: Platform Comparison + 7-Day Trend */}
+      {/* Bottom Asymmetric Visualization Band */}
       <motion.section
         variants={ITEM_VARIANTS}
-        className="grid grid-cols-1 gap-6 lg:grid-cols-12"
+        className="grid grid-cols-1 items-start gap-8 lg:grid-cols-12"
       >
-        <div className="rounded-2xl border border-[#E8E6E1] bg-white p-5 shadow-[0_1px_3px_rgba(24,24,27,0.04)] sm:p-6 lg:col-span-6">
-          <div className="mb-4">
-            <h2 className="text-sm font-semibold text-zinc-900">
-              各平台发布与爆款统计
+        {/* Left: Open Canvas Trend Chart (No Card Wrapper) */}
+        <div className="border-t border-[#DFDCD2] pt-6 lg:col-span-7">
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="text-sm font-semibold tracking-tight text-[#141413]">
+              近 7 日走势
             </h2>
-            <p className="mt-0.5 text-xs text-zinc-500">
-              抖音、今日头条、快手与微信公众号发布量及爆款数
-            </p>
-          </div>
-          <EChartBox option={platformBarOption} className="h-72 w-full" />
-        </div>
-
-        <div className="rounded-2xl border border-[#E8E6E1] bg-white p-5 shadow-[0_1px_3px_rgba(24,24,27,0.04)] sm:p-6 lg:col-span-6">
-          <div className="mb-4">
-            <h2 className="text-sm font-semibold text-zinc-900">
-              近 7 日发布与爆款走势
-            </h2>
-            <p className="mt-0.5 text-xs text-zinc-500">
-              追踪持续发布节奏与爆款文案产出趋势
-            </p>
+            <span className="font-mono text-[11px] text-zinc-400">7D</span>
           </div>
           <EChartBox option={trendOption} className="h-72 w-full" />
+        </div>
+
+        {/* Right: Warm Tinted Recessed Surface for Platform Breakdown */}
+        <div className="rounded-3xl bg-[#ECE9E1]/80 p-6 lg:col-span-5">
+          <div className="mb-4 flex items-center justify-between">
+            <h2 className="text-sm font-semibold tracking-tight text-[#141413]">
+              平台分布
+            </h2>
+            <span className="font-mono text-[11px] text-zinc-500">4 CHANNELS</span>
+          </div>
+          <EChartBox option={platformBarOption} className="h-72 w-full" />
         </div>
       </motion.section>
     </motion.div>

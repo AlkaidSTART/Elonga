@@ -40,13 +40,13 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <MotionConfig reducedMotion="user">
-      <div className="flex min-h-screen bg-[#F7F7F5] text-zinc-900">
+      <div className="flex min-h-screen bg-[#F5F3EE] text-[#141413]">
         {/* Desktop Sidebar */}
         <motion.aside
           initial={false}
-          animate={{ width: collapsed ? 72 : 232 }}
+          animate={{ width: collapsed ? 68 : 220 }}
           transition={{ type: "spring", stiffness: 340, damping: 34 }}
-          className="sticky top-0 hidden h-screen shrink-0 flex-col overflow-hidden border-r border-[#E7E5DF] bg-[#F3F2EE] lg:flex"
+          className="sticky top-0 hidden h-screen shrink-0 flex-col overflow-hidden border-r border-[#E2DFD7] bg-[#EFECE5] lg:flex"
         >
           {/* Brand Header */}
           <div
@@ -155,8 +155,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </motion.aside>
 
         {/* Mobile Header & Drawer */}
-        <div className="flex flex-1 flex-col min-w-0 bg-[#F7F7F5]">
-          <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-[#E7E5DF] bg-[#F7F7F5]/90 px-4 backdrop-blur-md lg:hidden">
+        <div className="flex flex-1 flex-col min-w-0 bg-[#F5F3EE]">
+          <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-[#E2DFD7] bg-[#F5F3EE]/90 px-4 backdrop-blur-md lg:hidden">
             <Link href="/" className="flex items-center gap-2">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img

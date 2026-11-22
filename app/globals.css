@@ -1,13 +1,14 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f6f4ef;
+  --background: #f5f3ee;
   --foreground: #141413;
   --surface: #ffffff;
-  --surface-muted: #f2efe8;
-  --border-subtle: #e5e2d9;
+  --surface-muted: #ece9e1;
+  --border-subtle: #e2dfd7;
   --accent: #0f6e5d;
   --accent-hover: #0b5649;
+  --ink: #161715;
 }
 
 @theme inline {
@@ -30,6 +31,15 @@ body {
   font-family: var(--font-serif);
 }
 
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+.studio-grid-dark {
+  background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
 /* Subtle minimalist scrollbars */
 ::-webkit-scrollbar {
   width: 5px;
@@ -41,10 +51,10 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #d4d4d8;
+  background: #d4d1c8;
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #a1a1aa;
+  background: #a8a498;
 }
