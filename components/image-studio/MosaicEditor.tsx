@@ -417,326 +417,38 @@ export function MosaicEditor() {
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12">
-      {/* Left Inspector Rail */}
-      <aside className="divide-y divide-neutral-200/70 border-b border-neutral-200 bg-[#FAFAFA] lg:col-span-4 lg:border-b-0 lg:border-r">
-        {/* Primary: Auto Redact */}
-        <div className="space-y-3 p-5">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-1.5">
-              <h3 className="text-xs font-semibold text-neutral-900">
-                智能自动打码
-              </h3>
-              <span className="rounded bg-neutral-900 px-1.5 py-0.5 text-[10px] font-medium text-white">
-                默认
-              </span>
-            </div>
-            {autoDetectMode && !isAutoDetecting && (
-              <span className="text-[11px] text-neutral-500">
-                {autoDetectMode === "ai" ? "AI 视觉" : "本地引擎"}
-              </span>
-            )}
-          </div>
-
-          <div className="grid grid-cols-3 gap-1.5">
-            {AUTO_CATEGORIES.map((item) => {
-              const active = autoCategories.includes(item.id);
-              return (
-                <button
-                  key={item.id}
-                  type="button"
-                  onClick={() => handleToggleCategory(item.id)}
-                  className={`rounded-lg border px-2 py-2 text-[11px] font-medium transition ${
-                    active
-                      ? "border-neutral-900 bg-neutral-900 text-white"
-                      : "border-neutral-200 bg-white text-neutral-600 hover:bg-neutral-50"
-                  }`}
-                >
-                  {item.label}
-                </button>
-              );
-            })}
-          </div>
-
-          <button
-            type="button"
-            disabled={isAutoDetecting}
-            onClick={() => {
-              if (imgRef.current) void runAutoRedact(imgRef.current);
-            }}
-            className="flex w-full items-center justify-center gap-1.5 rounded-lg border border-neutral-200 bg-white py-2 text-xs font-medium text-neutral-800 transition hover:bg-neutral-50 disabled:opacity-60"
-          >
-            {isAutoDetecting ? (
-              <>
-                <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                <span>正在自动识别敏感区域...</span>
-              </>
-            ) : (
-              <span>重新自动识别</span>
-            )}
-          </button>
-
-          {autoActions.length > 0 && (
-            <div className="space-y-1.5 pt-1">
-              <div className="flex items-center justify-between text-[11px] text-neutral-500">
-                <span>已自动打码 {autoActions.length} 处</span>
-                <span>可单独移除误判区域</span>
-              </div>
-              <div className="max-h-28 space-y-1 overflow-y-auto pr-1">
-                {autoActions.map((act, idx) => (
-                  <div
-                    key={act.id}
-                    className="flex items-center justify-between rounded-md border border-neutral-200/80 bg-white px-2.5 py-1.5 text-[11px]"
-                  >
-                    <span className="truncate font-medium text-neutral-700">
-                      #{idx + 1} {act.label || "敏感区域"}
-                    </span>
-                    <button
-                      type="button"
-                      onClick={() => removeActionById(act.id)}
-                      className="ml-2 rounded p-0.5 text-neutral-400 transition hover:bg-neutral-100 hover:text-neutral-700"
-                      title="取消此处的自动打码"
-                    >
-                      <X className="h-3 w-3" />
-                    </button>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-        </div>
-
-        {/* Mosaic Mode */}
-        <div className="p-5">
-          <h3 className="mb-3 text-xs font-semibold text-neutral-900">
-            打码样式
-          </h3>
-          <div className="space-y-1.5">
-            {MOSAIC_TYPES.map((item) => {
-              const active = mosaicType === item.id;
-              return (
-                <button
-                  key={item.id}
-                  type="button"
-                  onClick={() => setMosaicType(item.id)}
-                  className={`flex w-full items-center justify-between rounded-lg border px-3 py-2 text-left transition ${
-                    active
-                      ? "border-neutral-900 bg-white shadow-2xs"
-                      : "border-neutral-200/80 bg-white/60 hover:border-neutral-300 hover:bg-white"
-                  }`}
-                >
-                  <span className="text-xs font-semibold text-neutral-900">
-                    {item.label}
-                  </span>
-                  <span className="text-[11px] text-neutral-500">{item.desc}</span>
-                </button>
-              );
-            })}
-          </div>
-
-          {mosaicType !== "solid" && (
-            <div className="mt-3.5">
-              <div className="mb-1.5 flex items-center justify-between text-xs">
-                <span className="font-medium text-neutral-700">
-                  {mosaicType === "stackblur" ? "模糊半径" : "像素颗粒度"}
-                </span>
-                <span className="font-mono text-neutral-500">{intensity}</span>
-              </div>
-              <input
-                type="range"
-                min={6}
-                max={45}
-                value={intensity}
-                onChange={(e) => setIntensity(Number(e.target.value))}
-                className="w-full accent-neutral-900"
-              />
-            </div>
-          )}
-        </div>
-
-        {/* Manual Circle / Redaction */}
-        <div className="p-5">
-          <button
-            type="button"
-            onClick={() => setManualEnabled(!manualEnabled)}
-            className="flex w-full items-center justify-between text-left"
-          >
-            <div>
-              <div className="flex items-center gap-1.5 text-xs font-semibold text-neutral-900">
-                <span>手动圈选打码</span>
-                <span className="rounded bg-neutral-900 px-1.5 py-0.5 text-[10px] font-medium text-white">
-                  直接圈选
-                </span>
-              </div>
-              <p className="mt-0.5 text-[11px] text-neutral-500">
-                {manualEnabled
-                  ? `在右侧图片上圈出区域，松手即刻处理 · 已手动 ${manualActions.length} 处`
-                  : "点击开启以手动圈选、框选或涂抹"}
-              </p>
-            </div>
-            <ChevronDown
-              className={`h-4 w-4 text-neutral-500 transition-transform ${
-                manualEnabled ? "rotate-180" : ""
-              }`}
-            />
-          </button>
-
-          {manualEnabled && (
-            <div className="mt-4 space-y-3.5 border-t border-neutral-200/70 pt-3.5">
-              <div className="grid grid-cols-3 gap-1.5">
-                <button
-                  type="button"
-                  onClick={() => setToolShape("lasso")}
-                  className={`flex items-center justify-center gap-1 rounded-lg border py-2 text-[11px] font-medium transition ${
-                    toolShape === "lasso"
-                      ? "border-neutral-900 bg-neutral-900 text-white"
-                      : "border-neutral-200 bg-white text-neutral-600 hover:bg-neutral-50"
-                  }`}
-                >
-                  <Lasso className="h-3.5 w-3.5 shrink-0" />
-                  <span>自由圈选</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setToolShape("rect")}
-                  className={`flex items-center justify-center gap-1 rounded-lg border py-2 text-[11px] font-medium transition ${
-                    toolShape === "rect"
-                      ? "border-neutral-900 bg-neutral-900 text-white"
-                      : "border-neutral-200 bg-white text-neutral-600 hover:bg-neutral-50"
-                  }`}
-                >
-                  <Square className="h-3.5 w-3.5 shrink-0" />
-                  <span>矩形框选</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => setToolShape("brush")}
-                  className={`flex items-center justify-center gap-1 rounded-lg border py-2 text-[11px] font-medium transition ${
-                    toolShape === "brush"
-                      ? "border-neutral-900 bg-neutral-900 text-white"
-                      : "border-neutral-200 bg-white text-neutral-600 hover:bg-neutral-50"
-                  }`}
-                >
-                  <Brush className="h-3.5 w-3.5 shrink-0" />
-                  <span>画笔涂抹</span>
-                </button>
-              </div>
-
-              {toolShape === "brush" && (
-                <div>
-                  <div className="mb-1.5 flex items-center justify-between text-xs">
-                    <span className="font-medium text-neutral-700">画笔大小</span>
-                    <span className="font-mono text-neutral-500">{brushSize} px</span>
-                  </div>
-                  <input
-                    type="range"
-                    min={12}
-                    max={96}
-                    value={brushSize}
-                    onChange={(e) => setBrushSize(Number(e.target.value))}
-                    className="w-full accent-neutral-900"
-                  />
-                </div>
-              )}
-
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={undoAction}
-                  disabled={actions.length === 0}
-                  className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-neutral-200 bg-white py-2 text-xs font-medium text-neutral-700 transition hover:bg-neutral-50 disabled:opacity-40"
-                >
-                  <Undo2 className="h-3.5 w-3.5" />
-                  <span>撤销</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={redoAction}
-                  disabled={redoStack.length === 0}
-                  className="flex flex-1 items-center justify-center gap-1.5 rounded-lg border border-neutral-200 bg-white py-2 text-xs font-medium text-neutral-700 transition hover:bg-neutral-50 disabled:opacity-40"
-                >
-                  <Redo2 className="h-3.5 w-3.5" />
-                  <span>重做</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={resetActions}
-                  disabled={actions.length === 0}
-                  className="flex items-center justify-center rounded-lg border border-neutral-200 bg-white px-3 py-2 text-xs font-medium text-neutral-600 transition hover:bg-rose-50 hover:text-rose-600 disabled:opacity-40"
-                  title="清空所有打码"
-                >
-                  <RotateCcw className="h-3.5 w-3.5" />
-                </button>
-              </div>
-
-              {manualActions.length > 0 && (
-                <div className="max-h-24 space-y-1 overflow-y-auto pr-1 pt-0.5">
-                  {manualActions.map((act, idx) => (
-                    <div
-                      key={act.id}
-                      className="flex items-center justify-between rounded-md border border-neutral-200/80 bg-white px-2.5 py-1.5 text-[11px]"
-                    >
-                      <span className="truncate font-medium text-neutral-700">
-                        #{idx + 1} {act.label || "手动打码"}
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => removeActionById(act.id)}
-                        className="ml-2 rounded p-0.5 text-neutral-400 transition hover:bg-neutral-100 hover:text-neutral-700"
-                        title="移除此区域打码"
-                      >
-                        <X className="h-3 w-3" />
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-          )}
-        </div>
-
-        <div className="p-5">
-          <button
-            type="button"
-            onClick={handleDownload}
-            className="w-full rounded-lg bg-neutral-900 py-2.5 text-xs font-medium text-white transition hover:bg-neutral-800"
-          >
-            导出打码图片
-          </button>
-        </div>
-      </aside>
-
-      {/* Right Interactive Canvas Stage */}
-      <div className="flex flex-col bg-[#F4F5F7] p-4 lg:col-span-8">
+      {/* Left/Primary Darkroom Canvas Stage */}
+      <div className="flex flex-col bg-[#0F100F] p-5 studio-grid-dark lg:col-span-8">
         <div className="mb-3 flex items-center justify-between">
-          <span className="text-xs text-neutral-500">
+          <span className="font-mono text-[11px] text-zinc-400">
             {isAutoDetecting
-              ? "正在自动识别隐私区域..."
+              ? "自动识别中..."
               : manualEnabled
-              ? toolShape === "lasso"
-                ? `圈选模式：直接在图片上圈出要打码的区域，松手即刻处理（共 ${actions.length} 处）`
-                : toolShape === "rect"
-                ? `框选模式：在图片上拖拽框选要打码的区域，松手即刻处理（共 ${actions.length} 处）`
-                : `涂抹模式：在图片上涂抹要打码的区域（共 ${actions.length} 处）`
-              : `已自动打码 ${autoActions.length} 处${
-                  manualActions.length > 0 ? `，手动补充 ${manualActions.length} 处` : ""
-                }`}
+              ? `${
+                  toolShape === "lasso"
+                    ? "自由圈选"
+                    : toolShape === "rect"
+                    ? "矩形框选"
+                    : "画笔涂抹"
+                } · ${actions.length} 处`
+              : `已处理 ${actions.length} 处`}
           </span>
           <button
             type="button"
             onPointerDown={() => setShowOriginal(true)}
             onPointerUp={() => setShowOriginal(false)}
             onPointerLeave={() => setShowOriginal(false)}
-            className="rounded-md border border-neutral-200 bg-white px-2.5 py-1 text-xs font-medium text-neutral-700 select-none transition hover:bg-neutral-50"
+            className="rounded-full bg-white/[0.08] px-3 py-1 text-xs font-medium text-zinc-200 select-none transition hover:bg-white/[0.15]"
           >
-            {showOriginal ? "正在查看原图" : "按住对比原图"}
+            {showOriginal ? "原图" : "按住对比"}
           </button>
         </div>
 
-        <div className="relative flex min-h-[440px] flex-1 items-center justify-center overflow-hidden rounded-lg border border-neutral-200/80 bg-[radial-gradient(#d4d4d8_1px,transparent_1px)] [background-size:16px_16px] p-3">
+        <div className="relative flex min-h-[460px] flex-1 items-center justify-center overflow-hidden rounded-2xl bg-black/40 p-3 ring-1 ring-white/[0.07]">
           <div className="relative inline-block max-h-[560px] max-w-full">
             <canvas
               ref={canvasRef}
-              className="block max-h-[540px] max-w-full rounded object-contain shadow-sm"
+              className="block max-h-[540px] max-w-full rounded object-contain shadow-lg"
             />
             <canvas
               ref={overlayRef}
@@ -754,6 +466,270 @@ export function MosaicEditor() {
           </div>
         </div>
       </div>
+
+      {/* Right Docked Dark Inspector */}
+      <aside className="divide-y divide-white/10 border-t border-white/10 bg-[#1B1C1A] lg:col-span-4 lg:border-l lg:border-t-0">
+        {/* Auto Redact */}
+        <div className="space-y-3 p-5">
+          <div className="flex items-center justify-between">
+            <h3 className="text-xs font-medium text-zinc-300">自动识别</h3>
+            {autoDetectMode && !isAutoDetecting && (
+              <span className="font-mono text-[10px] text-zinc-500">
+                {autoDetectMode === "ai" ? "AI" : "LOCAL"}
+              </span>
+            )}
+          </div>
+
+          <div className="grid grid-cols-3 gap-1.5">
+            {AUTO_CATEGORIES.map((item) => {
+              const active = autoCategories.includes(item.id);
+              return (
+                <button
+                  key={item.id}
+                  type="button"
+                  onClick={() => handleToggleCategory(item.id)}
+                  className={`rounded-xl px-2 py-2 text-[11px] font-medium transition ${
+                    active
+                      ? "bg-[#0F6E5D] text-white"
+                      : "bg-white/[0.05] text-zinc-400 hover:bg-white/[0.1] hover:text-zinc-200"
+                  }`}
+                >
+                  {item.label}
+                </button>
+              );
+            })}
+          </div>
+
+          <button
+            type="button"
+            disabled={isAutoDetecting}
+            onClick={() => {
+              if (imgRef.current) void runAutoRedact(imgRef.current);
+            }}
+            className="flex w-full items-center justify-center gap-1.5 rounded-xl bg-white/[0.06] py-2 text-xs font-medium text-zinc-200 transition hover:bg-white/[0.12] disabled:opacity-50"
+          >
+            {isAutoDetecting ? (
+              <>
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                <span>识别中...</span>
+              </>
+            ) : (
+              <span>重新识别</span>
+            )}
+          </button>
+
+          {autoActions.length > 0 && (
+            <div className="max-h-24 space-y-1 overflow-y-auto pr-1 pt-1">
+              {autoActions.map((act, idx) => (
+                <div
+                  key={act.id}
+                  className="flex items-center justify-between rounded-lg bg-black/30 px-2.5 py-1.5 text-[11px]"
+                >
+                  <span className="truncate text-zinc-300">
+                    #{idx + 1} {act.label || "敏感区域"}
+                  </span>
+                  <button
+                    type="button"
+                    onClick={() => removeActionById(act.id)}
+                    className="ml-2 rounded p-0.5 text-zinc-500 transition hover:text-white"
+                    title="移除"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
+        {/* Mosaic Mode */}
+        <div className="p-5">
+          <h3 className="mb-3 text-xs font-medium text-zinc-300">样式</h3>
+          <div className="grid grid-cols-3 gap-1.5">
+            {MOSAIC_TYPES.map((item) => {
+              const active = mosaicType === item.id;
+              return (
+                <button
+                  key={item.id}
+                  type="button"
+                  onClick={() => setMosaicType(item.id)}
+                  className={`rounded-xl py-2 text-center text-[11px] font-medium transition ${
+                    active
+                      ? "bg-white text-[#141413]"
+                      : "bg-white/[0.05] text-zinc-400 hover:bg-white/[0.1] hover:text-zinc-200"
+                  }`}
+                >
+                  {item.label}
+                </button>
+              );
+            })}
+          </div>
+
+          {mosaicType !== "solid" && (
+            <div className="mt-4">
+              <div className="mb-1.5 flex items-center justify-between text-xs">
+                <span className="text-zinc-400">
+                  {mosaicType === "stackblur" ? "模糊半径" : "颗粒度"}
+                </span>
+                <span className="font-mono text-zinc-300">{intensity}</span>
+              </div>
+              <input
+                type="range"
+                min={6}
+                max={45}
+                value={intensity}
+                onChange={(e) => setIntensity(Number(e.target.value))}
+                className="w-full accent-[#15A085]"
+              />
+            </div>
+          )}
+        </div>
+
+        {/* Manual Redaction */}
+        <div className="p-5">
+          <button
+            type="button"
+            onClick={() => setManualEnabled(!manualEnabled)}
+            className="flex w-full items-center justify-between text-left"
+          >
+            <div className="flex items-center gap-2">
+              <span className="text-xs font-medium text-zinc-300">手动微调</span>
+              {manualActions.length > 0 && (
+                <span className="font-mono text-[10px] text-[#34D399]">
+                  {manualActions.length}
+                </span>
+              )}
+            </div>
+            <ChevronDown
+              className={`h-4 w-4 text-zinc-500 transition-transform ${
+                manualEnabled ? "rotate-180 text-white" : ""
+              }`}
+            />
+          </button>
+
+          {manualEnabled && (
+            <div className="mt-4 space-y-3.5">
+              <div className="grid grid-cols-3 gap-1.5">
+                <button
+                  type="button"
+                  onClick={() => setToolShape("lasso")}
+                  className={`flex items-center justify-center gap-1 rounded-xl py-2 text-[11px] font-medium transition ${
+                    toolShape === "lasso"
+                      ? "bg-[#0F6E5D] text-white"
+                      : "bg-white/[0.05] text-zinc-400 hover:bg-white/[0.1]"
+                  }`}
+                >
+                  <Lasso className="h-3.5 w-3.5 shrink-0" />
+                  <span>圈选</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setToolShape("rect")}
+                  className={`flex items-center justify-center gap-1 rounded-xl py-2 text-[11px] font-medium transition ${
+                    toolShape === "rect"
+                      ? "bg-[#0F6E5D] text-white"
+                      : "bg-white/[0.05] text-zinc-400 hover:bg-white/[0.1]"
+                  }`}
+                >
+                  <Square className="h-3.5 w-3.5 shrink-0" />
+                  <span>框选</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setToolShape("brush")}
+                  className={`flex items-center justify-center gap-1 rounded-xl py-2 text-[11px] font-medium transition ${
+                    toolShape === "brush"
+                      ? "bg-[#0F6E5D] text-white"
+                      : "bg-white/[0.05] text-zinc-400 hover:bg-white/[0.1]"
+                  }`}
+                >
+                  <Brush className="h-3.5 w-3.5 shrink-0" />
+                  <span>涂抹</span>
+                </button>
+              </div>
+
+              {toolShape === "brush" && (
+                <div>
+                  <div className="mb-1.5 flex items-center justify-between text-xs">
+                    <span className="text-zinc-400">画笔</span>
+                    <span className="font-mono text-zinc-300">{brushSize}px</span>
+                  </div>
+                  <input
+                    type="range"
+                    min={12}
+                    max={96}
+                    value={brushSize}
+                    onChange={(e) => setBrushSize(Number(e.target.value))}
+                    className="w-full accent-[#15A085]"
+                  />
+                </div>
+              )}
+
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={undoAction}
+                  disabled={actions.length === 0}
+                  className="flex flex-1 items-center justify-center gap-1 rounded-xl bg-white/[0.06] py-2 text-xs text-zinc-300 transition hover:bg-white/[0.12] disabled:opacity-30"
+                >
+                  <Undo2 className="h-3.5 w-3.5" />
+                  <span>撤销</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={redoAction}
+                  disabled={redoStack.length === 0}
+                  className="flex flex-1 items-center justify-center gap-1 rounded-xl bg-white/[0.06] py-2 text-xs text-zinc-300 transition hover:bg-white/[0.12] disabled:opacity-30"
+                >
+                  <Redo2 className="h-3.5 w-3.5" />
+                  <span>重做</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={resetActions}
+                  disabled={actions.length === 0}
+                  className="flex items-center justify-center rounded-xl bg-white/[0.06] px-3 py-2 text-xs text-zinc-400 transition hover:bg-rose-500/20 hover:text-rose-300 disabled:opacity-30"
+                  title="清空"
+                >
+                  <RotateCcw className="h-3.5 w-3.5" />
+                </button>
+              </div>
+
+              {manualActions.length > 0 && (
+                <div className="max-h-24 space-y-1 overflow-y-auto pr-1">
+                  {manualActions.map((act, idx) => (
+                    <div
+                      key={act.id}
+                      className="flex items-center justify-between rounded-lg bg-black/30 px-2.5 py-1.5 text-[11px]"
+                    >
+                      <span className="truncate text-zinc-300">
+                        #{idx + 1} {act.label || "手动"}
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => removeActionById(act.id)}
+                        className="ml-2 rounded p-0.5 text-zinc-500 hover:text-white"
+                      >
+                        <X className="h-3 w-3" />
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          )}
+        </div>
+
+        <div className="p-5">
+          <button
+            type="button"
+            onClick={handleDownload}
+            className="w-full rounded-full bg-[#0F6E5D] py-2.5 text-xs font-medium text-white transition hover:bg-[#13836F]"
+          >
+            导出图片
+          </button>
+        </div>
+      </aside>
     </div>
   );
 }

@@ -1,14 +1,14 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f5f3ee;
-  --foreground: #141413;
+  --background: #f7f8fa;
+  --foreground: #0f172a;
   --surface: #ffffff;
-  --surface-muted: #ece9e1;
-  --border-subtle: #e2dfd7;
-  --accent: #0f6e5d;
-  --accent-hover: #0b5649;
-  --ink: #161715;
+  --surface-muted: #f1f3f6;
+  --border-subtle: #e4e7ec;
+  --accent: #1d4ed8;
+  --accent-hover: #1e40af;
+  --ink: #0f141e;
 }
 
 @theme inline {
@@ -36,14 +36,16 @@ body {
 }
 
 .studio-grid-dark {
-  background-image: radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px);
-  background-size: 20px 20px;
+  background-image:
+    linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+  background-size: 24px 24px;
 }
 
-/* Subtle minimalist scrollbars */
+/* Precision minimalist scrollbars */
 ::-webkit-scrollbar {
-  width: 5px;
-  height: 5px;
+  width: 6px;
+  height: 6px;
 }
 
 ::-webkit-scrollbar-track {
@@ -51,10 +53,10 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #d4d1c8;
-  border-radius: 9999px;
+  background: #cbd5e1;
+  border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #a8a498;
+  background: #94a3b8;
 }

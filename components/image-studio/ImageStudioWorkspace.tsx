@@ -2,6 +2,7 @@
 
 import { useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
+import { ImagePlus, Sparkles } from "lucide-react";
 import { useImageStudioStore } from "@/store/useImageStudioStore";
 import { MosaicEditor } from "./MosaicEditor";
 import { Stylize2DPanel } from "./Stylize2DPanel";
@@ -114,17 +115,25 @@ export function ImageStudioWorkspace() {
         }}
         onDragLeave={() => setIsDragging(false)}
         onDrop={handleDrop}
-        className={`flex min-h-[460px] flex-col items-center justify-center rounded-xl border border-dashed p-10 text-center transition-colors ${
-          isDragging
-            ? "border-neutral-900 bg-neutral-100/70"
-            : "border-neutral-300 bg-[#FAFAFA] hover:border-neutral-400"
+        className={`relative flex min-h-[calc(100vh-8rem)] flex-col items-center justify-center overflow-hidden rounded-3xl bg-[#161715] p-10 text-center text-[#F5F3EE] studio-grid-dark transition-all ${
+          isDragging ? "ring-2 ring-[#15A085]" : ""
         }`}
       >
-        <h2 className="text-base font-semibold text-neutral-900">
-          上传图片开始处理
-        </h2>
-        <p className="mt-1.5 max-w-md text-xs leading-relaxed text-neutral-500">
-          支持拖拽或点击选择本地 JPG、PNG、WebP 图片。上传后可进行交互式隐私打码，或一键转换为二维动漫插画风格。
+        {/* Minimal Viewfinder Corner Marks */}
+        <span className="pointer-events-none absolute left-7 top-7 h-5 w-5 border-l border-t border-white/25" />
+        <span className="pointer-events-none absolute right-7 top-7 h-5 w-5 border-r border-t border-white/25" />
+        <span className="pointer-events-none absolute bottom-7 left-7 h-5 w-5 border-b border-l border-white/25" />
+        <span className="pointer-events-none absolute bottom-7 right-7 h-5 w-5 border-b border-r border-white/25" />
+
+        <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-white/[0.06] ring-1 ring-white/10">
+          <ImagePlus className="h-5 w-5 text-[#34D399]" />
+        </div>
+
+        <h1 className="text-xl font-semibold tracking-tight text-white">
+          图片工坊
+        </h1>
+        <p className="mt-2 font-mono text-[11px] tracking-wider text-zinc-500 uppercase">
+          DROP IMAGE · JPG / PNG / WEBP
         </p>
 
         <input
@@ -138,20 +147,21 @@ export function ImageStudioWorkspace() {
           }}
         />
 
-        <div className="mt-6 flex flex-wrap items-center justify-center gap-2.5">
+        <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            className="rounded-lg bg-neutral-900 px-4 py-2 text-xs font-medium text-white transition hover:bg-neutral-800"
+            className="rounded-full bg-[#0F6E5D] px-6 py-2.5 text-xs font-medium text-white transition hover:bg-[#13836F]"
           >
-            选择本地图片
+            选择图片
           </button>
           <button
             type="button"
             onClick={handleLoadSample}
-            className="rounded-lg border border-neutral-200 bg-white px-4 py-2 text-xs font-medium text-neutral-700 transition hover:bg-neutral-50"
+            className="inline-flex items-center gap-1.5 rounded-full bg-white/[0.08] px-5 py-2.5 text-xs font-medium text-zinc-200 transition hover:bg-white/[0.14]"
           >
-            使用示例图片
+            <Sparkles className="h-3.5 w-3.5 text-amber-400" />
+            <span>示例图</span>
           </button>
         </div>
       </div>
@@ -159,60 +169,65 @@ export function ImageStudioWorkspace() {
   }
 
   return (
-    <div className="overflow-hidden rounded-xl border border-neutral-200 bg-white">
-      {/* Unified Top Studio Bar */}
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-neutral-200 px-5 py-3">
-        <div className="flex items-center gap-1 rounded-lg border border-neutral-200/80 bg-neutral-100/80 p-0.5">
-          <button
-            type="button"
-            onClick={() => setActiveMode("mosaic")}
-            className={`relative rounded-md px-3.5 py-1.5 text-xs font-medium transition-colors ${
-              activeMode === "mosaic"
-                ? "text-neutral-900"
-                : "text-neutral-500 hover:text-neutral-900"
-            }`}
-          >
-            {activeMode === "mosaic" && (
-              <motion.div
-                layoutId="imageStudioModePill"
-                transition={{ type: "spring", stiffness: 420, damping: 32 }}
-                className="absolute inset-0 rounded-md bg-white shadow-2xs"
-              />
-            )}
-            <span className="relative z-10">智能打码</span>
-          </button>
-          <button
-            type="button"
-            onClick={() => setActiveMode("stylize")}
-            className={`relative rounded-md px-3.5 py-1.5 text-xs font-medium transition-colors ${
-              activeMode === "stylize"
-                ? "text-neutral-900"
-                : "text-neutral-500 hover:text-neutral-900"
-            }`}
-          >
-            {activeMode === "stylize" && (
-              <motion.div
-                layoutId="imageStudioModePill"
-                transition={{ type: "spring", stiffness: 420, damping: 32 }}
-                className="absolute inset-0 rounded-md bg-white shadow-2xs"
-              />
-            )}
-            <span className="relative z-10">二维风格化</span>
-          </button>
+    <div className="overflow-hidden rounded-3xl bg-[#161715] text-zinc-100 shadow-[0_20px_50px_rgba(20,20,19,0.18)]">
+      {/* Darkroom Top Bar */}
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 bg-[#1B1C1A] px-5 py-3">
+        <div className="flex items-center gap-4">
+          <span className="text-sm font-semibold tracking-tight text-white">
+            图片工坊
+          </span>
+          <div className="flex items-center gap-1 rounded-full bg-black/40 p-1">
+            <button
+              type="button"
+              onClick={() => setActiveMode("mosaic")}
+              className={`relative rounded-full px-3.5 py-1 text-xs font-medium transition-colors ${
+                activeMode === "mosaic"
+                  ? "text-white"
+                  : "text-zinc-400 hover:text-zinc-200"
+              }`}
+            >
+              {activeMode === "mosaic" && (
+                <motion.div
+                  layoutId="imageStudioModePill"
+                  transition={{ type: "spring", stiffness: 420, damping: 32 }}
+                  className="absolute inset-0 rounded-full bg-[#0F6E5D]"
+                />
+              )}
+              <span className="relative z-10">智能打码</span>
+            </button>
+            <button
+              type="button"
+              onClick={() => setActiveMode("stylize")}
+              className={`relative rounded-full px-3.5 py-1 text-xs font-medium transition-colors ${
+                activeMode === "stylize"
+                  ? "text-white"
+                  : "text-zinc-400 hover:text-zinc-200"
+              }`}
+            >
+              {activeMode === "stylize" && (
+                <motion.div
+                  layoutId="imageStudioModePill"
+                  transition={{ type: "spring", stiffness: 420, damping: 32 }}
+                  className="absolute inset-0 rounded-full bg-[#0F6E5D]"
+                />
+              )}
+              <span className="relative z-10">二维风格化</span>
+            </button>
+          </div>
         </div>
 
         <div className="flex items-center gap-3">
           {imageMeta && (
-            <span className="hidden font-mono text-[11px] text-neutral-400 sm:inline">
-              {imageMeta.name} · {imageMeta.width}×{imageMeta.height}
+            <span className="hidden font-mono text-[11px] text-zinc-500 sm:inline">
+              {imageMeta.width}×{imageMeta.height}
             </span>
           )}
           <button
             type="button"
             onClick={clearImage}
-            className="rounded-md border border-neutral-200 bg-white px-2.5 py-1 text-xs font-medium text-neutral-600 transition hover:bg-neutral-50 hover:text-neutral-900"
+            className="rounded-full bg-white/[0.08] px-3 py-1 text-xs font-medium text-zinc-300 transition hover:bg-white/[0.15] hover:text-white"
           >
-            更换图片
+            换图
           </button>
         </div>
       </div>
@@ -221,10 +236,10 @@ export function ImageStudioWorkspace() {
       <AnimatePresence mode="wait">
         <motion.div
           key={activeMode}
-          initial={{ opacity: 0, y: 6, filter: "blur(3px)" }}
-          animate={{ opacity: 1, y: 0, filter: "blur(0px)" }}
-          exit={{ opacity: 0, y: -6, filter: "blur(3px)" }}
-          transition={{ duration: 0.22, ease: [0.22, 1, 0.36, 1] }}
+          initial={{ opacity: 0, y: 6 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -6 }}
+          transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
         >
           {activeMode === "mosaic" ? <MosaicEditor /> : <Stylize2DPanel />}
         </motion.div>

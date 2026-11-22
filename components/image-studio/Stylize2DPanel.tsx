@@ -97,116 +97,16 @@ export function Stylize2DPanel() {
 
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12">
-      {/* Left Inspector Rail */}
-      <aside className="divide-y divide-neutral-200/70 border-b border-neutral-200 bg-[#FAFAFA] lg:col-span-4 lg:border-b-0 lg:border-r">
-        <div className="p-5">
-          <h3 className="mb-3 text-xs font-semibold text-neutral-900">
-            选择二维画风
-          </h3>
-          <div className="grid grid-cols-2 gap-2">
-            {PRESETS.map((preset) => {
-              const active = stylePreset === preset.id;
-              return (
-                <button
-                  key={preset.id}
-                  type="button"
-                  onClick={() => setStylePreset(preset.id)}
-                  className={`rounded-lg border p-3 text-left transition ${
-                    active
-                      ? "border-neutral-900 bg-white shadow-2xs"
-                      : "border-neutral-200/80 bg-white/60 hover:border-neutral-300 hover:bg-white"
-                  }`}
-                >
-                  <div className="text-xs font-semibold text-neutral-900">
-                    {preset.label}
-                  </div>
-                  <div className="mt-1 text-[11px] leading-snug text-neutral-500">
-                    {preset.desc}
-                  </div>
-                </button>
-              );
-            })}
-          </div>
-        </div>
-
-        <div className="space-y-4 p-5">
-          <div>
-            <div className="mb-1.5 flex items-center justify-between text-xs">
-              <span className="font-medium text-neutral-700">风格化强度</span>
-              <span className="font-mono text-neutral-500">
-                {Math.round(stylizeStrength * 100)}%
-              </span>
-            </div>
-            <input
-              type="range"
-              min={0.3}
-              max={0.95}
-              step={0.05}
-              value={stylizeStrength}
-              onChange={(e) => setStylizeStrength(Number(e.target.value))}
-              className="w-full accent-neutral-900"
-            />
-          </div>
-
-          <div>
-            <label className="mb-1.5 block text-xs font-medium text-neutral-700">
-              画面补充描述（选填，大模型模式生效）
-            </label>
-            <textarea
-              rows={2}
-              value={stylePrompt}
-              onChange={(e) => setStylePrompt(e.target.value)}
-              placeholder="例如：保留人物神态，背景加入柔和春日光影..."
-              className="w-full resize-none rounded-lg border border-neutral-200 bg-white p-2.5 text-xs text-neutral-900 outline-none transition focus:border-neutral-900"
-            />
-          </div>
-
-          {!modelConfig.imageApiKey.trim() && (
-            <div className="rounded-lg border border-neutral-200 bg-white p-3 text-xs leading-relaxed text-neutral-600">
-              当前未配置图像大模型 API Key，将使用本地二维线稿与赛璐璐算法进行即时预览。
-              <Link
-                href="/settings"
-                className="ml-1 font-semibold text-neutral-900 underline underline-offset-2"
-              >
-                去配置
-              </Link>
-            </div>
-          )}
-
-          {stylizeError && (
-            <div className="rounded-lg border border-rose-200 bg-rose-50 px-3 py-2 text-xs text-rose-700">
-              {stylizeError}
-            </div>
-          )}
-
-          <button
-            type="button"
-            disabled={isStylizing}
-            onClick={handleStylize}
-            className="flex w-full items-center justify-center gap-2 rounded-lg bg-neutral-900 py-2.5 text-xs font-medium text-white transition hover:bg-neutral-800 disabled:opacity-60"
-          >
-            {isStylizing ? (
-              <>
-                <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                <span>正在绘制二维风格...</span>
-              </>
-            ) : (
-              <span>生成二维风格图片</span>
-            )}
-          </button>
-        </div>
-      </aside>
-
-      {/* Right Preview Comparison Stage */}
-      <div className="flex flex-col bg-[#F4F5F7] p-5 lg:col-span-8">
-        <div className="mb-3 flex items-center justify-between">
+      {/* Left/Main Preview Comparison Stage */}
+      <div className="flex flex-col bg-[#0F100F] p-5 studio-grid-dark lg:col-span-8">
+        <div className="mb-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="text-xs font-semibold text-neutral-700">
-              效果对比
+            <span className="font-mono text-[11px] tracking-wider text-zinc-400 uppercase">
+              COMPARE
             </span>
             {stylizeMode && (
-              <span className="rounded border border-neutral-200 bg-white px-2 py-0.5 text-[11px] font-medium text-neutral-600">
-                {stylizeMode === "ai" ? "图像大模型重绘" : "本地 2D 算法预览"}
+              <span className="rounded-full bg-white/[0.08] px-2.5 py-0.5 text-[10px] font-medium text-zinc-300">
+                {stylizeMode === "ai" ? "AI 重绘" : "本地预览"}
               </span>
             )}
           </div>
@@ -215,19 +115,19 @@ export function Stylize2DPanel() {
             <button
               type="button"
               onClick={handleDownload}
-              className="rounded-md bg-neutral-900 px-3 py-1 text-xs font-medium text-white transition hover:bg-neutral-800"
+              className="rounded-full bg-[#0F6E5D] px-3.5 py-1 text-xs font-medium text-white transition hover:bg-[#13836F]"
             >
-              下载二维成品图
+              下载成品
             </button>
           )}
         </div>
 
         <div className="grid flex-1 grid-cols-1 gap-4 md:grid-cols-2">
-          <div className="flex flex-col rounded-lg border border-neutral-200/80 bg-white p-3">
-            <span className="mb-2 text-[11px] font-medium text-neutral-400">
-              原始图片
+          <div className="flex flex-col rounded-2xl bg-[#181917] p-3 ring-1 ring-white/[0.07]">
+            <span className="mb-2 font-mono text-[10px] text-zinc-500">
+              原图
             </span>
-            <div className="flex flex-1 items-center justify-center overflow-hidden rounded bg-[#FAFAFA] p-2">
+            <div className="flex flex-1 items-center justify-center overflow-hidden rounded-xl bg-black/40 p-2">
               {originalImage && (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
@@ -239,15 +139,15 @@ export function Stylize2DPanel() {
             </div>
           </div>
 
-          <div className="flex flex-col rounded-lg border border-neutral-200/80 bg-white p-3">
-            <span className="mb-2 text-[11px] font-medium text-neutral-400">
-              二维风格成品
+          <div className="flex flex-col rounded-2xl bg-[#181917] p-3 ring-1 ring-white/[0.07]">
+            <span className="mb-2 font-mono text-[10px] text-zinc-500">
+              二维成品
             </span>
-            <div className="flex min-h-[300px] flex-1 items-center justify-center overflow-hidden rounded bg-[#FAFAFA] p-2">
+            <div className="flex min-h-[300px] flex-1 items-center justify-center overflow-hidden rounded-xl bg-black/40 p-2">
               {isStylizing ? (
-                <div className="flex flex-col items-center gap-2 text-neutral-400">
-                  <Loader2 className="h-6 w-6 animate-spin text-neutral-700" />
-                  <span className="text-xs">正在重绘二维线条与色彩...</span>
+                <div className="flex flex-col items-center gap-2 text-zinc-400">
+                  <Loader2 className="h-5 w-5 animate-spin text-[#34D399]" />
+                  <span className="text-xs">绘制中...</span>
                 </div>
               ) : stylizedImage ? (
                 // eslint-disable-next-line @next/next/no-img-element
@@ -257,14 +157,102 @@ export function Stylize2DPanel() {
                   className="max-h-[420px] w-auto rounded object-contain"
                 />
               ) : (
-                <div className="px-6 text-center text-xs leading-relaxed text-neutral-400">
-                  在左侧选择画风并点击生成，即可查看风格化效果
-                </div>
+                <span className="text-xs text-zinc-500">等待生成</span>
               )}
             </div>
           </div>
         </div>
       </div>
+
+      {/* Right Docked Dark Inspector */}
+      <aside className="divide-y divide-white/10 border-t border-white/10 bg-[#1B1C1A] lg:col-span-4 lg:border-l lg:border-t-0">
+        <div className="p-5">
+          <h3 className="mb-3 text-xs font-medium text-zinc-400">画风</h3>
+          <div className="grid grid-cols-2 gap-2">
+            {PRESETS.map((preset) => {
+              const active = stylePreset === preset.id;
+              return (
+                <button
+                  key={preset.id}
+                  type="button"
+                  onClick={() => setStylePreset(preset.id)}
+                  className={`rounded-xl px-3 py-2.5 text-left transition ${
+                    active
+                      ? "bg-[#0F6E5D] text-white"
+                      : "bg-white/[0.05] text-zinc-300 hover:bg-white/[0.1]"
+                  }`}
+                >
+                  <div className="text-xs font-semibold">{preset.label}</div>
+                </button>
+              );
+            })}
+          </div>
+        </div>
+
+        <div className="space-y-4 p-5">
+          <div>
+            <div className="mb-1.5 flex items-center justify-between text-xs">
+              <span className="text-zinc-400">强度</span>
+              <span className="font-mono text-zinc-300">
+                {Math.round(stylizeStrength * 100)}%
+              </span>
+            </div>
+            <input
+              type="range"
+              min={0.3}
+              max={0.95}
+              step={0.05}
+              value={stylizeStrength}
+              onChange={(e) => setStylizeStrength(Number(e.target.value))}
+              className="w-full accent-[#15A085]"
+            />
+          </div>
+
+          <div>
+            <textarea
+              rows={2}
+              value={stylePrompt}
+              onChange={(e) => setStylePrompt(e.target.value)}
+              placeholder="补充画面描述（选填）..."
+              className="w-full resize-none rounded-xl bg-black/35 p-2.5 text-xs text-zinc-100 outline-none ring-1 ring-white/10 placeholder:text-zinc-500 focus:ring-[#15A085]"
+            />
+          </div>
+
+          {!modelConfig.imageApiKey.trim() && (
+            <div className="flex items-center justify-between rounded-xl bg-white/[0.04] px-3 py-2 text-[11px] text-zinc-400">
+              <span>当前为本地预览模式</span>
+              <Link
+                href="/settings"
+                className="font-medium text-[#34D399] hover:underline"
+              >
+                配置密钥
+              </Link>
+            </div>
+          )}
+
+          {stylizeError && (
+            <div className="rounded-xl bg-rose-500/15 px-3 py-2 text-xs text-rose-300">
+              {stylizeError}
+            </div>
+          )}
+
+          <button
+            type="button"
+            disabled={isStylizing}
+            onClick={handleStylize}
+            className="flex w-full items-center justify-center gap-2 rounded-full bg-[#0F6E5D] py-2.5 text-xs font-medium text-white transition hover:bg-[#13836F] disabled:opacity-60"
+          >
+            {isStylizing ? (
+              <>
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                <span>生成中...</span>
+              </>
+            ) : (
+              <span>生成二维图</span>
+            )}
+          </button>
+        </div>
+      </aside>
     </div>
   );
 }

@@ -40,17 +40,17 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <MotionConfig reducedMotion="user">
-      <div className="flex min-h-screen bg-[#F5F3EE] text-[#141413]">
+      <div className="flex min-h-screen bg-[#F7F8FA] text-[#0F172A]">
         {/* Desktop Sidebar */}
         <motion.aside
           initial={false}
-          animate={{ width: collapsed ? 68 : 220 }}
-          transition={{ type: "spring", stiffness: 340, damping: 34 }}
-          className="sticky top-0 hidden h-screen shrink-0 flex-col overflow-hidden border-r border-[#E2DFD7] bg-[#EFECE5] lg:flex"
+          animate={{ width: collapsed ? 64 : 224 }}
+          transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
+          className="sticky top-0 hidden h-screen shrink-0 flex-col overflow-hidden border-r border-[#E4E7EC] bg-white lg:flex"
         >
           {/* Brand Header */}
           <div
-            className={`flex h-14 items-center border-b border-[#E7E5DF]/80 ${
+            className={`flex h-14 items-center border-b border-[#E4E7EC] ${
               collapsed ? "justify-center px-2" : "justify-between px-4"
             }`}
           >
@@ -60,7 +60,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                   initial={{ opacity: 0, width: 0 }}
                   animate={{ opacity: 1, width: "auto" }}
                   exit={{ opacity: 0, width: 0 }}
-                  transition={{ duration: 0.16 }}
+                  transition={{ duration: 0.14 }}
                   className="overflow-hidden"
                 >
                   <Link
@@ -71,9 +71,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                     <img
                       src="/elonga-logo.png"
                       alt="Elonga Logo"
-                      className="h-7 w-7 shrink-0 object-contain"
+                      className="h-6 w-6 shrink-0 object-contain"
                     />
-                    <span className="text-[17px] font-bold tracking-tight text-neutral-900">
+                    <span className="text-[16px] font-semibold tracking-tight text-[#0F172A]">
                       Elonga
                     </span>
                   </Link>
@@ -85,7 +85,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               type="button"
               onClick={() => setCollapsed((v) => !v)}
               aria-label={collapsed ? "展开侧边栏" : "收起侧边栏"}
-              className="flex h-6 w-6 shrink-0 items-center justify-center rounded-md text-neutral-400 transition hover:bg-neutral-200/60 hover:text-neutral-700"
+              className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-slate-400 transition hover:bg-slate-100 hover:text-slate-700"
             >
               {collapsed ? (
                 <ChevronRight className="h-3.5 w-3.5" />
@@ -98,7 +98,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           {/* Navigation */}
           <nav
             aria-label="主导航"
-            className="flex-1 space-y-1 overflow-y-auto px-2.5 py-4"
+            className="flex-1 space-y-0.5 overflow-y-auto px-2.5 py-3.5"
           >
             {NAV_ITEMS.map((item) => {
               const Icon = item.icon;
@@ -108,26 +108,22 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                   key={item.href}
                   href={item.href}
                   title={collapsed ? item.label : undefined}
-                  className={`relative flex items-center gap-2.5 rounded-xl px-3 py-2 text-[13px] font-medium transition-colors ${
+                  className={`relative flex items-center gap-2.5 rounded-md px-2.5 py-2 text-[13px] font-medium transition-colors ${
                     active
-                      ? "text-zinc-950"
-                      : "text-zinc-500 hover:bg-black/[0.035] hover:text-zinc-900"
+                      ? "bg-[#F1F5F9] text-[#0F172A]"
+                      : "text-slate-500 hover:bg-slate-50 hover:text-[#0F172A]"
                   }`}
                 >
                   {active && (
                     <motion.div
-                      layoutId="sidebarActivePill"
-                      transition={{
-                        type: "spring",
-                        stiffness: 420,
-                        damping: 34,
-                      }}
-                      className="absolute inset-0 rounded-xl bg-white shadow-[0_1px_3px_rgba(24,24,27,0.06)] ring-1 ring-[#E8E6E1]"
+                      layoutId="sidebarActiveBar"
+                      transition={{ duration: 0.16, ease: [0.16, 1, 0.3, 1] }}
+                      className="absolute left-0 top-1.5 bottom-1.5 w-[2.5px] rounded-r-xs bg-[#1D4ED8]"
                     />
                   )}
                   <Icon
                     className={`relative z-10 h-4 w-4 shrink-0 transition-colors ${
-                      active ? "text-[#0F6E5D]" : "text-zinc-400"
+                      active ? "text-[#1D4ED8]" : "text-slate-400"
                     }`}
                   />
                   <AnimatePresence initial={false}>
@@ -136,12 +132,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        transition={{ duration: 0.14 }}
+                        transition={{ duration: 0.12 }}
                         className="relative z-10 flex flex-1 items-center justify-between truncate"
                       >
                         <span>{item.label}</span>
                         {item.href === "/history" && historyCount > 0 && (
-                          <span className="font-mono text-[11px] text-neutral-400">
+                          <span className="rounded bg-slate-200/70 px-1.5 py-0.5 font-mono text-[10px] leading-none text-slate-600 tabular-nums">
                             {historyCount}
                           </span>
                         )}
@@ -155,8 +151,8 @@ export function AppShell({ children }: { children: React.ReactNode }) {
         </motion.aside>
 
         {/* Mobile Header & Drawer */}
-        <div className="flex flex-1 flex-col min-w-0 bg-[#F5F3EE]">
-          <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-[#E2DFD7] bg-[#F5F3EE]/90 px-4 backdrop-blur-md lg:hidden">
+        <div className="flex flex-1 flex-col min-w-0 bg-[#F7F8FA]">
+          <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-[#E4E7EC] bg-white/95 px-4 backdrop-blur-sm lg:hidden">
             <Link href="/" className="flex items-center gap-2">
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
@@ -164,7 +160,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 alt="Elonga Logo"
                 className="h-6 w-6 object-contain"
               />
-              <span className="text-base font-bold tracking-tight text-neutral-900">
+              <span className="text-[15px] font-semibold tracking-tight text-[#0F172A]">
                 Elonga
               </span>
             </Link>
@@ -172,7 +168,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               type="button"
               onClick={() => setMobileOpen(true)}
               aria-label="打开菜单"
-              className="rounded-lg p-2 text-neutral-600 hover:bg-neutral-100"
+              className="rounded-md p-2 text-slate-600 hover:bg-slate-100"
             >
               <Menu className="h-5 w-5" />
             </button>
@@ -186,16 +182,16 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                   onClick={() => setMobileOpen(false)}
-                  className="fixed inset-0 bg-neutral-950/20 backdrop-blur-xs"
+                  className="fixed inset-0 bg-slate-950/30 backdrop-blur-xs"
                 />
                 <motion.aside
                   initial={{ x: "-100%" }}
                   animate={{ x: 0 }}
                   exit={{ x: "-100%" }}
-                  transition={{ type: "spring", stiffness: 360, damping: 34 }}
-                  className="fixed inset-y-0 left-0 flex w-60 flex-col bg-[#FAFAFA] border-r border-neutral-200 shadow-xl"
+                  transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
+                  className="fixed inset-y-0 left-0 flex w-60 flex-col border-r border-[#E4E7EC] bg-white shadow-xl"
                 >
-                  <div className="flex h-14 items-center justify-between border-b border-neutral-200/60 px-4">
+                  <div className="flex h-14 items-center justify-between border-b border-[#E4E7EC] px-4">
                     <div className="flex items-center gap-2">
                       {/* eslint-disable-next-line @next/next/no-img-element */}
                       <img
@@ -203,20 +199,20 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                         alt="Elonga Logo"
                         className="h-6 w-6 object-contain"
                       />
-                      <span className="text-base font-bold text-neutral-900">
+                      <span className="text-[15px] font-semibold text-[#0F172A]">
                         Elonga
                       </span>
                     </div>
                     <button
                       type="button"
                       onClick={() => setMobileOpen(false)}
-                      className="rounded-lg p-1.5 text-neutral-400 hover:bg-neutral-200/60"
+                      className="rounded-md p-1.5 text-slate-400 hover:bg-slate-100 hover:text-slate-700"
                       aria-label="关闭菜单"
                     >
                       <X className="h-4 w-4" />
                     </button>
                   </div>
-                  <nav className="flex-1 space-y-1 p-3">
+                  <nav className="flex-1 space-y-0.5 p-2.5">
                     {NAV_ITEMS.map((item) => {
                       const Icon = item.icon;
                       const active = isActive(item.href);
@@ -225,15 +221,15 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                           key={item.href}
                           href={item.href}
                           onClick={() => setMobileOpen(false)}
-                          className={`flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition ${
+                          className={`flex items-center gap-2.5 rounded-md px-3 py-2 text-sm font-medium transition ${
                             active
-                              ? "bg-white text-neutral-950 shadow-2xs ring-1 ring-neutral-200/80"
-                              : "text-neutral-500 hover:bg-neutral-200/40"
+                              ? "bg-[#F1F5F9] text-[#0F172A]"
+                              : "text-slate-500 hover:bg-slate-50 hover:text-[#0F172A]"
                           }`}
                         >
                           <Icon
                             className={`h-4 w-4 ${
-                              active ? "text-neutral-900" : "text-neutral-400"
+                              active ? "text-[#1D4ED8]" : "text-slate-400"
                             }`}
                           />
                           <span>{item.label}</span>
@@ -247,7 +243,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
           </AnimatePresence>
 
           {/* Main Route Viewport */}
-          <main className="mx-auto w-full max-w-[1380px] flex-1 px-5 py-6 sm:px-8 lg:px-11 lg:py-8">
+          <main className="mx-auto w-full max-w-[1360px] flex-1 px-5 py-6 sm:px-8 lg:px-10 lg:py-8">
             {children}
           </main>
         </div>
