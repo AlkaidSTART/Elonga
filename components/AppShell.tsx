@@ -8,6 +8,7 @@ import {
   Building2,
   ChevronLeft,
   ChevronRight,
+  FileBarChart2,
   History,
   Image as ImageIcon,
   LayoutDashboard,
@@ -24,6 +25,7 @@ const NAV_ITEMS = [
   { href: "/workflow", label: "内容创作", icon: PenTool },
   { href: "/image-studio", label: "图片工坊", icon: ImageIcon },
   { href: "/history", label: "创作记录", icon: History },
+  { href: "/reports", label: "AI 月报", icon: FileBarChart2 },
   { href: "/settings", label: "模型配置", icon: SlidersHorizontal },
 ] as const;
 

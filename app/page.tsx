@@ -236,23 +236,58 @@ export default function OverviewPage() {
       {/* Top Page Header */}
       <motion.header
         variants={ITEM_VARIANTS}
-        className="flex items-center justify-between border-b border-[#E4E7EC] pb-4"
+        className="flex flex-wrap items-center justify-between gap-3 border-b border-[#E4E7EC] pb-4"
       >
-        <div className="flex items-baseline gap-3">
+        <div className="flex flex-wrap items-center gap-3">
           <h1 className="text-lg font-semibold tracking-tight text-[#0F172A]">
             工作台概览
           </h1>
           <span className="font-mono text-[11px] tracking-wider text-slate-400 uppercase">
             OVERVIEW
           </span>
+
+          <div className="flex items-center gap-0.5 rounded-md border border-[#E4E7EC] bg-[#F1F3F6] p-0.5">
+            <button
+              type="button"
+              onClick={() => setDataMode("live")}
+              className={`rounded-[5px] px-2.5 py-0.5 text-[11px] font-medium transition ${
+                effectiveMode === "live"
+                  ? "bg-white text-[#0F172A] shadow-2xs"
+                  : "text-slate-500 hover:text-[#0F172A]"
+              }`}
+            >
+              真实数据
+            </button>
+            <button
+              type="button"
+              onClick={() => setDataMode("demo")}
+              className={`rounded-[5px] px-2.5 py-0.5 text-[11px] font-medium transition ${
+                effectiveMode === "demo"
+                  ? "bg-white text-[#0F172A] shadow-2xs"
+                  : "text-slate-500 hover:text-[#0F172A]"
+              }`}
+            >
+              示例视图
+            </button>
+          </div>
         </div>
-        <Link
-          href="/workflow"
-          className="group inline-flex items-center gap-1.5 rounded-md bg-[#1D4ED8] px-3.5 py-2 text-xs font-medium text-white shadow-2xs transition hover:bg-[#1E40AF]"
-        >
-          <span>开始内容创作</span>
-          <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
-        </Link>
+
+        <div className="flex items-center gap-2">
+          <Link
+            href="/reports"
+            className="inline-flex items-center gap-1.5 rounded-md border border-[#E4E7EC] bg-white px-3 py-2 text-xs font-medium text-[#0F172A] transition hover:bg-slate-50"
+          >
+            <FileBarChart2 className="h-3.5 w-3.5 text-[#1D4ED8]" />
+            <span>AI 月报</span>
+          </Link>
+          <Link
+            href="/workflow"
+            className="group inline-flex items-center gap-1.5 rounded-md bg-[#1D4ED8] px-3.5 py-2 text-xs font-medium text-white shadow-2xs transition hover:bg-[#1E40AF]"
+          >
+            <span>开始内容创作</span>
+            <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
+          </Link>
+        </div>
       </motion.header>
 
       {/* Top Asymmetric Architectural Band */}

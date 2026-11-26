@@ -273,7 +273,7 @@ export function MosaicEditor() {
         ctx.strokeStyle = isHighlighted
           ? "#F59E0B"
           : isAuto
-            ? "rgba(52, 211, 153, 0.9)"
+            ? "rgba(59, 130, 246, 0.9)"
             : "rgba(148, 163, 184, 0.75)";
         if (isHighlighted) {
           ctx.fillStyle = "rgba(245, 158, 11, 0.16)";
@@ -298,13 +298,13 @@ export function MosaicEditor() {
         ctx.fillStyle = isHighlighted
           ? "#F59E0B"
           : isAuto
-            ? "#0F6E5D"
+            ? "#1D4ED8"
             : "#334155";
         ctx.beginPath();
-        ctx.roundRect(bx, by, badgeW, badgeH, 4 * scaleUnit);
+        ctx.roundRect(bx, by, badgeW, badgeH, 3 * scaleUnit);
         ctx.fill();
 
-        ctx.fillStyle = isHighlighted ? "#141413" : "#FFFFFF";
+        ctx.fillStyle = isHighlighted ? "#0F172A" : "#FFFFFF";
         ctx.textBaseline = "middle";
         ctx.fillText(tagText, bx + padX, by + badgeH / 2 + 0.5);
         ctx.restore();

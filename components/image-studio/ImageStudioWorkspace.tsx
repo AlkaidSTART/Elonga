@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { ImagePlus, RefreshCw, Sparkles } from "lucide-react";
+import { FileImage, ImagePlus, RefreshCw } from "lucide-react";
 import { useImageStudioStore } from "@/store/useImageStudioStore";
 import { MosaicEditor } from "./MosaicEditor";
 import { Stylize2DPanel } from "./Stylize2DPanel";
@@ -13,52 +13,77 @@ function createSampleImageDataUrl(): string {
   canvas.height = 640;
   const ctx = canvas.getContext("2d")!;
 
-  const sky = ctx.createLinearGradient(0, 0, 0, 420);
-  sky.addColorStop(0, "#e5e5e5");
-  sky.addColorStop(0.55, "#f5f5f4");
-  sky.addColorStop(1, "#fef3c7");
-  ctx.fillStyle = sky;
+  // Deep slate studio backdrop
+  ctx.fillStyle = "#0F172A";
   ctx.fillRect(0, 0, 960, 640);
 
-  ctx.fillStyle = "#f59e0b";
-  ctx.beginPath();
-  ctx.arc(730, 145, 58, 0, Math.PI * 2);
-  ctx.fill();
+  // Subtle architectural grid
+  ctx.strokeStyle = "rgba(148, 163, 184, 0.08)";
+  ctx.lineWidth = 1;
+  for (let x = 0; x <= 960; x += 40) {
+    ctx.beginPath();
+    ctx.moveTo(x, 0);
+    ctx.lineTo(x, 640);
+    ctx.stroke();
+  }
+  for (let y = 0; y <= 640; y += 40) {
+    ctx.beginPath();
+    ctx.moveTo(0, y);
+    ctx.lineTo(960, y);
+    ctx.stroke();
+  }
 
-  ctx.fillStyle = "#3f3f46";
-  ctx.beginPath();
-  ctx.moveTo(0, 410);
-  ctx.lineTo(220, 230);
-  ctx.lineTo(440, 380);
-  ctx.lineTo(680, 200);
-  ctx.lineTo(960, 390);
-  ctx.lineTo(960, 640);
-  ctx.lineTo(0, 640);
-  ctx.closePath();
-  ctx.fill();
+  // Top cobalt bar
+  ctx.fillStyle = "#1D4ED8";
+  ctx.fillRect(0, 0, 960, 6);
 
-  ctx.fillStyle = "#10b981";
-  ctx.beginPath();
-  ctx.moveTo(0, 450);
-  ctx.quadraticCurveTo(260, 370, 520, 440);
-  ctx.quadraticCurveTo(760, 500, 960, 410);
-  ctx.lineTo(960, 640);
-  ctx.lineTo(0, 640);
-  ctx.closePath();
-  ctx.fill();
+  // Clean document card for redaction / stylize testing
+  ctx.fillStyle = "#FFFFFF";
+  ctx.fillRect(72, 76, 816, 488);
+  ctx.strokeStyle = "#CBD5E1";
+  ctx.lineWidth = 2;
+  ctx.strokeRect(72, 76, 816, 488);
 
-  ctx.fillStyle = "rgba(255, 255, 255, 0.94)";
-  ctx.beginPath();
-  ctx.roundRect(70, 430, 340, 145, 16);
-  ctx.fill();
+  // Card header
+  ctx.fillStyle = "#F8FAFC";
+  ctx.fillRect(73, 77, 814, 88);
+  ctx.fillStyle = "#E2E8F0";
+  ctx.fillRect(73, 165, 814, 1);
 
-  ctx.fillStyle = "#0f172a";
-  ctx.font = "bold 22px sans-serif";
-  ctx.fillText("创作者示例卡片", 98, 474);
-  ctx.fillStyle = "#475569";
-  ctx.font = "16px sans-serif";
-  ctx.fillText("订单编号：EL-2026-88412", 98, 512);
-  ctx.fillText("联系方式：138-0000-1234", 98, 544);
+  ctx.fillStyle = "#1D4ED8";
+  ctx.fillRect(108, 108, 4, 26);
+
+  ctx.fillStyle = "#0F172A";
+  ctx.font = "600 24px -apple-system, BlinkMacSystemFont, sans-serif";
+  ctx.fillText("公益物资交接单 · 现场核验样本", 126, 129);
+
+  ctx.fillStyle = "#64748B";
+  ctx.font = "500 13px ui-monospace, SFMono-Regular, Menlo, monospace";
+  ctx.fillText("STUDIO SAMPLE · 960×640", 662, 125);
+
+  const rows = [
+    ["工单编号", "EL-2026-88412"],
+    ["现场联系人", "138-0000-1234"],
+    ["接收单位", "某乡村小学图书角项目组"],
+    ["物资清单", "少儿绘本 620 册 / 书架 6 组"],
+    ["归档备注", "发布前请对敏感编号与联系电话打码"],
+  ];
+
+  rows.forEach(([k, v], i) => {
+    const y = 224 + i * 64;
+    ctx.fillStyle = "#64748B";
+    ctx.font = "500 15px -apple-system, BlinkMacSystemFont, sans-serif";
+    ctx.fillText(k, 108, y);
+
+    ctx.fillStyle = "#0F172A";
+    ctx.font = "600 17px ui-monospace, SFMono-Regular, Menlo, monospace";
+    ctx.fillText(v, 280, y);
+
+    if (i < rows.length - 1) {
+      ctx.fillStyle = "#F1F5F9";
+      ctx.fillRect(108, y + 22, 744, 1);
+    }
+  });
 
   return canvas.toDataURL("image/png");
 }
@@ -103,129 +128,136 @@ export function ImageStudioWorkspace() {
 
   const handleLoadSample = () => {
     const url = createSampleImageDataUrl();
-    setImage(url, { name: "sample_scene.png", width: 960, height: 640 });
+    setImage(url, { name: "sample_document.png", width: 960, height: 640 });
   };
 
   if (!originalImage) {
     return (
-      <div
-        onDragOver={(e) => {
-          e.preventDefault();
-          setIsDragging(true);
-        }}
-        onDragLeave={() => setIsDragging(false)}
-        onDrop={handleDrop}
-        className={`relative flex min-h-[calc(100vh-8rem)] flex-col items-center justify-center overflow-hidden rounded-3xl bg-[#161715] p-10 text-center text-[#F5F3EE] studio-grid-dark transition-all ${
-          isDragging ? "ring-2 ring-[#15A085]" : ""
-        }`}
-      >
-        {/* Minimal Viewfinder Corner Marks */}
-        <span className="pointer-events-none absolute left-7 top-7 h-5 w-5 border-l border-t border-white/25" />
-        <span className="pointer-events-none absolute right-7 top-7 h-5 w-5 border-r border-t border-white/25" />
-        <span className="pointer-events-none absolute bottom-7 left-7 h-5 w-5 border-b border-l border-white/25" />
-        <span className="pointer-events-none absolute bottom-7 right-7 h-5 w-5 border-b border-r border-white/25" />
+      <div className="space-y-5">
+        <header className="flex items-center justify-between border-b border-[#E2E8F0] pb-4">
+          <div className="flex items-baseline gap-3">
+            <h1 className="text-lg font-semibold tracking-tight text-[#0F172A]">
+              图片工坊
+            </h1>
+            <span className="font-mono text-[11px] tracking-wider text-slate-400 uppercase">
+              IMAGE STUDIO
+            </span>
+          </div>
+        </header>
 
-        <div className="mb-5 flex h-12 w-12 items-center justify-center rounded-2xl bg-white/[0.06] ring-1 ring-white/10">
-          <ImagePlus className="h-5 w-5 text-[#34D399]" />
-        </div>
-
-        <h1 className="text-xl font-semibold tracking-tight text-white">
-          图片工坊
-        </h1>
-        <p className="mt-2 font-mono text-[11px] tracking-wider text-zinc-500 uppercase">
-          DROP IMAGE · JPG / PNG / WEBP
-        </p>
-
-        <input
-          ref={fileInputRef}
-          type="file"
-          accept="image/*"
-          className="hidden"
-          onChange={(e) => {
-            const file = e.target.files?.[0];
-            if (file) loadFile(file);
+        <div
+          onDragOver={(e) => {
+            e.preventDefault();
+            setIsDragging(true);
           }}
-        />
+          onDragLeave={() => setIsDragging(false)}
+          onDrop={handleDrop}
+          className={`relative flex min-h-[calc(100vh-12rem)] flex-col items-center justify-center overflow-hidden rounded-lg border bg-[#0B1120] p-10 text-center text-slate-100 studio-grid-dark transition-all ${
+            isDragging
+              ? "border-[#3B82F6] ring-2 ring-[#3B82F6]/30"
+              : "border-[#1E293B]"
+          }`}
+        >
+          {/* Precision Viewfinder Corner Marks */}
+          <span className="pointer-events-none absolute left-6 top-6 h-4 w-4 border-l border-t border-slate-600" />
+          <span className="pointer-events-none absolute right-6 top-6 h-4 w-4 border-r border-t border-slate-600" />
+          <span className="pointer-events-none absolute bottom-6 left-6 h-4 w-4 border-b border-l border-slate-600" />
+          <span className="pointer-events-none absolute bottom-6 right-6 h-4 w-4 border-b border-r border-slate-600" />
 
-        <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
-          <button
-            type="button"
-            onClick={() => fileInputRef.current?.click()}
-            className="rounded-full bg-[#0F6E5D] px-6 py-2.5 text-xs font-medium text-white transition hover:bg-[#13836F]"
-          >
-            选择图片
-          </button>
-          <button
-            type="button"
-            onClick={handleLoadSample}
-            className="inline-flex items-center gap-1.5 rounded-full bg-white/[0.08] px-5 py-2.5 text-xs font-medium text-zinc-200 transition hover:bg-white/[0.14]"
-          >
-            <Sparkles className="h-3.5 w-3.5 text-amber-400" />
-            <span>示例图</span>
-          </button>
+          <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-lg border border-slate-700/80 bg-slate-900">
+            <ImagePlus className="h-5 w-5 text-[#3B82F6]" />
+          </div>
+
+          <h2 className="text-base font-semibold tracking-tight text-white">
+            导入待处理图片
+          </h2>
+          <p className="mt-1.5 font-mono text-[11px] tracking-wider text-slate-500 uppercase">
+            DRAG & DROP · JPG / PNG / WEBP · PRIVACY REDACTION & 2D STYLIZE
+          </p>
+
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={(e) => {
+              const file = e.target.files?.[0];
+              if (file) loadFile(file);
+            }}
+          />
+
+          <div className="mt-6 flex flex-wrap items-center justify-center gap-2.5">
+            <button
+              type="button"
+              onClick={() => fileInputRef.current?.click()}
+              className="rounded-md bg-[#1D4ED8] px-4 py-2 text-xs font-medium text-white transition hover:bg-[#1E40AF]"
+            >
+              选择本地图片
+            </button>
+            <button
+              type="button"
+              onClick={handleLoadSample}
+              className="inline-flex items-center gap-1.5 rounded-md border border-slate-700 bg-slate-800/80 px-4 py-2 text-xs font-medium text-slate-200 transition hover:bg-slate-800 hover:text-white"
+            >
+              <FileImage className="h-3.5 w-3.5 text-slate-400" />
+              <span>载入示例样本</span>
+            </button>
+          </div>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="overflow-hidden rounded-3xl bg-[#161715] text-zinc-100 shadow-[0_20px_50px_rgba(20,20,19,0.18)]">
-      {/* Darkroom Top Bar */}
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-white/10 bg-[#1B1C1A] px-5 py-3">
+    <div className="overflow-hidden rounded-lg border border-[#1E293B] bg-[#0B1120] text-slate-100 shadow-[0_4px_20px_rgba(15,23,42,0.16)]">
+      {/* Precision Darkroom Top Bar */}
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 bg-[#0F172A] px-5 py-3">
         <div className="flex items-center gap-4">
-          <span className="text-sm font-semibold tracking-tight text-white">
-            图片工坊
-          </span>
-          <div className="flex items-center gap-1 rounded-full bg-black/40 p-1">
+          <div className="flex items-baseline gap-2">
+            <span className="text-sm font-semibold tracking-tight text-white">
+              图片工坊
+            </span>
+            <span className="hidden font-mono text-[10px] tracking-wider text-slate-500 uppercase sm:inline">
+              STUDIO
+            </span>
+          </div>
+
+          <div className="flex items-center gap-0.5 rounded-md border border-slate-800 bg-[#0B1120] p-0.5">
             <button
               type="button"
               onClick={() => setActiveMode("mosaic")}
-              className={`relative rounded-full px-3.5 py-1 text-xs font-medium transition-colors ${
+              className={`rounded-[5px] px-3 py-1 text-xs font-medium transition ${
                 activeMode === "mosaic"
-                  ? "text-white"
-                  : "text-zinc-400 hover:text-zinc-200"
+                  ? "bg-[#1D4ED8] text-white"
+                  : "text-slate-400 hover:text-slate-200"
               }`}
             >
-              {activeMode === "mosaic" && (
-                <motion.div
-                  layoutId="imageStudioModePill"
-                  transition={{ type: "spring", stiffness: 420, damping: 32 }}
-                  className="absolute inset-0 rounded-full bg-[#0F6E5D]"
-                />
-              )}
-              <span className="relative z-10">智能打码</span>
+              智能打码
             </button>
             <button
               type="button"
               onClick={() => setActiveMode("stylize")}
-              className={`relative rounded-full px-3.5 py-1 text-xs font-medium transition-colors ${
+              className={`rounded-[5px] px-3 py-1 text-xs font-medium transition ${
                 activeMode === "stylize"
-                  ? "text-white"
-                  : "text-zinc-400 hover:text-zinc-200"
+                  ? "bg-[#1D4ED8] text-white"
+                  : "text-slate-400 hover:text-slate-200"
               }`}
             >
-              {activeMode === "stylize" && (
-                <motion.div
-                  layoutId="imageStudioModePill"
-                  transition={{ type: "spring", stiffness: 420, damping: 32 }}
-                  className="absolute inset-0 rounded-full bg-[#0F6E5D]"
-                />
-              )}
-              <span className="relative z-10">二维风格化</span>
+              二维风格化
             </button>
           </div>
         </div>
 
         <div className="flex items-center gap-3">
           {imageMeta && (
-            <span className="hidden font-mono text-[11px] text-zinc-500 sm:inline">
+            <span className="hidden font-mono text-[11px] text-slate-500 tabular-nums sm:inline">
               {imageMeta.width}×{imageMeta.height}
             </span>
           )}
           <button
             type="button"
             onClick={clearImage}
-            className="inline-flex items-center gap-1.5 rounded-full bg-white px-3.5 py-1.5 text-xs font-semibold text-[#141413] shadow-sm transition hover:bg-zinc-200 active:scale-[0.98]"
+            className="inline-flex items-center gap-1.5 rounded-md border border-slate-700 bg-slate-800/80 px-3 py-1.5 text-xs font-medium text-slate-200 transition hover:bg-slate-700 hover:text-white"
           >
             <RefreshCw className="h-3.5 w-3.5" />
             <span>更换图片</span>
@@ -237,10 +269,10 @@ export function ImageStudioWorkspace() {
       <AnimatePresence mode="wait">
         <motion.div
           key={activeMode}
-          initial={{ opacity: 0, y: 6 }}
-          animate={{ opacity: 1, y: 0 }}
-          exit={{ opacity: 0, y: -6 }}
-          transition={{ duration: 0.2, ease: [0.22, 1, 0.36, 1] }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.14 }}
         >
           {activeMode === "mosaic" ? <MosaicEditor /> : <Stylize2DPanel />}
         </motion.div>
