@@ -2,7 +2,6 @@
 
 import { useMemo, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
-import type { EChartsOption } from "echarts";
 import {
   Check,
   Copy,
@@ -11,7 +10,6 @@ import {
   Loader2,
   Trash2,
 } from "lucide-react";
-import { EChartBox } from "@/components/charts/EChartBox";
 import {
   exportDocumentAsDocx,
   exportDocumentAsMarkdown,
@@ -78,63 +76,19 @@ export function ReportsWorkspace() {
     return reports.find((r) => r.month === selectedMonth) ?? reports[0] ?? null;
   }, [activeReportId, reports, selectedMonth]);
 
-  const channelChartOption = useMemo<EChartsOption>(
-    () => ({
-      tooltip: {
-        trigger: "axis",
-        axisPointer: { type: "shadow" },
-        backgroundColor: "#FCFBF8",
-        borderColor: "#E2DDD3",
-        borderWidth: 1,
-        textStyle: { color: "#181816", fontSize: 12 },
-      },
-      legend: {
-        top: 0,
-        right: 0,
-        itemWidth: 8,
-        itemHeight: 8,
-        textStyle: { color: "#57534E", fontSize: 11 },
-      },
-      grid: { left: 6, right: 12, top: 30, bottom: 4, containLabel: true },
-      xAxis: {
-        type: "category",
-        data: snapshot.platformBreakdown.map((p) => p.platformName),
-        axisLine: { lineStyle: { color: "#DDD7CA" } },
-        axisTick: { show: false },
-        axisLabel: { color: "#57534E", fontSize: 11 },
-      },
-      yAxis: {
-        type: "value",
-        minInterval: 1,
-        splitLine: { lineStyle: { color: "#EAE5DC", type: "dashed" } },
-        axisLabel: { color: "#8C857B", fontSize: 11 },
-      },
-      series: [
-        {
-          name: "已发布",
-          type: "bar",
-          barMaxWidth: 14,
-          itemStyle: { color: "#1B4D3E", borderRadius: [2, 2, 0, 0] },
-          data: snapshot.platformBreakdown.map((p) => p.publishedCount),
-        },
-        {
-          name: "已归档",
-          type: "bar",
-          barMaxWidth: 14,
-          itemStyle: { color: "#C4BEB2", borderRadius: [2, 2, 0, 0] },
-          data: snapshot.platformBreakdown.map((p) => p.archivedCount),
-        },
-        {
-          name: "爆款",
-          type: "bar",
-          barMaxWidth: 14,
-          itemStyle: { color: "#B85D3B", borderRadius: [2, 2, 0, 0] },
-          data: snapshot.platformBreakdown.map((p) => p.viralCount),
-        },
-      ],
-    }),
+  const maxChannelCount = useMemo(
+    () =>
+      Math.max(
+        1,
+        ...snapshot.platformBreakdown.map(
+          (p) => p.publishedCount + p.archivedCount
+        )
+      ),
     [snapshot.platformBreakdown]
   );
+
+  const totalInteractions =
+    snapshot.totalLikes + snapshot.totalComments + snapshot.totalShares;
 
   const handleGenerateReport = async () => {
     setErrorMsg(null);
@@ -219,15 +173,15 @@ export function ReportsWorkspace() {
   };
 
   return (
-    <div className="space-y-9">
-      {/* Header */}
+    <div className="space-y-8">
+      {/* Masthead Header */}
       <header className="flex flex-col gap-4 border-b border-[#181816]/15 pb-5 sm:flex-row sm:items-end sm:justify-between">
         <div>
           <h1 className="font-editorial text-2xl font-semibold tracking-tight text-[#181816]">
             运营月报
           </h1>
           <p className="mt-1 text-xs text-[#78716C]">
-            汇总当月活动档案与发布数据，生成可编辑与导出的月度报告
+            月度公报编印台 · 自动汇总当月活动档案与发布回填数据
           </p>
         </div>
 
@@ -276,7 +230,7 @@ export function ReportsWorkspace() {
             {isGenerating ? (
               <>
                 <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                <span>生成中...</span>
+                <span>编印中...</span>
               </>
             ) : (
               <>
@@ -294,104 +248,242 @@ export function ReportsWorkspace() {
         </p>
       )}
 
-      {/* Monthly Live Data Snapshot Band (Flush Hairline Grid, Zero Stretched KPI Cards) */}
-      <section className="grid grid-cols-1 gap-8 border-b border-[#E2DDD3] pb-8 lg:grid-cols-12 lg:items-center lg:gap-0 lg:divide-x lg:divide-[#E2DDD3]">
-        <div className="grid grid-cols-2 gap-x-6 gap-y-6 sm:grid-cols-4 lg:col-span-7 lg:pr-8">
+      {/* Main 2-Column Publication Desk: Left Digest Rail (4) + Right Publication Sheet (8) */}
+      <div className="grid grid-cols-1 items-start gap-10 lg:grid-cols-12 lg:gap-0 lg:divide-x lg:divide-[#E2DDD3]">
+        {/* LEFT RAIL: Monthly Live Digest + Channel Breakdown + Saved Index */}
+        <aside className="space-y-8 lg:col-span-4 lg:pr-8">
+          {/* 1. Data Digest Ledger */}
           <div>
-            <span className="text-[11px] font-medium text-[#78716C]">
-              本月建档活动
-            </span>
-            <p className="mt-2 font-editorial text-3xl font-semibold text-[#181816] tabular-nums">
-              {snapshot.activitiesCount}
-            </p>
-            <Link
-              href="/organization"
-              className="mt-1 inline-block text-[11px] font-medium text-[#1B4D3E] hover:underline"
-            >
-              管理档案 →
-            </Link>
-          </div>
-
-          <div>
-            <span className="text-[11px] font-medium text-[#78716C]">
-              已发布 / 已归档
-            </span>
-            <p className="mt-2 font-editorial text-3xl font-semibold text-[#181816] tabular-nums">
-              {snapshot.publishedCount}
-              <span className="text-base font-normal text-[#8C857B]">
-                {" "}
-                / {snapshot.archivedCount}
+            <div className="mb-2 flex items-baseline justify-between">
+              <h2 className="font-editorial text-sm font-semibold text-[#181816]">
+                {selectedMonth} 数据台账
+              </h2>
+              <span className="font-mono text-[10px] text-[#8C857B]">
+                LIVE SNAPSHOT
               </span>
-            </p>
-            <span className="mt-1 block text-[11px] text-[#8C857B]">
-              审查通过 {snapshot.reviewApprovedCount} 篇
-            </span>
+            </div>
+
+            <dl className="divide-y divide-[#E2DDD3] border-y border-[#E2DDD3] text-xs">
+              <div className="flex items-baseline justify-between py-3">
+                <div>
+                  <dt className="text-[#57534E]">本月建档活动</dt>
+                  <Link
+                    href="/organization"
+                    className="mt-0.5 inline-block text-[11px] text-[#1B4D3E] hover:underline"
+                  >
+                    管理活动档案 →
+                  </Link>
+                </div>
+                <dd className="font-editorial text-2xl font-semibold text-[#181816] tabular-nums">
+                  {snapshot.activitiesCount}
+                </dd>
+              </div>
+
+              <div className="flex items-baseline justify-between py-3">
+                <div>
+                  <dt className="text-[#57534E]">已发布 / 已归档</dt>
+                  <span className="mt-0.5 block text-[11px] text-[#8C857B]">
+                    审查通过 {snapshot.reviewApprovedCount} 篇
+                  </span>
+                </div>
+                <dd className="font-editorial text-2xl font-semibold text-[#181816] tabular-nums">
+                  {snapshot.publishedCount}
+                  <span className="text-sm font-normal text-[#8C857B]">
+                    {" "}
+                    / {snapshot.archivedCount}
+                  </span>
+                </dd>
+              </div>
+
+              <div className="flex items-baseline justify-between py-3">
+                <div>
+                  <dt className="text-[#57534E]">回填总播放 / 阅读</dt>
+                  <Link
+                    href="/history"
+                    className="mt-0.5 inline-block text-[11px] text-[#1B4D3E] hover:underline"
+                  >
+                    前往回填数据 →
+                  </Link>
+                </div>
+                <dd className="font-editorial text-2xl font-semibold text-[#181816] tabular-nums">
+                  {snapshot.totalViews.toLocaleString("zh-CN")}
+                </dd>
+              </div>
+
+              <div className="flex items-baseline justify-between py-3">
+                <div>
+                  <dt className="text-[#57534E]">总互动（赞 / 评 / 转）</dt>
+                  <span className="mt-0.5 block text-[11px] text-[#B85D3B]">
+                    爆款 {snapshot.viralCount} 篇
+                  </span>
+                </div>
+                <dd className="font-editorial text-2xl font-semibold text-[#181816] tabular-nums">
+                  {totalInteractions.toLocaleString("zh-CN")}
+                </dd>
+              </div>
+            </dl>
           </div>
 
-          <div>
-            <span className="text-[11px] font-medium text-[#78716C]">
-              回填总播放/阅读
-            </span>
-            <p className="mt-2 font-editorial text-3xl font-semibold text-[#181816] tabular-nums">
-              {snapshot.totalViews.toLocaleString("zh-CN")}
-            </p>
-            <Link
-              href="/history"
-              className="mt-1 inline-block text-[11px] font-medium text-[#1B4D3E] hover:underline"
-            >
-              去回填数据 →
-            </Link>
+          {/* 2. Compact Channel Bars */}
+          <div className="space-y-2.5">
+            <h3 className="font-editorial text-sm font-semibold text-[#181816]">
+              渠道分布
+            </h3>
+            <div className="space-y-2.5">
+              {snapshot.platformBreakdown.map((ch) => {
+                const total = ch.publishedCount + ch.archivedCount;
+                const width =
+                  total > 0
+                    ? Math.max(8, Math.round((total / maxChannelCount) * 100))
+                    : 0;
+                return (
+                  <div key={ch.platform} className="space-y-1">
+                    <div className="flex items-baseline justify-between text-[11px]">
+                      <span className="text-[#57534E]">{ch.platformName}</span>
+                      <span className="font-mono text-[#8C857B] tabular-nums">
+                        发 {ch.publishedCount} · 档 {ch.archivedCount} · 爆{" "}
+                        {ch.viralCount}
+                      </span>
+                    </div>
+                    <div className="h-1.5 w-full overflow-hidden rounded-xs bg-[#EFECE4]">
+                      <div
+                        className="h-full bg-[#1B4D3E]"
+                        style={{ width: `${width}%` }}
+                      />
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
           </div>
 
-          <div>
-            <span className="text-[11px] font-medium text-[#78716C]">
-              总互动（赞/评/转）
-            </span>
-            <p className="mt-2 font-editorial text-3xl font-semibold text-[#181816] tabular-nums">
-              {(
-                snapshot.totalLikes +
-                snapshot.totalComments +
-                snapshot.totalShares
-              ).toLocaleString("zh-CN")}
-            </p>
-            <span className="mt-1 block text-[11px] text-[#B85D3B]">
-              爆款 {snapshot.viralCount} 篇
-            </span>
+          {/* 3. Saved Reports Index */}
+          <div className="space-y-2.5 border-t border-[#E2DDD3] pt-6">
+            <h3 className="font-editorial text-sm font-semibold text-[#181816]">
+              历史月报档案（{reports.length}）
+            </h3>
+            {reports.length === 0 ? (
+              <p className="py-3 text-xs text-[#8C857B]">
+                暂无已保存月报，点击右侧按钮即可生成首份月报。
+              </p>
+            ) : (
+              <div className="divide-y divide-[#E2DDD3] border-y border-[#E2DDD3]">
+                {reports.map((rep) => {
+                  const isSelected = activeReport?.id === rep.id;
+                  return (
+                    <div
+                      key={rep.id}
+                      className={`flex items-start justify-between gap-2 py-2.5 transition ${
+                        isSelected
+                          ? "bg-[#E9F0ED]/60 px-2"
+                          : "px-0.5 hover:bg-[#FCFBF8]/70"
+                      }`}
+                    >
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setActiveReportId(rep.id);
+                          setSelectedMonthOverride(rep.month);
+                        }}
+                        className="min-w-0 flex-1 text-left"
+                      >
+                        <div className="flex items-center gap-1.5">
+                          <span className="font-mono text-[11px] font-semibold text-[#1B4D3E]">
+                            {rep.month}
+                          </span>
+                          <span className="rounded bg-[#EFECE4] px-1.5 py-0.5 text-[10px] text-[#57534E]">
+                            {rep.focus === "donor" ? "对外汇报" : "对内复盘"}
+                          </span>
+                        </div>
+                        <p className="mt-1 truncate text-xs font-medium text-[#181816]">
+                          {rep.title}
+                        </p>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => deleteReport(rep.id)}
+                        className="rounded p-1 text-[#8C857B] hover:bg-[#FDF2F2] hover:text-[#B42318]"
+                        title="删除月报"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
-        </div>
+        </aside>
 
-        <div className="lg:col-span-5 lg:pl-8">
-          <div className="mb-2 flex items-center justify-between">
-            <span className="text-xs font-semibold text-[#181816]">
-              {selectedMonth} 渠道分布
-            </span>
-          </div>
-          <EChartBox option={channelChartOption} className="h-36 w-full" />
-        </div>
-      </section>
-
-      {/* Report Manuscript + Saved Index Sidebar (Hairline Divided) */}
-      <section className="grid grid-cols-1 items-start gap-8 lg:grid-cols-12">
-        {/* Main Report Manuscript */}
-        <div className="lg:col-span-8">
+        {/* RIGHT STAGE: Warm Ivory Monthly Bulletin Manuscript */}
+        <section className="lg:col-span-8 lg:pl-9">
           {!activeReport ? (
-            <div className="flex min-h-[300px] flex-col items-center justify-center border border-dashed border-[#D5CFC3] bg-[#FCFBF8]/60 px-6 py-12 text-center">
-              <FileBarChart2 className="h-7 w-7 text-[#CFC8BA]" />
-              <p className="mt-3 font-editorial text-base font-medium text-[#57534E]">
-                尚未生成 {selectedMonth} 月报
-              </p>
-              <p className="mt-1.5 max-w-md text-xs leading-relaxed text-[#8C857B]">
-                系统将自动汇总本月「机构中心」活动档案与「创作记录」中已发布/归档的稿件及回填数据，一键生成可编辑、可导出的月报。
-              </p>
-              <button
-                type="button"
-                disabled={isGenerating}
-                onClick={() => void handleGenerateReport()}
-                className="mt-5 inline-flex items-center gap-1.5 rounded bg-[#1B4D3E] px-4 py-2 text-xs font-medium text-[#FCFBF8] hover:bg-[#143A2F]"
-              >
-                <FileBarChart2 className="h-3.5 w-3.5" />
-                <span>立即生成 {selectedMonth} 月报</span>
-              </button>
+            <div className="border-t-2 border-[#181816] bg-[#FCFBF8] px-7 py-9 sm:px-10 sm:py-10">
+              <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#E2DDD3] pb-4 text-[11px] text-[#8C857B]">
+                <span className="font-medium text-[#181816]">
+                  {orgProfile.name} · 月度公报样稿
+                </span>
+                <span className="font-mono">
+                  {selectedMonth} ·{" "}
+                  {focus === "donor" ? "DONOR EDITION" : "INTERNAL REVIEW"}
+                </span>
+              </div>
+
+              <div className="mt-7 space-y-6">
+                <div>
+                  <h2 className="font-editorial text-2xl font-semibold text-[#181816]">
+                    {orgProfile.name} {selectedMonth}{" "}
+                    {focus === "donor" ? "对外公益进展月报" : "内部运营复盘月报"}
+                  </h2>
+                  <p className="mt-2 text-xs leading-relaxed text-[#57534E]">
+                    尚未正式编印本期月报。点击下方按钮后，系统将自动汇集本月已建档的{" "}
+                    <strong className="text-[#181816]">
+                      {snapshot.activitiesCount}
+                    </strong>{" "}
+                    项公益活动与已发布的{" "}
+                    <strong className="text-[#181816]">
+                      {snapshot.publishedCount}
+                    </strong>{" "}
+                    篇内容记录，生成可直接编辑、打印与导出 Word / PDF / Markdown 的正式月度报告。
+                  </p>
+                </div>
+
+                {activities.length > 0 && (
+                  <div className="space-y-2 border-y border-[#E2DDD3] py-4">
+                    <div className="text-[11px] font-medium text-[#8C857B]">
+                      拟纳入本期汇总的机构活动档案：
+                    </div>
+                    <ul className="space-y-1.5 text-xs text-[#57534E]">
+                      {activities.slice(0, 4).map((act) => (
+                        <li key={act.id} className="flex items-baseline gap-2.5">
+                          <span className="font-mono text-[11px] text-[#8C857B]">
+                            {act.date}
+                          </span>
+                          <span className="font-medium text-[#181816]">
+                            {act.title}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
+
+                <div className="pt-1">
+                  <button
+                    type="button"
+                    disabled={isGenerating}
+                    onClick={() => void handleGenerateReport()}
+                    className="inline-flex items-center gap-2 rounded bg-[#1B4D3E] px-5 py-2.5 text-xs font-medium text-[#FCFBF8] transition hover:bg-[#143A2F] disabled:opacity-60"
+                  >
+                    {isGenerating ? (
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    ) : (
+                      <FileBarChart2 className="h-3.5 w-3.5" />
+                    )}
+                    <span>立即生成 {selectedMonth} 月报</span>
+                  </button>
+                </div>
+              </div>
             </div>
           ) : (
             <div className="space-y-5 border-t-2 border-[#181816] bg-[#FCFBF8] p-7 sm:p-9">
@@ -532,63 +624,8 @@ export function ReportsWorkspace() {
               )}
             </div>
           )}
-        </div>
-
-        {/* Saved Reports Index Rail */}
-        <aside className="border-t border-[#E2DDD3] pt-5 lg:col-span-4 lg:border-l lg:border-t-0 lg:pl-7 lg:pt-0">
-          <h3 className="mb-3 border-b border-[#E2DDD3] pb-2.5 text-xs font-semibold text-[#181816]">
-            已保存月报（{reports.length}）
-          </h3>
-          {reports.length === 0 ? (
-            <p className="py-8 text-center text-xs text-[#8C857B]">
-              暂无已生成月报
-            </p>
-          ) : (
-            <div className="divide-y divide-[#E2DDD3]">
-              {reports.map((rep) => {
-                const isSelected = activeReport?.id === rep.id;
-                return (
-                  <div
-                    key={rep.id}
-                    className={`flex items-start justify-between gap-2 py-3 transition ${
-                      isSelected ? "bg-[#E9F0ED]/50 px-2.5" : "hover:bg-[#FCFBF8]/70 px-1"
-                    }`}
-                  >
-                    <button
-                      type="button"
-                      onClick={() => {
-                        setActiveReportId(rep.id);
-                        setSelectedMonthOverride(rep.month);
-                      }}
-                      className="min-w-0 flex-1 text-left"
-                    >
-                      <div className="flex items-center gap-1.5">
-                        <span className="font-mono text-[11px] font-semibold text-[#1B4D3E]">
-                          {rep.month}
-                        </span>
-                        <span className="rounded bg-[#EFECE4] px-1.5 py-0.5 text-[10px] text-[#57534E]">
-                          {rep.focus === "donor" ? "对外汇报" : "对内复盘"}
-                        </span>
-                      </div>
-                      <p className="mt-1 truncate text-xs font-medium text-[#181816]">
-                        {rep.title}
-                      </p>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => deleteReport(rep.id)}
-                      className="rounded p-1 text-[#8C857B] hover:bg-[#FDF2F2] hover:text-[#B42318]"
-                      title="删除月报"
-                    >
-                      <Trash2 className="h-3.5 w-3.5" />
-                    </button>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </aside>
-      </section>
+        </section>
+      </div>
     </div>
   );
 }

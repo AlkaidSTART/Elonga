@@ -64,6 +64,7 @@ export function OrganizationWorkspace() {
 
   const [orgForm, setOrgForm] = useState(profile);
   const [profileSaved, setProfileSaved] = useState(false);
+  const [profileEditing, setProfileEditing] = useState(false);
 
   const [query, setQuery] = useState("");
   const [statusFilter, setStatusFilter] = useState<"all" | ActivityStatus>("all");
@@ -199,129 +200,185 @@ export function OrganizationWorkspace() {
         </button>
       </header>
 
-      {/* Organization Profile Band (Flush 2-Column Editorial Form, No Card Box) */}
-      <section className="grid grid-cols-1 gap-8 border-b border-[#E2DDD3] pb-9 lg:grid-cols-12">
-        <div className="flex flex-col justify-between gap-4 lg:col-span-4">
-          <div>
-            <div className="flex items-center gap-2">
+      {/* Organization Dossier Masthead (Compact Editorial Summary + Expandable Edit Form) */}
+      <section className="border-b border-[#E2DDD3] pb-7">
+        <div className="flex flex-col gap-5 lg:flex-row lg:items-start lg:justify-between">
+          <div className="max-w-3xl space-y-2.5">
+            <div className="flex flex-wrap items-center gap-2.5">
               <Building2 className="h-4 w-4 text-[#1B4D3E]" />
-              <h2 className="font-editorial text-base font-semibold text-[#181816]">
-                机构基础档案
+              <h2 className="font-editorial text-lg font-semibold text-[#181816]">
+                {profile.name}
               </h2>
+              <span className="rounded bg-[#E9F0ED] px-2 py-0.5 text-[11px] font-medium text-[#1B4D3E]">
+                默认口吻：{TONES.find((t) => t.id === profile.defaultTone)?.label ?? "温暖真诚"}
+              </span>
             </div>
-            <p className="mt-1.5 text-xs leading-relaxed text-[#78716C]">
-              AI 创作与月报生成时默认读取机构名称、使命、默认传播口吻与合规红线禁用词。
-            </p>
+
+            {profile.mission && (
+              <p className="text-xs leading-relaxed text-[#57534E]">
+                {profile.mission}
+              </p>
+            )}
+
+            <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 pt-0.5 text-[11px] text-[#78716C]">
+              {profile.defaultSignOff && (
+                <span>
+                  <strong className="font-medium text-[#57534E]">常用落款：</strong>
+                  {profile.defaultSignOff}
+                </span>
+              )}
+              {profile.complianceRedlines && (
+                <span className="inline-flex items-center gap-1 text-[#9A4A22]">
+                  <ShieldAlert className="h-3 w-3 shrink-0" />
+                  <span>红线禁用词：{profile.complianceRedlines}</span>
+                </span>
+              )}
+            </div>
           </div>
 
-          <div>
+          <div className="flex shrink-0 items-center gap-2">
+            {profileSaved && !profileEditing && (
+              <span className="inline-flex items-center gap-1 text-xs font-medium text-[#1B4D3E]">
+                <Check className="h-3.5 w-3.5" />
+                已保存
+              </span>
+            )}
             <button
               type="button"
-              onClick={handleSaveProfile}
-              className="inline-flex items-center gap-1.5 rounded bg-[#181816] px-4 py-2 text-xs font-medium text-[#FCFBF8] transition hover:bg-[#2F2E2A]"
+              onClick={() => setProfileEditing((v) => !v)}
+              className="inline-flex items-center gap-1.5 rounded border border-[#D5CFC3] bg-[#FCFBF8] px-3.5 py-1.5 text-xs font-medium text-[#181816] transition hover:border-[#181816]"
             >
-              {profileSaved ? (
-                <>
-                  <Check className="h-3.5 w-3.5 text-[#86EFAC]" />
-                  <span>已保存机构资料</span>
-                </>
-              ) : (
-                <span>保存机构资料</span>
-              )}
+              <Edit3 className="h-3.5 w-3.5 text-[#78716C]" />
+              <span>{profileEditing ? "收起资料编辑" : "编辑机构资料"}</span>
             </button>
           </div>
         </div>
 
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:col-span-8">
-          <label className="space-y-1.5">
-            <span className="block text-xs font-medium text-[#57534E]">
-              机构名称
-            </span>
-            <input
-              type="text"
-              value={orgForm.name}
-              onChange={(e) =>
-                setOrgForm((prev) => ({ ...prev, name: e.target.value }))
-              }
-              placeholder="例如：微光公益服务中心"
-              className="w-full rounded border border-[#D5CFC3] bg-[#FCFBF8] px-3 py-2 text-xs text-[#181816] outline-none transition focus:border-[#1B4D3E]"
-            />
-          </label>
-
-          <label className="space-y-1.5">
-            <span className="block text-xs font-medium text-[#57534E]">
-              默认传播口吻
-            </span>
-            <select
-              value={orgForm.defaultTone}
-              onChange={(e) =>
-                setOrgForm((prev) => ({
-                  ...prev,
-                  defaultTone: e.target.value as ToneId,
-                }))
-              }
-              className="w-full rounded border border-[#D5CFC3] bg-[#FCFBF8] px-3 py-2 text-xs text-[#181816] outline-none transition focus:border-[#1B4D3E]"
+        <AnimatePresence initial={false}>
+          {profileEditing && (
+            <motion.div
+              initial={{ opacity: 0, height: 0 }}
+              animate={{ opacity: 1, height: "auto" }}
+              exit={{ opacity: 0, height: 0 }}
+              transition={{ duration: 0.16 }}
+              className="overflow-hidden"
             >
-              {TONES.map((t) => (
-                <option key={t.id} value={t.id}>
-                  {t.label}
-                </option>
-              ))}
-            </select>
-          </label>
+              <div className="mt-6 grid grid-cols-1 gap-4 border-t border-[#E2DDD3] pt-6 md:grid-cols-2">
+                <label className="space-y-1.5">
+                  <span className="block text-xs font-medium text-[#57534E]">
+                    机构名称
+                  </span>
+                  <input
+                    type="text"
+                    value={orgForm.name}
+                    onChange={(e) =>
+                      setOrgForm((prev) => ({ ...prev, name: e.target.value }))
+                    }
+                    placeholder="例如：微光公益服务中心"
+                    className="w-full rounded border border-[#D5CFC3] bg-[#FCFBF8] px-3 py-2 text-xs text-[#181816] outline-none transition focus:border-[#1B4D3E]"
+                  />
+                </label>
 
-          <label className="space-y-1.5 md:col-span-2">
-            <span className="block text-xs font-medium text-[#57534E]">
-              机构使命与简介
-            </span>
-            <textarea
-              rows={2}
-              value={orgForm.mission}
-              onChange={(e) =>
-                setOrgForm((prev) => ({ ...prev, mission: e.target.value }))
-              }
-              placeholder="简要描述机构服务领域、核心理念与公益定位，便于 AI 准确把握机构语调..."
-              className="w-full resize-none rounded border border-[#D5CFC3] bg-[#FCFBF8] px-3 py-2 text-xs leading-relaxed text-[#181816] outline-none transition focus:border-[#1B4D3E]"
-            />
-          </label>
+                <label className="space-y-1.5">
+                  <span className="block text-xs font-medium text-[#57534E]">
+                    默认传播口吻
+                  </span>
+                  <select
+                    value={orgForm.defaultTone}
+                    onChange={(e) =>
+                      setOrgForm((prev) => ({
+                        ...prev,
+                        defaultTone: e.target.value as ToneId,
+                      }))
+                    }
+                    className="w-full rounded border border-[#D5CFC3] bg-[#FCFBF8] px-3 py-2 text-xs text-[#181816] outline-none transition focus:border-[#1B4D3E]"
+                  >
+                    {TONES.map((t) => (
+                      <option key={t.id} value={t.id}>
+                        {t.label}
+                      </option>
+                    ))}
+                  </select>
+                </label>
 
-          <label className="space-y-1.5">
-            <span className="block text-xs font-medium text-[#57534E]">
-              固定落款 / 引导语参考
-            </span>
-            <input
-              type="text"
-              value={orgForm.defaultSignOff}
-              onChange={(e) =>
-                setOrgForm((prev) => ({
-                  ...prev,
-                  defaultSignOff: e.target.value,
-                }))
-              }
-              placeholder="例如：微光汇聚，温暖同行..."
-              className="w-full rounded border border-[#D5CFC3] bg-[#FCFBF8] px-3 py-2 text-xs text-[#181816] outline-none transition focus:border-[#1B4D3E]"
-            />
-          </label>
+                <label className="space-y-1.5 md:col-span-2">
+                  <span className="block text-xs font-medium text-[#57534E]">
+                    机构使命与简介
+                  </span>
+                  <textarea
+                    rows={2}
+                    value={orgForm.mission}
+                    onChange={(e) =>
+                      setOrgForm((prev) => ({ ...prev, mission: e.target.value }))
+                    }
+                    placeholder="简要描述机构服务领域、核心理念与公益定位，便于 AI 准确把握机构语调..."
+                    className="w-full resize-none rounded border border-[#D5CFC3] bg-[#FCFBF8] px-3 py-2 text-xs leading-relaxed text-[#181816] outline-none transition focus:border-[#1B4D3E]"
+                  />
+                </label>
 
-          <label className="space-y-1.5">
-            <span className="flex items-center gap-1 text-xs font-medium text-[#57534E]">
-              <ShieldAlert className="h-3.5 w-3.5 text-[#B85D3B]" />
-              <span>机构红线禁用词（逗号分隔）</span>
-            </span>
-            <input
-              type="text"
-              value={orgForm.complianceRedlines}
-              onChange={(e) =>
-                setOrgForm((prev) => ({
-                  ...prev,
-                  complianceRedlines: e.target.value,
-                }))
-              }
-              placeholder="例如：包治百病, 100%保证, 私下转账"
-              className="w-full rounded border border-[#D5CFC3] bg-[#FCFBF8] px-3 py-2 text-xs text-[#181816] outline-none transition focus:border-[#1B4D3E]"
-            />
-          </label>
-        </div>
+                <label className="space-y-1.5">
+                  <span className="block text-xs font-medium text-[#57534E]">
+                    固定落款 / 引导语参考
+                  </span>
+                  <input
+                    type="text"
+                    value={orgForm.defaultSignOff}
+                    onChange={(e) =>
+                      setOrgForm((prev) => ({
+                        ...prev,
+                        defaultSignOff: e.target.value,
+                      }))
+                    }
+                    placeholder="例如：微光汇聚，温暖同行..."
+                    className="w-full rounded border border-[#D5CFC3] bg-[#FCFBF8] px-3 py-2 text-xs text-[#181816] outline-none transition focus:border-[#1B4D3E]"
+                  />
+                </label>
+
+                <label className="space-y-1.5">
+                  <span className="flex items-center gap-1 text-xs font-medium text-[#57534E]">
+                    <ShieldAlert className="h-3.5 w-3.5 text-[#B85D3B]" />
+                    <span>机构红线禁用词（逗号分隔）</span>
+                  </span>
+                  <input
+                    type="text"
+                    value={orgForm.complianceRedlines}
+                    onChange={(e) =>
+                      setOrgForm((prev) => ({
+                        ...prev,
+                        complianceRedlines: e.target.value,
+                      }))
+                    }
+                    placeholder="例如：包治百病, 100%保证, 私下转账"
+                    className="w-full rounded border border-[#D5CFC3] bg-[#FCFBF8] px-3 py-2 text-xs text-[#181816] outline-none transition focus:border-[#1B4D3E]"
+                  />
+                </label>
+
+                <div className="flex items-center justify-end gap-2 pt-2 md:col-span-2">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setOrgForm(profile);
+                      setProfileEditing(false);
+                    }}
+                    className="rounded border border-[#D5CFC3] bg-[#FCFBF8] px-3.5 py-1.5 text-xs font-medium text-[#57534E] hover:text-[#181816]"
+                  >
+                    取消
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      handleSaveProfile();
+                      setProfileEditing(false);
+                    }}
+                    className="inline-flex items-center gap-1.5 rounded bg-[#181816] px-4 py-1.5 text-xs font-medium text-[#FCFBF8] transition hover:bg-[#2F2E2A]"
+                  >
+                    <span>保存机构资料</span>
+                  </button>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </section>
 
       {/* Activity Archives Ledger (Hairline List, Zero Nested Cards) */}
@@ -720,7 +777,7 @@ export function OrganizationWorkspace() {
                 <button
                   type="button"
                   onClick={handleSubmitActivity}
-                  className="rounded-md bg-[#1D4ED8] px-4 py-1.5 text-xs font-medium text-white hover:bg-[#1E40AF]"
+                  className="rounded bg-[#1B4D3E] px-4 py-1.5 text-xs font-medium text-[#FCFBF8] hover:bg-[#143A2F]"
                 >
                   {editingId ? "保存修改" : "确认建档"}
                 </button>
