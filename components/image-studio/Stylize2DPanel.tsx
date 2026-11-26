@@ -101,8 +101,8 @@ export function Stylize2DPanel() {
       <div className="flex flex-col bg-[#090D16] p-5 studio-grid-dark lg:col-span-8">
         <div className="mb-3.5 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="font-mono text-[11px] tracking-wider text-slate-400 uppercase">
-              SIDE-BY-SIDE COMPARE
+            <span className="text-xs font-medium text-slate-300">
+              效果对比
             </span>
             {stylizeMode && (
               <span className="rounded border border-slate-700 bg-slate-800/80 px-2 py-0.5 text-[10px] font-medium text-slate-300">
@@ -115,7 +115,7 @@ export function Stylize2DPanel() {
             <button
               type="button"
               onClick={handleDownload}
-              className="inline-flex items-center gap-1.5 rounded-md bg-[#1D4ED8] px-3 py-1.5 text-xs font-medium text-white transition hover:bg-[#1E40AF]"
+              className="inline-flex items-center gap-1.5 rounded-md bg-[#3451E5] px-3 py-1.5 text-xs font-medium text-white transition hover:bg-[#2740C7]"
             >
               <Download className="h-3.5 w-3.5" />
               <span>下载成品</span>
@@ -125,8 +125,8 @@ export function Stylize2DPanel() {
 
         <div className="grid flex-1 grid-cols-1 gap-4 md:grid-cols-2">
           <div className="flex flex-col rounded-md border border-slate-800 bg-[#0F172A] p-3">
-            <span className="mb-2 font-mono text-[10px] tracking-wider text-slate-500 uppercase">
-              ORIGINAL
+            <span className="mb-2 text-xs text-slate-400">
+              原图
             </span>
             <div className="flex flex-1 items-center justify-center overflow-hidden rounded border border-slate-800/80 bg-black/50 p-2">
               {originalImage && (
@@ -141,8 +141,8 @@ export function Stylize2DPanel() {
           </div>
 
           <div className="flex flex-col rounded-md border border-slate-800 bg-[#0F172A] p-3">
-            <span className="mb-2 font-mono text-[10px] tracking-wider text-slate-500 uppercase">
-              STYLIZED OUTPUT
+            <span className="mb-2 text-xs text-slate-400">
+              风格化结果
             </span>
             <div className="flex min-h-[300px] flex-1 items-center justify-center overflow-hidden rounded border border-slate-800/80 bg-black/50 p-2">
               {isStylizing ? (

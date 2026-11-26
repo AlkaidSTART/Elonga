@@ -9,7 +9,6 @@ import {
   Download,
   FileBarChart2,
   Loader2,
-  Sparkles,
   Trash2,
 } from "lucide-react";
 import { EChartBox } from "@/components/charts/EChartBox";
@@ -84,9 +83,10 @@ export default function ReportsPage() {
       tooltip: {
         trigger: "axis",
         axisPointer: { type: "shadow" },
-        backgroundColor: "#0F141E",
-        borderColor: "#1E293B",
-        textStyle: { color: "#F8FAFC", fontSize: 12 },
+        backgroundColor: "#FFFFFF",
+        borderColor: "#E5E7EB",
+        borderWidth: 1,
+        textStyle: { color: "#111827", fontSize: 12 },
       },
       legend: {
         top: 0,
@@ -221,14 +221,14 @@ export default function ReportsPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <header className="flex flex-col gap-4 border-b border-[#E4E7EC] pb-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-baseline gap-3">
-          <h1 className="text-lg font-semibold tracking-tight text-[#0F172A]">
-            AI 运营月报
+      <header className="flex flex-col gap-4 border-b border-[#E5E7EB] pb-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 className="text-lg font-semibold tracking-tight text-[#111827]">
+            运营月报
           </h1>
-          <span className="font-mono text-[11px] tracking-wider text-slate-400 uppercase">
-            AI MONTHLY REPORT
-          </span>
+          <p className="mt-0.5 text-xs text-gray-500">
+            汇总当月活动档案与发布数据，生成可编辑与导出的月度报告
+          </p>
         </div>
 
         <div className="flex flex-wrap items-center gap-2">
@@ -239,17 +239,17 @@ export default function ReportsPage() {
               setSelectedMonthOverride(e.target.value);
               setActiveReportId(null);
             }}
-            className="rounded-md border border-[#E4E7EC] bg-white px-3 py-1.5 font-mono text-xs text-[#0F172A] outline-none focus:border-[#1D4ED8]"
+            className="rounded-md border border-[#E5E7EB] bg-white px-3 py-1.5 font-mono text-xs text-[#111827] outline-none focus:border-[#3451E5]"
           />
 
-          <div className="flex items-center gap-0.5 rounded-md border border-[#E4E7EC] bg-[#F1F3F6] p-0.5">
+          <div className="flex items-center gap-0.5 rounded-md border border-[#E5E7EB] bg-[#F3F4F6] p-0.5">
             <button
               type="button"
               onClick={() => setFocus("internal")}
               className={`rounded-[5px] px-2.5 py-1 text-xs font-medium transition ${
                 focus === "internal"
-                  ? "bg-white text-[#0F172A] shadow-2xs"
-                  : "text-slate-500 hover:text-[#0F172A]"
+                  ? "bg-white text-[#111827] shadow-2xs"
+                  : "text-gray-500 hover:text-[#111827]"
               }`}
             >
               对内复盘
@@ -259,8 +259,8 @@ export default function ReportsPage() {
               onClick={() => setFocus("donor")}
               className={`rounded-[5px] px-2.5 py-1 text-xs font-medium transition ${
                 focus === "donor"
-                  ? "bg-white text-[#0F172A] shadow-2xs"
-                  : "text-slate-500 hover:text-[#0F172A]"
+                  ? "bg-white text-[#111827] shadow-2xs"
+                  : "text-gray-500 hover:text-[#111827]"
               }`}
             >
               对外汇报
@@ -271,17 +271,17 @@ export default function ReportsPage() {
             type="button"
             disabled={isGenerating}
             onClick={() => void handleGenerateReport()}
-            className="inline-flex items-center gap-1.5 rounded-md bg-[#1D4ED8] px-3.5 py-1.5 text-xs font-medium text-white shadow-2xs transition hover:bg-[#1E40AF] disabled:opacity-60"
+            className="inline-flex items-center gap-1.5 rounded-md bg-[#3451E5] px-3.5 py-1.5 text-xs font-medium text-white transition hover:bg-[#2740C7] disabled:opacity-60"
           >
             {isGenerating ? (
               <>
                 <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                <span>AI 汇总生成中...</span>
+                <span>生成中...</span>
               </>
             ) : (
               <>
-                <Sparkles className="h-3.5 w-3.5" />
-                <span>生成本月 AI 月报</span>
+                <FileBarChart2 className="h-3.5 w-3.5" />
+                <span>生成本月月报</span>
               </>
             )}
           </button>
@@ -360,13 +360,10 @@ export default function ReportsPage() {
           </div>
         </div>
 
-        <div className="rounded-lg border border-[#E4E7EC] bg-white p-4 lg:col-span-5">
+        <div className="rounded-lg border border-[#E5E7EB] bg-white p-4 lg:col-span-5">
           <div className="mb-2 flex items-center justify-between">
-            <span className="text-xs font-semibold text-[#0F172A]">
+            <span className="text-xs font-semibold text-[#111827]">
               {selectedMonth} 渠道分布
-            </span>
-            <span className="font-mono text-[10px] text-slate-400">
-              MONTHLY CHANNELS
             </span>
           </div>
           <EChartBox option={channelChartOption} className="h-36 w-full" />
@@ -376,23 +373,23 @@ export default function ReportsPage() {
       {/* Report Viewer + History Sidebar */}
       <section className="grid grid-cols-1 items-start gap-6 lg:grid-cols-12">
         {/* Main Report Manuscript */}
-        <div className="rounded-lg border border-[#E4E7EC] bg-white p-6 shadow-[0_1px_2px_rgba(15,23,42,0.03)] lg:col-span-8">
+        <div className="rounded-lg border border-[#E5E7EB] bg-white p-6 lg:col-span-8">
           {!activeReport ? (
             <div className="flex min-h-[300px] flex-col items-center justify-center text-center">
-              <FileBarChart2 className="h-8 w-8 text-slate-300" />
-              <p className="mt-3 text-sm font-medium text-slate-500">
+              <FileBarChart2 className="h-8 w-8 text-gray-300" />
+              <p className="mt-3 text-sm font-medium text-gray-600">
                 尚未生成 {selectedMonth} 月报
               </p>
-              <p className="mt-1 max-w-md text-xs leading-relaxed text-slate-400">
-                系统将自动汇总本月「机构中心」活动档案与「创作记录」中已发布/归档的稿件及回填数据，一键生成可编辑、可导出的专业月报。
+              <p className="mt-1 max-w-md text-xs leading-relaxed text-gray-400">
+                系统将自动汇总本月「机构中心」活动档案与「创作记录」中已发布/归档的稿件及回填数据，一键生成可编辑、可导出的月报。
               </p>
               <button
                 type="button"
                 disabled={isGenerating}
                 onClick={() => void handleGenerateReport()}
-                className="mt-4 inline-flex items-center gap-1.5 rounded-md bg-[#1D4ED8] px-4 py-2 text-xs font-medium text-white hover:bg-[#1E40AF]"
+                className="mt-4 inline-flex items-center gap-1.5 rounded-md bg-[#3451E5] px-4 py-2 text-xs font-medium text-white hover:bg-[#2740C7]"
               >
-                <Sparkles className="h-3.5 w-3.5" />
+                <FileBarChart2 className="h-3.5 w-3.5" />
                 <span>立即生成 {selectedMonth} 月报</span>
               </button>
             </div>

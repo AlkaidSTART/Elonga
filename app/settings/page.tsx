@@ -21,14 +21,14 @@ export default function SettingsPage() {
   return (
     <form onSubmit={handleSave} className="mx-auto max-w-4xl space-y-6">
       {/* Header */}
-      <header className="flex items-center justify-between border-b border-[#E4E7EC] pb-4">
-        <div className="flex items-baseline gap-3">
-          <h1 className="text-lg font-semibold tracking-tight text-[#0F172A]">
+      <header className="flex items-center justify-between border-b border-[#E5E7EB] pb-4">
+        <div>
+          <h1 className="text-lg font-semibold tracking-tight text-[#111827]">
             模型配置
           </h1>
-          <span className="font-mono text-[11px] tracking-wider text-slate-400 uppercase">
-            MODEL SETTINGS
-          </span>
+          <p className="mt-0.5 text-xs text-gray-500">
+            配置文本与图像生成服务接口，密钥仅保存在本地浏览器
+          </p>
         </div>
 
         <div className="flex items-center gap-2.5">
@@ -38,14 +38,14 @@ export default function SettingsPage() {
               onClick={() =>
                 updateModelConfig({ textApiKey: "", imageApiKey: "" })
               }
-              className="rounded-md border border-[#E4E7EC] bg-white px-3 py-1.5 text-xs font-medium text-slate-600 transition hover:bg-slate-50 hover:text-[#0F172A]"
+              className="rounded-md border border-[#E5E7EB] bg-white px-3 py-1.5 text-xs font-medium text-gray-600 transition hover:bg-gray-50 hover:text-[#111827]"
             >
               清空密钥
             </button>
           )}
           <button
             type="submit"
-            className="inline-flex items-center gap-1.5 rounded-md bg-[#1D4ED8] px-4 py-1.5 text-xs font-medium text-white shadow-2xs transition hover:bg-[#1E40AF]"
+            className="inline-flex items-center gap-1.5 rounded-md bg-[#3451E5] px-4 py-1.5 text-xs font-medium text-white transition hover:bg-[#2740C7]"
           >
             {savedToast && <Check className="h-3.5 w-3.5" />}
             <span>{savedToast ? "已保存" : "保存配置"}</span>
@@ -54,21 +54,21 @@ export default function SettingsPage() {
       </header>
 
       {/* Structured Settings Container */}
-      <div className="divide-y divide-[#ECEEF2] rounded-lg border border-[#E4E7EC] bg-white shadow-[0_1px_2px_rgba(15,23,42,0.03)]">
+      <div className="divide-y divide-[#F3F4F6] rounded-lg border border-[#E5E7EB] bg-white">
         {/* Text Model Band */}
         <section className="grid grid-cols-1 gap-6 p-6 sm:p-7 lg:grid-cols-12">
           <div className="lg:col-span-4">
             <div className="flex items-center gap-2">
-              <h2 className="text-sm font-semibold text-[#0F172A]">文本模型</h2>
+              <h2 className="text-sm font-semibold text-[#111827]">文本模型</h2>
               <span
                 className={`h-1.5 w-1.5 rounded-full ${
-                  hasTextKey ? "bg-emerald-500" : "bg-slate-300"
+                  hasTextKey ? "bg-emerald-500" : "bg-gray-300"
                 }`}
               />
             </div>
-            <span className="mt-1 block font-mono text-[11px] text-slate-400">
-              DEEPSEEK / OPENAI
-            </span>
+            <p className="mt-1 text-xs text-gray-500">
+              兼容 DeepSeek 与 OpenAI 协议
+            </p>
           </div>
 
           <div className="space-y-4 lg:col-span-8">
@@ -125,16 +125,16 @@ export default function SettingsPage() {
         <section className="grid grid-cols-1 gap-6 p-6 sm:p-7 lg:grid-cols-12">
           <div className="lg:col-span-4">
             <div className="flex items-center gap-2">
-              <h2 className="text-sm font-semibold text-[#0F172A]">生图模型</h2>
+              <h2 className="text-sm font-semibold text-[#111827]">生图模型</h2>
               <span
                 className={`h-1.5 w-1.5 rounded-full ${
-                  hasImageKey ? "bg-emerald-500" : "bg-slate-300"
+                  hasImageKey ? "bg-emerald-500" : "bg-gray-300"
                 }`}
               />
             </div>
-            <span className="mt-1 block font-mono text-[11px] text-slate-400">
-              SEEDREAM / ARK
-            </span>
+            <p className="mt-1 text-xs text-gray-500">
+              兼容 Seedream 与火山方舟接口
+            </p>
           </div>
 
           <div className="space-y-4 lg:col-span-8">

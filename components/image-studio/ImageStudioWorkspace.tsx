@@ -58,8 +58,8 @@ function createSampleImageDataUrl(): string {
   ctx.fillText("公益物资交接单 · 现场核验样本", 126, 129);
 
   ctx.fillStyle = "#64748B";
-  ctx.font = "500 13px ui-monospace, SFMono-Regular, Menlo, monospace";
-  ctx.fillText("STUDIO SAMPLE · 960×640", 662, 125);
+  ctx.font = "500 13px -apple-system, BlinkMacSystemFont, sans-serif";
+  ctx.fillText("示例样本 · 960×640", 720, 125);
 
   const rows = [
     ["工单编号", "EL-2026-88412"],
@@ -134,14 +134,14 @@ export function ImageStudioWorkspace() {
   if (!originalImage) {
     return (
       <div className="space-y-5">
-        <header className="flex items-center justify-between border-b border-[#E2E8F0] pb-4">
-          <div className="flex items-baseline gap-3">
-            <h1 className="text-lg font-semibold tracking-tight text-[#0F172A]">
+        <header className="flex items-center justify-between border-b border-[#E5E7EB] pb-4">
+          <div>
+            <h1 className="text-lg font-semibold tracking-tight text-[#111827]">
               图片工坊
             </h1>
-            <span className="font-mono text-[11px] tracking-wider text-slate-400 uppercase">
-              IMAGE STUDIO
-            </span>
+            <p className="mt-0.5 text-xs text-gray-500">
+              对现场素材进行隐私打码或二维风格化处理
+            </p>
           </div>
         </header>
 
@@ -152,27 +152,21 @@ export function ImageStudioWorkspace() {
           }}
           onDragLeave={() => setIsDragging(false)}
           onDrop={handleDrop}
-          className={`relative flex min-h-[calc(100vh-12rem)] flex-col items-center justify-center overflow-hidden rounded-lg border bg-[#0B1120] p-10 text-center text-slate-100 studio-grid-dark transition-all ${
+          className={`flex min-h-[calc(100vh-14rem)] flex-col items-center justify-center rounded-xl border border-dashed bg-white p-10 text-center transition-colors ${
             isDragging
-              ? "border-[#3B82F6] ring-2 ring-[#3B82F6]/30"
-              : "border-[#1E293B]"
+              ? "border-[#3451E5] bg-[#EEF2FF]/40"
+              : "border-[#D1D5DB] hover:border-gray-400"
           }`}
         >
-          {/* Precision Viewfinder Corner Marks */}
-          <span className="pointer-events-none absolute left-6 top-6 h-4 w-4 border-l border-t border-slate-600" />
-          <span className="pointer-events-none absolute right-6 top-6 h-4 w-4 border-r border-t border-slate-600" />
-          <span className="pointer-events-none absolute bottom-6 left-6 h-4 w-4 border-b border-l border-slate-600" />
-          <span className="pointer-events-none absolute bottom-6 right-6 h-4 w-4 border-b border-r border-slate-600" />
-
-          <div className="mb-4 flex h-11 w-11 items-center justify-center rounded-lg border border-slate-700/80 bg-slate-900">
-            <ImagePlus className="h-5 w-5 text-[#3B82F6]" />
+          <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-[#F3F4F6] text-[#3451E5]">
+            <ImagePlus className="h-5 w-5" />
           </div>
 
-          <h2 className="text-base font-semibold tracking-tight text-white">
-            导入待处理图片
+          <h2 className="text-base font-semibold text-[#111827]">
+            拖放或选择本地图片
           </h2>
-          <p className="mt-1.5 font-mono text-[11px] tracking-wider text-slate-500 uppercase">
-            DRAG & DROP · JPG / PNG / WEBP · PRIVACY REDACTION & 2D STYLIZE
+          <p className="mt-1.5 text-xs text-gray-500">
+            支持 JPG、PNG、WebP 格式，用于隐私信息打码与二维风格化
           </p>
 
           <input
@@ -190,16 +184,16 @@ export function ImageStudioWorkspace() {
             <button
               type="button"
               onClick={() => fileInputRef.current?.click()}
-              className="rounded-md bg-[#1D4ED8] px-4 py-2 text-xs font-medium text-white transition hover:bg-[#1E40AF]"
+              className="rounded-md bg-[#3451E5] px-4 py-2 text-xs font-medium text-white transition hover:bg-[#2740C7]"
             >
               选择本地图片
             </button>
             <button
               type="button"
               onClick={handleLoadSample}
-              className="inline-flex items-center gap-1.5 rounded-md border border-slate-700 bg-slate-800/80 px-4 py-2 text-xs font-medium text-slate-200 transition hover:bg-slate-800 hover:text-white"
+              className="inline-flex items-center gap-1.5 rounded-md border border-[#E5E7EB] bg-white px-4 py-2 text-xs font-medium text-gray-700 transition hover:bg-gray-50"
             >
-              <FileImage className="h-3.5 w-3.5 text-slate-400" />
+              <FileImage className="h-3.5 w-3.5 text-gray-400" />
               <span>载入示例样本</span>
             </button>
           </div>
@@ -209,18 +203,13 @@ export function ImageStudioWorkspace() {
   }
 
   return (
-    <div className="overflow-hidden rounded-lg border border-[#1E293B] bg-[#0B1120] text-slate-100 shadow-[0_4px_20px_rgba(15,23,42,0.16)]">
-      {/* Precision Darkroom Top Bar */}
+    <div className="overflow-hidden rounded-lg border border-[#1E293B] bg-[#0B1120] text-slate-100 shadow-[0_4px_20px_rgba(15,23,42,0.12)]">
+      {/* Editor Top Bar */}
       <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 bg-[#0F172A] px-5 py-3">
         <div className="flex items-center gap-4">
-          <div className="flex items-baseline gap-2">
-            <span className="text-sm font-semibold tracking-tight text-white">
-              图片工坊
-            </span>
-            <span className="hidden font-mono text-[10px] tracking-wider text-slate-500 uppercase sm:inline">
-              STUDIO
-            </span>
-          </div>
+          <span className="text-sm font-semibold tracking-tight text-white">
+            图片工坊
+          </span>
 
           <div className="flex items-center gap-0.5 rounded-md border border-slate-800 bg-[#0B1120] p-0.5">
             <button
@@ -228,7 +217,7 @@ export function ImageStudioWorkspace() {
               onClick={() => setActiveMode("mosaic")}
               className={`rounded-[5px] px-3 py-1 text-xs font-medium transition ${
                 activeMode === "mosaic"
-                  ? "bg-[#1D4ED8] text-white"
+                  ? "bg-[#3451E5] text-white"
                   : "text-slate-400 hover:text-slate-200"
               }`}
             >
@@ -239,7 +228,7 @@ export function ImageStudioWorkspace() {
               onClick={() => setActiveMode("stylize")}
               className={`rounded-[5px] px-3 py-1 text-xs font-medium transition ${
                 activeMode === "stylize"
-                  ? "bg-[#1D4ED8] text-white"
+                  ? "bg-[#3451E5] text-white"
                   : "text-slate-400 hover:text-slate-200"
               }`}
             >

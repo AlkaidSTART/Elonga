@@ -179,20 +179,20 @@ export default function OrganizationPage() {
   return (
     <div className="space-y-6">
       {/* Header */}
-      <header className="flex flex-col gap-4 border-b border-[#E4E7EC] pb-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex items-baseline gap-3">
-          <h1 className="text-lg font-semibold tracking-tight text-[#0F172A]">
+      <header className="flex flex-col gap-4 border-b border-[#E5E7EB] pb-4 sm:flex-row sm:items-center sm:justify-between">
+        <div>
+          <h1 className="text-lg font-semibold tracking-tight text-[#111827]">
             机构中心
           </h1>
-          <span className="font-mono text-[11px] tracking-wider text-slate-400 uppercase">
-            ORGANIZATION & ARCHIVES
-          </span>
+          <p className="mt-0.5 text-xs text-gray-500">
+            维护机构基础信息与活动档案，供内容创作与月报自动读取
+          </p>
         </div>
 
         <button
           type="button"
           onClick={openCreateModal}
-          className="inline-flex items-center gap-1.5 rounded-md bg-[#1D4ED8] px-3.5 py-2 text-xs font-medium text-white shadow-2xs transition hover:bg-[#1E40AF]"
+          className="inline-flex items-center gap-1.5 rounded-md bg-[#3451E5] px-3.5 py-2 text-xs font-medium text-white transition hover:bg-[#2740C7]"
         >
           <FolderPlus className="h-3.5 w-3.5" />
           <span>新建活动档案</span>

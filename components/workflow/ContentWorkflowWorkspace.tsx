@@ -663,15 +663,10 @@ export function ContentWorkflowWorkspace() {
   return (
     <div className="space-y-5">
       {/* Top Page Header */}
-      <header className="flex flex-wrap items-center justify-between gap-4 border-b border-[#E2E8F0] pb-4">
-        <div className="flex items-baseline gap-3">
-          <h1 className="text-lg font-semibold tracking-tight text-[#0F172A]">
-            内容创作
-          </h1>
-          <span className="font-mono text-[11px] tracking-wider text-slate-400 uppercase">
-            CONTENT WORKFLOW
-          </span>
-        </div>
+      <header className="flex flex-wrap items-center justify-between gap-4 border-b border-[#E5E7EB] pb-4">
+        <h1 className="text-lg font-semibold tracking-tight text-[#111827]">
+          内容创作
+        </h1>
 
         <ol className="flex items-center gap-4 sm:gap-5">
           {pipelineSteps.map((step, idx) => {
