@@ -563,29 +563,29 @@ export function MosaicEditor() {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12">
       {/* Left/Primary Darkroom Canvas Stage */}
-      <div className="flex flex-col bg-[#0F100F] p-5 studio-grid-dark lg:col-span-8">
+      <div className="flex flex-col bg-[#090D16] p-5 studio-grid-dark lg:col-span-8">
         <div className="mb-3 flex items-center justify-between">
-          <span className="font-mono text-[11px] text-zinc-400">
+          <span className="font-mono text-[11px] text-slate-400">
             {isAutoDetecting
               ? "自动识别中..."
               : manualEnabled
-              ? `${
-                  toolShape === "lasso"
-                    ? "自由圈选"
-                    : toolShape === "rect"
-                    ? "矩形框选"
-                    : "画笔涂抹"
-                } · ${actions.length} 处`
-              : `已处理 ${actions.length} 处`}
+                ? `${
+                    toolShape === "lasso"
+                      ? "自由圈选"
+                      : toolShape === "rect"
+                        ? "矩形框选"
+                        : "画笔涂抹"
+                  } · ${actions.length} 处`
+                : `已处理 ${actions.length} 处`}
           </span>
           <div className="flex items-center gap-2">
             <button
               type="button"
               onClick={() => setShowMarkers((v) => !v)}
-              className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium select-none transition ${
+              className={`inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1 text-xs font-medium select-none transition ${
                 showMarkers
-                  ? "bg-[#0F6E5D]/25 text-[#34D399] ring-1 ring-[#34D399]/30"
-                  : "bg-white/[0.06] text-zinc-400 hover:bg-white/[0.12] hover:text-zinc-200"
+                  ? "border-[#2563EB]/50 bg-[#1D4ED8]/20 text-[#93C5FD]"
+                  : "border-slate-700 bg-slate-800/70 text-slate-400 hover:bg-slate-800 hover:text-slate-200"
               }`}
               title="切换画布上的打码编号标注（导出图片不会包含标注）"
             >
@@ -601,18 +601,18 @@ export function MosaicEditor() {
               onPointerDown={() => setShowOriginal(true)}
               onPointerUp={() => setShowOriginal(false)}
               onPointerLeave={() => setShowOriginal(false)}
-              className="rounded-full bg-white/[0.08] px-3 py-1 text-xs font-medium text-zinc-200 select-none transition hover:bg-white/[0.15]"
+              className="rounded-md border border-slate-700 bg-slate-800/70 px-2.5 py-1 text-xs font-medium text-slate-200 select-none transition hover:bg-slate-700"
             >
               {showOriginal ? "原图" : "按住对比"}
             </button>
           </div>
         </div>
 
-        <div className="relative flex min-h-[460px] flex-1 items-center justify-center overflow-hidden rounded-2xl bg-black/40 p-3 ring-1 ring-white/[0.07]">
+        <div className="relative flex min-h-[460px] flex-1 items-center justify-center overflow-hidden rounded-md border border-slate-800 bg-black/50 p-3">
           <div className="relative inline-block max-h-[560px] max-w-full">
             <canvas
               ref={canvasRef}
-              className="block max-h-[540px] max-w-full rounded object-contain shadow-lg"
+              className="block max-h-[540px] max-w-full rounded-xs object-contain shadow-lg"
             />
             <canvas
               ref={overlayRef}
@@ -623,7 +623,7 @@ export function MosaicEditor() {
               onPointerLeave={() => {
                 if (!isDrawing) clearOverlay();
               }}
-              className={`absolute inset-0 h-full w-full touch-none rounded ${
+              className={`absolute inset-0 h-full w-full touch-none rounded-xs ${
                 manualEnabled ? "cursor-crosshair" : "pointer-events-none"
               }`}
             />
@@ -632,13 +632,13 @@ export function MosaicEditor() {
       </div>
 
       {/* Right Docked Dark Inspector */}
-      <aside className="divide-y divide-white/10 border-t border-white/10 bg-[#1B1C1A] lg:col-span-4 lg:border-l lg:border-t-0">
+      <aside className="divide-y divide-slate-800 border-t border-slate-800 bg-[#0F172A] lg:col-span-4 lg:border-l lg:border-t-0">
         {/* Auto Redact */}
         <div className="space-y-3 p-5">
           <div className="flex items-center justify-between">
-            <h3 className="text-xs font-medium text-zinc-300">自动识别</h3>
+            <h3 className="text-xs font-medium text-slate-300">自动识别</h3>
             {autoDetectMode && !isAutoDetecting && (
-              <span className="font-mono text-[10px] text-zinc-500">
+              <span className="font-mono text-[10px] text-slate-500">
                 {autoDetectMode === "ai" ? "AI" : "LOCAL"}
               </span>
             )}
@@ -652,10 +652,10 @@ export function MosaicEditor() {
                   key={item.id}
                   type="button"
                   onClick={() => handleToggleCategory(item.id)}
-                  className={`relative flex flex-col items-center justify-center rounded-xl px-2 py-2 text-[11px] font-medium transition ${
+                  className={`relative flex flex-col items-center justify-center rounded-md border px-2 py-2 text-[11px] font-medium transition ${
                     active
-                      ? "bg-[#0F6E5D] text-white"
-                      : "bg-white/[0.05] text-zinc-400 hover:bg-white/[0.1] hover:text-zinc-200"
+                      ? "border-[#2563EB] bg-[#1D4ED8]/25 text-white"
+                      : "border-slate-800 bg-slate-900/70 text-slate-400 hover:border-slate-700 hover:bg-slate-800/80 hover:text-slate-200"
                   }`}
                 >
                   <span>{item.label}</span>
@@ -675,7 +675,7 @@ export function MosaicEditor() {
             })}
           </div>
 
-          <p className="text-[10px] leading-relaxed text-zinc-500">
+          <p className="text-[10px] leading-relaxed text-slate-500">
             默认开启高置信度「文字/号码」识别；人脸与二维码为 Beta 能力，如出现误判可悬停下方编号定位后单独移除。
           </p>
 
@@ -685,7 +685,7 @@ export function MosaicEditor() {
             onClick={() => {
               if (imgRef.current) void runAutoRedact(imgRef.current);
             }}
-            className="flex w-full items-center justify-center gap-1.5 rounded-xl bg-white/[0.06] py-2 text-xs font-medium text-zinc-200 transition hover:bg-white/[0.12] disabled:opacity-50"
+            className="flex w-full items-center justify-center gap-1.5 rounded-md border border-slate-700 bg-slate-800/70 py-2 text-xs font-medium text-slate-200 transition hover:bg-slate-800 hover:text-white disabled:opacity-50"
           >
             {isAutoDetecting ? (
               <>
@@ -716,23 +716,23 @@ export function MosaicEditor() {
                         prev === act.id ? null : act.id
                       )
                     }
-                    className={`flex cursor-pointer items-center justify-between rounded-lg px-2.5 py-1.5 text-[11px] transition ${
+                    className={`flex cursor-pointer items-center justify-between rounded-md border px-2.5 py-1.5 text-[11px] transition ${
                       isActive
-                        ? "bg-amber-500/15 ring-1 ring-amber-400/70"
-                        : "bg-black/30 hover:bg-white/[0.08]"
+                        ? "border-amber-400/70 bg-amber-500/15"
+                        : "border-slate-800 bg-[#0B1120] hover:border-slate-700 hover:bg-slate-800/60"
                     }`}
                   >
                     <div className="flex min-w-0 items-center gap-2">
                       <span
                         className={`shrink-0 rounded px-1.5 py-0.5 font-mono text-[10px] font-semibold ${
                           isActive
-                            ? "bg-amber-400 text-[#141413]"
-                            : "bg-[#0F6E5D] text-white"
+                            ? "bg-amber-400 text-[#0F172A]"
+                            : "bg-[#1D4ED8] text-white"
                         }`}
                       >
                         #{idx + 1}
                       </span>
-                      <span className="truncate text-zinc-200">
+                      <span className="truncate text-slate-200">
                         {act.label || "敏感区域"}
                       </span>
                     </div>
@@ -740,11 +740,13 @@ export function MosaicEditor() {
                       type="button"
                       onClick={(e) => {
                         e.stopPropagation();
-                        if (hoveredActionId === act.id) setHoveredActionId(null);
-                        if (selectedActionId === act.id) setSelectedActionId(null);
+                        if (hoveredActionId === act.id)
+                          setHoveredActionId(null);
+                        if (selectedActionId === act.id)
+                          setSelectedActionId(null);
                         removeActionById(act.id);
                       }}
-                      className="ml-2 rounded p-0.5 text-zinc-400 transition hover:bg-rose-500/20 hover:text-rose-300"
+                      className="ml-2 rounded p-0.5 text-slate-400 transition hover:bg-rose-500/20 hover:text-rose-300"
                       title="移除此区域"
                     >
                       <X className="h-3 w-3" />
@@ -758,7 +760,7 @@ export function MosaicEditor() {
 
         {/* Mosaic Mode */}
         <div className="p-5">
-          <h3 className="mb-3 text-xs font-medium text-zinc-300">样式</h3>
+          <h3 className="mb-3 text-xs font-medium text-slate-300">遮盖样式</h3>
           <div className="grid grid-cols-3 gap-1.5">
             {MOSAIC_TYPES.map((item) => {
               const active = mosaicType === item.id;
@@ -767,10 +769,10 @@ export function MosaicEditor() {
                   key={item.id}
                   type="button"
                   onClick={() => setMosaicType(item.id)}
-                  className={`rounded-xl py-2 text-center text-[11px] font-medium transition ${
+                  className={`rounded-md border py-2 text-center text-[11px] font-medium transition ${
                     active
-                      ? "bg-white text-[#141413]"
-                      : "bg-white/[0.05] text-zinc-400 hover:bg-white/[0.1] hover:text-zinc-200"
+                      ? "border-white bg-white text-[#0F172A]"
+                      : "border-slate-800 bg-slate-900/70 text-slate-400 hover:border-slate-700 hover:bg-slate-800/80 hover:text-slate-200"
                   }`}
                 >
                   {item.label}
@@ -782,10 +784,12 @@ export function MosaicEditor() {
           {mosaicType !== "solid" && (
             <div className="mt-4">
               <div className="mb-1.5 flex items-center justify-between text-xs">
-                <span className="text-zinc-400">
+                <span className="text-slate-400">
                   {mosaicType === "stackblur" ? "模糊半径" : "颗粒度"}
                 </span>
-                <span className="font-mono text-zinc-300">{intensity}</span>
+                <span className="font-mono text-slate-300 tabular-nums">
+                  {intensity}
+                </span>
               </div>
               <input
                 type="range"
@@ -793,7 +797,7 @@ export function MosaicEditor() {
                 max={45}
                 value={intensity}
                 onChange={(e) => setIntensity(Number(e.target.value))}
-                className="w-full accent-[#15A085]"
+                className="w-full accent-[#2563EB]"
               />
             </div>
           )}
@@ -807,15 +811,17 @@ export function MosaicEditor() {
             className="flex w-full items-center justify-between text-left"
           >
             <div className="flex items-center gap-2">
-              <span className="text-xs font-medium text-zinc-300">手动微调</span>
+              <span className="text-xs font-medium text-slate-300">
+                手动微调
+              </span>
               {manualActions.length > 0 && (
-                <span className="font-mono text-[10px] text-[#34D399]">
+                <span className="font-mono text-[10px] text-[#60A5FA]">
                   {manualActions.length}
                 </span>
               )}
             </div>
             <ChevronDown
-              className={`h-4 w-4 text-zinc-500 transition-transform ${
+              className={`h-4 w-4 text-slate-500 transition-transform ${
                 manualEnabled ? "rotate-180 text-white" : ""
               }`}
             />
@@ -827,10 +833,10 @@ export function MosaicEditor() {
                 <button
                   type="button"
                   onClick={() => setToolShape("lasso")}
-                  className={`flex items-center justify-center gap-1 rounded-xl py-2 text-[11px] font-medium transition ${
+                  className={`flex items-center justify-center gap-1 rounded-md border py-2 text-[11px] font-medium transition ${
                     toolShape === "lasso"
-                      ? "bg-[#0F6E5D] text-white"
-                      : "bg-white/[0.05] text-zinc-400 hover:bg-white/[0.1]"
+                      ? "border-[#2563EB] bg-[#1D4ED8]/25 text-white"
+                      : "border-slate-800 bg-slate-900/70 text-slate-400 hover:border-slate-700 hover:bg-slate-800/80"
                   }`}
                 >
                   <Lasso className="h-3.5 w-3.5 shrink-0" />
@@ -839,10 +845,10 @@ export function MosaicEditor() {
                 <button
                   type="button"
                   onClick={() => setToolShape("rect")}
-                  className={`flex items-center justify-center gap-1 rounded-xl py-2 text-[11px] font-medium transition ${
+                  className={`flex items-center justify-center gap-1 rounded-md border py-2 text-[11px] font-medium transition ${
                     toolShape === "rect"
-                      ? "bg-[#0F6E5D] text-white"
-                      : "bg-white/[0.05] text-zinc-400 hover:bg-white/[0.1]"
+                      ? "border-[#2563EB] bg-[#1D4ED8]/25 text-white"
+                      : "border-slate-800 bg-slate-900/70 text-slate-400 hover:border-slate-700 hover:bg-slate-800/80"
                   }`}
                 >
                   <Square className="h-3.5 w-3.5 shrink-0" />
@@ -851,10 +857,10 @@ export function MosaicEditor() {
                 <button
                   type="button"
                   onClick={() => setToolShape("brush")}
-                  className={`flex items-center justify-center gap-1 rounded-xl py-2 text-[11px] font-medium transition ${
+                  className={`flex items-center justify-center gap-1 rounded-md border py-2 text-[11px] font-medium transition ${
                     toolShape === "brush"
-                      ? "bg-[#0F6E5D] text-white"
-                      : "bg-white/[0.05] text-zinc-400 hover:bg-white/[0.1]"
+                      ? "border-[#2563EB] bg-[#1D4ED8]/25 text-white"
+                      : "border-slate-800 bg-slate-900/70 text-slate-400 hover:border-slate-700 hover:bg-slate-800/80"
                   }`}
                 >
                   <Brush className="h-3.5 w-3.5 shrink-0" />
@@ -865,8 +871,10 @@ export function MosaicEditor() {
               {toolShape === "brush" && (
                 <div>
                   <div className="mb-1.5 flex items-center justify-between text-xs">
-                    <span className="text-zinc-400">画笔</span>
-                    <span className="font-mono text-zinc-300">{brushSize}px</span>
+                    <span className="text-slate-400">画笔直径</span>
+                    <span className="font-mono text-slate-300 tabular-nums">
+                      {brushSize}px
+                    </span>
                   </div>
                   <input
                     type="range"
@@ -874,7 +882,7 @@ export function MosaicEditor() {
                     max={96}
                     value={brushSize}
                     onChange={(e) => setBrushSize(Number(e.target.value))}
-                    className="w-full accent-[#15A085]"
+                    className="w-full accent-[#2563EB]"
                   />
                 </div>
               )}
@@ -884,7 +892,7 @@ export function MosaicEditor() {
                   type="button"
                   onClick={undoAction}
                   disabled={actions.length === 0}
-                  className="flex flex-1 items-center justify-center gap-1 rounded-xl bg-white/[0.06] py-2 text-xs text-zinc-300 transition hover:bg-white/[0.12] disabled:opacity-30"
+                  className="flex flex-1 items-center justify-center gap-1 rounded-md border border-slate-700 bg-slate-800/70 py-2 text-xs text-slate-300 transition hover:bg-slate-800 disabled:opacity-30"
                 >
                   <Undo2 className="h-3.5 w-3.5" />
                   <span>撤销</span>
@@ -893,7 +901,7 @@ export function MosaicEditor() {
                   type="button"
                   onClick={redoAction}
                   disabled={redoStack.length === 0}
-                  className="flex flex-1 items-center justify-center gap-1 rounded-xl bg-white/[0.06] py-2 text-xs text-zinc-300 transition hover:bg-white/[0.12] disabled:opacity-30"
+                  className="flex flex-1 items-center justify-center gap-1 rounded-md border border-slate-700 bg-slate-800/70 py-2 text-xs text-slate-300 transition hover:bg-slate-800 disabled:opacity-30"
                 >
                   <Redo2 className="h-3.5 w-3.5" />
                   <span>重做</span>
@@ -902,7 +910,7 @@ export function MosaicEditor() {
                   type="button"
                   onClick={resetActions}
                   disabled={actions.length === 0}
-                  className="flex items-center justify-center rounded-xl bg-white/[0.06] px-3 py-2 text-xs text-zinc-400 transition hover:bg-rose-500/20 hover:text-rose-300 disabled:opacity-30"
+                  className="flex items-center justify-center rounded-md border border-slate-700 bg-slate-800/70 px-3 py-2 text-xs text-slate-400 transition hover:border-rose-500/40 hover:bg-rose-500/15 hover:text-rose-300 disabled:opacity-30"
                   title="清空"
                 >
                   <RotateCcw className="h-3.5 w-3.5" />
@@ -928,23 +936,23 @@ export function MosaicEditor() {
                             prev === act.id ? null : act.id
                           )
                         }
-                        className={`flex cursor-pointer items-center justify-between rounded-lg px-2.5 py-1.5 text-[11px] transition ${
+                        className={`flex cursor-pointer items-center justify-between rounded-md border px-2.5 py-1.5 text-[11px] transition ${
                           isActive
-                            ? "bg-amber-500/15 ring-1 ring-amber-400/70"
-                            : "bg-black/30 hover:bg-white/[0.08]"
+                            ? "border-amber-400/70 bg-amber-500/15"
+                            : "border-slate-800 bg-[#0B1120] hover:border-slate-700 hover:bg-slate-800/60"
                         }`}
                       >
                         <div className="flex min-w-0 items-center gap-2">
                           <span
                             className={`shrink-0 rounded px-1.5 py-0.5 font-mono text-[10px] font-semibold ${
                               isActive
-                                ? "bg-amber-400 text-[#141413]"
+                                ? "bg-amber-400 text-[#0F172A]"
                                 : "bg-slate-600 text-white"
                             }`}
                           >
                             M{idx + 1}
                           </span>
-                          <span className="truncate text-zinc-200">
+                          <span className="truncate text-slate-200">
                             {act.label || "手动"}
                           </span>
                         </div>
@@ -952,11 +960,13 @@ export function MosaicEditor() {
                           type="button"
                           onClick={(e) => {
                             e.stopPropagation();
-                            if (hoveredActionId === act.id) setHoveredActionId(null);
-                            if (selectedActionId === act.id) setSelectedActionId(null);
+                            if (hoveredActionId === act.id)
+                              setHoveredActionId(null);
+                            if (selectedActionId === act.id)
+                              setSelectedActionId(null);
                             removeActionById(act.id);
                           }}
-                          className="ml-2 rounded p-0.5 text-zinc-400 transition hover:bg-rose-500/20 hover:text-rose-300"
+                          className="ml-2 rounded p-0.5 text-slate-400 transition hover:bg-rose-500/20 hover:text-rose-300"
                           title="移除此区域"
                         >
                           <X className="h-3 w-3" />
@@ -974,9 +984,9 @@ export function MosaicEditor() {
           <button
             type="button"
             onClick={handleDownload}
-            className="w-full rounded-full bg-[#0F6E5D] py-2.5 text-xs font-medium text-white transition hover:bg-[#13836F]"
+            className="w-full rounded-md bg-[#1D4ED8] py-2.5 text-xs font-medium text-white transition hover:bg-[#1E40AF]"
           >
-            导出图片
+            导出打码图片
           </button>
         </div>
       </aside>

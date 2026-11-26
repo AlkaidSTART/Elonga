@@ -63,7 +63,7 @@ export interface SavedMonthlyReport {
   snapshot: MonthlyReportSnapshot;
 }
 
-const PLATFORM_ORDER: PlatformId[] = ["douyin", "toutiao", "kuaishou", "wechat"];
+const PLATFORM_ORDER: PlatformId[] = ["douyin", "toutiao", "xiaohongshu", "wechat"];
 
 function getItemMonth(item: CopywritingResult): string {
   const refDate =

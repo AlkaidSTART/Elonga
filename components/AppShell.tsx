@@ -1,22 +1,23 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { AnimatePresence, MotionConfig, motion } from "framer-motion";
 import {
   Building2,
   ChevronLeft,
   ChevronRight,
-  FileBarChart2,
   History,
   Image as ImageIcon,
   LayoutDashboard,
+  LogOut,
   Menu,
   PenTool,
   SlidersHorizontal,
   X,
 } from "lucide-react";
+import type { AuthUser } from "@/lib/auth/jwt";
 import { useWorkbenchStore } from "@/store/useWorkbenchStore";
 
 const NAV_ITEMS = [
@@ -25,7 +26,6 @@ const NAV_ITEMS = [
   { href: "/workflow", label: "内容创作", icon: PenTool },
   { href: "/image-studio", label: "图片工坊", icon: ImageIcon },
   { href: "/history", label: "创作记录", icon: History },
-  { href: "/reports", label: "AI 月报", icon: FileBarChart2 },
   { href: "/settings", label: "模型配置", icon: SlidersHorizontal },
 ] as const;
 
@@ -51,14 +51,61 @@ function BrandMark() {
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [currentUser, setCurrentUser] = useState<AuthUser | null>(null);
+  const [loggingOut, setLoggingOut] = useState(false);
   const historyCount = useWorkbenchStore((s) => s.history.length);
+
+  const isAuthPage = pathname === "/login";
+
+  useEffect(() => {
+    if (isAuthPage) {
+      return;
+    }
+
+    let cancelled = false;
+    fetch("/api/auth/me", { credentials: "same-origin" })
+      .then((res) => (res.ok ? res.json() : null))
+      .then((data: { authenticated?: boolean; user?: AuthUser } | null) => {
+        if (!cancelled) {
+          setCurrentUser(data?.authenticated && data.user ? data.user : null);
+        }
+      })
+      .catch(() => {
+        // Ignore transient network errors; proxy enforces session on navigation
+      });
+
+    return () => {
+      cancelled = true;
+    };
+  }, [isAuthPage, pathname]);
+
+  const handleLogout = async () => {
+    if (loggingOut) return;
+    setLoggingOut(true);
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
+    } finally {
+      setCurrentUser(null);
+      setMobileOpen(false);
+      setLoggingOut(false);
+      router.replace("/login");
+      router.refresh();
+    }
+  };
+
+  if (isAuthPage) {
+    return <MotionConfig reducedMotion="user">{children}</MotionConfig>;
+  }
 
   const isActive = (href: string) => {
     if (href === "/") return pathname === "/";
     return pathname.startsWith(href);
   };
+
+  const userInitial = currentUser?.name?.slice(0, 1) || "E";
 
   return (
     <MotionConfig reducedMotion="user">
@@ -171,14 +218,57 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             })}
           </nav>
 
-          {/* Subtle Workspace Footer */}
-          {!collapsed && (
-            <div className="border-t border-[#E2E8F0] px-4 py-3">
-              <div className="font-mono text-[10px] tracking-wider text-slate-400 uppercase">
-                CONTENT WORKBENCH
+          {/* Session Footer */}
+          <div className="border-t border-[#E2E8F0] p-2.5">
+            {collapsed ? (
+              <div className="flex flex-col items-center gap-2">
+                {currentUser && (
+                  <div
+                    title={`${currentUser.name} (${currentUser.role})`}
+                    className="flex h-8 w-8 items-center justify-center rounded-md bg-[#0F172A] text-xs font-semibold text-white"
+                  >
+                    {userInitial}
+                  </div>
+                )}
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  disabled={loggingOut}
+                  title="退出登录"
+                  aria-label="退出登录"
+                  className="flex h-8 w-8 items-center justify-center rounded-md text-slate-400 transition hover:bg-slate-100 hover:text-red-600 disabled:opacity-50"
+                >
+                  <LogOut className="h-4 w-4" />
+                </button>
               </div>
-            </div>
-          )}
+            ) : (
+              <div className="flex items-center justify-between gap-2 rounded-lg bg-[#F8FAFC] px-2.5 py-2">
+                <div className="flex min-w-0 items-center gap-2.5">
+                  <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-[#0F172A] text-xs font-semibold text-white">
+                    {userInitial}
+                  </div>
+                  <div className="min-w-0 leading-tight">
+                    <div className="truncate text-xs font-medium text-[#0F172A]">
+                      {currentUser?.name ?? "已认证会话"}
+                    </div>
+                    <div className="truncate text-[10px] text-slate-500">
+                      {currentUser?.role ?? "JWT Session"}
+                    </div>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleLogout}
+                  disabled={loggingOut}
+                  title="退出登录"
+                  aria-label="退出登录"
+                  className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-slate-400 transition hover:bg-white hover:text-red-600 hover:shadow-2xs disabled:opacity-50"
+                >
+                  <LogOut className="h-3.5 w-3.5" />
+                </button>
+              </div>
+            )}
+          </div>
         </motion.aside>
 
         {/* Mobile Header & Drawer */}
@@ -258,6 +348,34 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                       );
                     })}
                   </nav>
+
+                  {/* Mobile Session Footer */}
+                  <div className="border-t border-[#E2E8F0] p-3">
+                    <div className="flex items-center justify-between gap-2 rounded-lg bg-[#F8FAFC] px-2.5 py-2">
+                      <div className="flex min-w-0 items-center gap-2.5">
+                        <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-[#0F172A] text-xs font-semibold text-white">
+                          {userInitial}
+                        </div>
+                        <div className="min-w-0 leading-tight">
+                          <div className="truncate text-xs font-medium text-[#0F172A]">
+                            {currentUser?.name ?? "已认证会话"}
+                          </div>
+                          <div className="truncate text-[10px] text-slate-500">
+                            {currentUser?.role ?? "JWT Session"}
+                          </div>
+                        </div>
+                      </div>
+                      <button
+                        type="button"
+                        onClick={handleLogout}
+                        disabled={loggingOut}
+                        aria-label="退出登录"
+                        className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md text-slate-400 transition hover:bg-white hover:text-red-600 disabled:opacity-50"
+                      >
+                        <LogOut className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                  </div>
                 </motion.aside>
               </div>
             )}

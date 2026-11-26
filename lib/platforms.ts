@@ -149,7 +149,7 @@ export interface PublishArchiveRecord {
 export const PLATFORM_CREATOR_URLS: Record<PlatformId, { label: string; url: string }> = {
   douyin: { label: "抖音创作者服务平台", url: "https://creator.douyin.com/" },
   toutiao: { label: "头条号创作平台", url: "https://mp.toutiao.com/" },
-  kuaishou: { label: "快手创作者服务平台", url: "https://cp.kuaishou.com/" },
+  xiaohongshu: { label: "小红书创作服务平台", url: "https://creator.xiaohongshu.com/" },
   wechat: { label: "微信公众平台", url: "https://mp.weixin.qq.com/" },
 };
 

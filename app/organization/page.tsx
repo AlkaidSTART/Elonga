@@ -511,7 +511,7 @@ export default function OrganizationPage() {
               initial={{ opacity: 0, scale: 0.98, y: 8 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.98, y: 8 }}
-              className="relative z-10 max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-xl border border-[#E4E7EC] bg-white p-6 shadow-xl"
+              className="relative z-10 max-h-[90vh] w-full max-w-2xl overflow-y-auto rounded-lg border border-[#E2E8F0] bg-white p-6 shadow-xl"
             >
               <div className="mb-4 flex items-center justify-between border-b border-[#F1F3F6] pb-3">
                 <h3 className="text-base font-semibold text-[#0F172A]">
