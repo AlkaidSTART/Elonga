@@ -8,6 +8,7 @@ import {
   type WordCountId,
 } from "./platforms";
 import type { DouyinTrendInsights } from "./skills/types";
+import type { ActivityContextPayload } from "./organization";
 
 export interface CopywritingRequest {
   platform: PlatformId;
@@ -17,6 +18,7 @@ export interface CopywritingRequest {
   topic: string;
   keywords?: string;
   targetAudience?: string;
+  activityContext?: ActivityContextPayload;
   trendInsights?: DouyinTrendInsights;
 }
 
@@ -43,8 +45,12 @@ export function generateLocalCopywriting(
 
   const titles = buildCharityTitles(req.platform, topic, req.contentType, req.trendInsights);
   const hook = buildCharityHook(req.platform, topic, req.trendInsights);
-  const body = buildCharityBody(req, topic, audience, kwList, scenarioLabel);
-  const cta = buildCharityCta(req.platform, topic);
+  const baseBody = buildCharityBody(req, topic, audience, kwList, scenarioLabel);
+  const activityBrief = buildActivityArchiveBlock(req.activityContext);
+  const body = activityBrief ? `${activityBrief}\n\n${baseBody}` : baseBody;
+  const cta = req.activityContext?.orgSignOff
+    ? `${buildCharityCta(req.platform, topic)}\n${req.activityContext.orgSignOff}`
+    : buildCharityCta(req.platform, topic);
   const tags = buildCharityTags(req.platform, topic, kwList, scenarioLabel, req.trendInsights);
 
   return {
@@ -61,8 +67,29 @@ export function generateLocalCopywriting(
     tips: platformMeta.algorithmTips,
     mode: "local",
     createdAt: new Date().toISOString(),
+    activityId: req.activityContext?.activityId,
+    activityTitle: req.activityContext?.activityTitle,
     trendInsights: req.trendInsights,
   };
+}
+
+function buildActivityArchiveBlock(ctx?: ActivityContextPayload): string {
+  if (!ctx?.activityTitle) return "";
+  const parts: string[] = [];
+  if (ctx.activityDate || ctx.activityLocation) {
+    parts.push(
+      `${ctx.activityDate ? `${ctx.activityDate}，` : ""}${ctx.orgName || "我们"}在${ctx.activityLocation || "项目一线"}开展了「${ctx.activityTitle}」。`
+    );
+  }
+  if (ctx.participantCount || ctx.fundOrGoods) {
+    parts.push(
+      `本次行动${ctx.participantCount ? `共有${ctx.participantCount}` : ""}${ctx.participantCount && ctx.fundOrGoods ? "，" : ""}${ctx.fundOrGoods ? `实际落实：${ctx.fundOrGoods}` : ""}。`
+    );
+  }
+  if (ctx.highlights) {
+    parts.push(`现场记录：${ctx.highlights}`);
+  }
+  return parts.join("\n");
 }
 
 function buildCharityTitles(
@@ -89,11 +116,11 @@ function buildCharityTitles(
       `透明回访「${topic}」：每一份微小善意，最终都落到了实处`,
     ];
   }
-  if (platform === "kuaishou") {
+  if (platform === "xiaohongshu") {
     return [
-      `咱今天说点实在的，关于「${topic}」，一线现场真挺不容易`,
-      `实打实记录「${topic}」的进展，感谢每一位默默帮忙的家人`,
-      `不喊口号，带大家看看「${topic}」这几天的真实变化`,
+      `被问了好多次的「${topic}」，整理了一份真实一线记录`,
+      `普通人也能轻松参与的「${topic}」｜看完这篇就懂了`,
+      `关于「${topic}」的温暖瞬间：微小的善意真的会被看见`,
     ];
   }
 
@@ -127,8 +154,8 @@ function buildCharityHook(
   if (platform === "toutiao") {
     return `最近「${topic}」牵动了不少热心网友的心。在一线开展工作时，我们发现大家最关心的不仅是故事本身，更是“真实需求在哪里、善意如何落地”。下面把最新情况如实分享给大家。`;
   }
-  if (platform === "kuaishou") {
-    return `家人们，今天不讲虚头巴脑的大道理，直接带大家看看「${topic}」这边的真实情况。每一分关心都特别珍贵，咱有啥说啥。`;
+  if (platform === "xiaohongshu") {
+    return `一直想把「${topic}」的真实日常整理出来分享给大家。很多人以为参与公益门槛很高，其实走进现场后会发现，普通人顺手做的一件小事就已经很有力量。`;
   }
   return `在推进「${topic}」的过程中，我们越来越确信一件事：公益从来不是少数人做很多，而是大多数人顺手做一点点。今天这篇文章，想把现场最真实的故事与行动方式分享给你。`;
 }
@@ -184,18 +211,18 @@ function buildCharityBody(
     return sections.join("\n");
   }
 
-  if (req.platform === "kuaishou") {
+  if (req.platform === "xiaohongshu") {
     return [
-      `说起「${topic}」${kwNote}，其实咱一线工作人员每天都在琢磨怎么把事办实、办透明：`,
+      `最近一直在跟进「${topic}」${kwNote}，整理了几个最真实的一线观察，分享给同样关心这件事的你：`,
       ``,
-      `第一，不整虚的，只看实际效果。`,
-      `咱面向${audience}做公益，最看重的是真真切切帮到需要帮助的对象，每一笔物资和每一次行动都要落到实处。`,
+      `1. 真实需求往往藏在细节里`,
+      `面向${audience}做公益记录，我们尽量不喊口号，而是把现场最具体的情况和变化拍下来、写清楚，让每一份善意都能落到实处。`,
       ``,
-      `第二，人多力量大，顺手转发也是帮忙。`,
-      `很多老铁问自己能做点啥，其实点个赞、转给身边的朋友看看，让更多人知道「${topic}」，就已经帮了大忙了。`,
+      `2. 普通人的参与方式其实很轻量`,
+      `不一定非要亲临现场，一次科普转发、一条友善留言，或者收藏这篇笔记分享给身边的朋友，都是在帮「${topic}」被更多人看见。`,
       ``,
-      `第三，持续汇报进展，对得起大家的信任。`,
-      `后面有新的好消息，咱第一时间在账号里向大家汇报，让每一份热心肠都不落空。`,
+      `3. 持续更新透明进展`,
+      `后续有新的落地反馈，我也会第一时间在这里整理成合集同步给大家，不辜负每一份信任。`,
     ].join("\n");
   }
 
@@ -226,8 +253,8 @@ function buildCharityCta(platform: PlatformId, topic: string): string {
   if (platform === "toutiao") {
     return `关于「${topic}」，你有什么建议或想了解的现场细节？欢迎在评论区留言，我们会持续跟进解答。`;
   }
-  if (platform === "kuaishou") {
-    return `觉得这件事有意义的家人们，点个小红心支持一下，有想参与「${topic}」或了解进展的欢迎打在评论区！`;
+  if (platform === "xiaohongshu") {
+    return `如果你也关心「${topic}」，欢迎点赞收藏这篇笔记，或者在评论区聊聊你的想法和建议，一起让更多温暖被看见。`;
   }
   return `如果这篇文章让你对「${topic}」多了一点了解，欢迎点亮「在看」或转发给身边的朋友。每一份关注，都是推动改变的开始。`;
 }
@@ -256,8 +283,8 @@ function buildCharityTags(
     base.push("微光公益", "传递正能量");
   } else if (platform === "toutiao") {
     base.push("公益行动", "温暖记录");
-  } else if (platform === "kuaishou") {
-    base.push("凡人善举", "公益日常");
+  } else if (platform === "xiaohongshu") {
+    base.push("公益日常", "温暖瞬间");
   } else {
     base.push("公益传播", "社会关爱");
   }

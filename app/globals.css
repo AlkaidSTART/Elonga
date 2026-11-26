@@ -1,14 +1,15 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f7f8fa;
+  --background: #f6f7f9;
   --foreground: #0f172a;
   --surface: #ffffff;
-  --surface-muted: #f1f3f6;
-  --border-subtle: #e4e7ec;
+  --surface-muted: #f1f5f9;
+  --border-subtle: #e2e8f0;
+  --border-strong: #cbd5e1;
   --accent: #1d4ed8;
   --accent-hover: #1e40af;
-  --ink: #0f141e;
+  --ink: #0f172a;
 }
 
 @theme inline {
@@ -37,8 +38,8 @@ body {
 
 .studio-grid-dark {
   background-image:
-    linear-gradient(to right, rgba(255, 255, 255, 0.04) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(255, 255, 255, 0.04) 1px, transparent 1px);
+    linear-gradient(to right, rgba(148, 163, 184, 0.06) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(148, 163, 184, 0.06) 1px, transparent 1px);
   background-size: 24px 24px;
 }
 

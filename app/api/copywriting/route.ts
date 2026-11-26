@@ -7,6 +7,7 @@ import type {
 } from "@/lib/platforms";
 import { runCopywritingSkillsWorkflow } from "@/lib/skills";
 import type { DouyinTrendInsights, ModelConfigPayload } from "@/lib/skills/types";
+import type { ActivityContextPayload } from "@/lib/organization";
 
 interface RequestPayload {
   platform: PlatformId;
@@ -16,6 +17,7 @@ interface RequestPayload {
   topic: string;
   keywords?: string;
   targetAudience?: string;
+  activityContext?: ActivityContextPayload;
   trendInsights?: DouyinTrendInsights;
   modelConfig?: ModelConfigPayload;
 }
@@ -31,6 +33,7 @@ export async function POST(req: Request) {
       topic,
       keywords,
       targetAudience,
+      activityContext,
       trendInsights,
       modelConfig,
     } = body;
@@ -50,6 +53,7 @@ export async function POST(req: Request) {
       topic,
       keywords,
       targetAudience,
+      activityContext,
       trendInsights,
       modelConfig,
     });

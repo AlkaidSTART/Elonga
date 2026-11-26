@@ -1,6 +1,8 @@
 import type { DouyinTrendInsights, SkillTraceItem } from "./skills/types";
+import type { TextRedactionRecord } from "./text-redaction";
+import type { PublishReviewState } from "./publish-review";
 
-export type PlatformId = "douyin" | "toutiao" | "kuaishou" | "wechat";
+export type PlatformId = "douyin" | "toutiao" | "xiaohongshu" | "wechat";
 
 export type CharityScenarioId = "story" | "activity" | "science";
 
@@ -64,19 +66,19 @@ export const PLATFORMS: Record<PlatformId, PlatformMeta> = {
       "正文使用小标题分段（如一、二、三），每段控制在 3-5 行以内提升手机端阅读体验。",
     ],
   },
-  kuaishou: {
-    id: "kuaishou",
-    name: "快手",
-    tagline: "接地气 · 强信任",
-    description: "强调真实感、烟火气与老铁式互动，语言直白有温度，注重实用价值。",
-    accentColor: "#EA580C",
-    badgeBg: "bg-orange-50",
-    badgeText: "text-orange-700",
-    recommendedLength: "180 - 400 字（真实叙事）",
+  xiaohongshu: {
+    id: "xiaohongshu",
+    name: "小红书",
+    tagline: "强种草 · 封面吸睛",
+    description: "注重首图质感、情绪共鸣与实用干货清单，分段轻快易读，擅长以真实体验撬动收藏与评论。",
+    accentColor: "#E11D48",
+    badgeBg: "bg-rose-50",
+    badgeText: "text-rose-700",
+    recommendedLength: "250 - 600 字（图文笔记 / 干货清单）",
     algorithmTips: [
-      "用“咱”“大家”“老铁们”等拉近距离的称呼，避免高高在上的说教感。",
-      "把复杂道理讲成大白话和身边案例，突出真实经验与实操细节。",
-      "在正文中间和结尾自然引导点赞关注，强化粉丝粘性与复访率。",
+      "标题结合人群场景、痛点或数字清单，搭配高质感首图提升点击率（CTR）。",
+      "正文多用短段落与清晰要点排版，突出真实体验细节与可参考的行动建议。",
+      "文末自然引导收藏、点赞或评论区交流，配合精准垂直话题标签提升长尾搜索流量。",
     ],
   },
   wechat: {
@@ -127,6 +129,30 @@ export const WORD_COUNTS: { id: WordCountId; label: string; desc: string }[] = [
   { id: "long", label: "深度长文", desc: "约 1000 字+" },
 ];
 
+export interface PublishMetrics {
+  views?: number;
+  likes?: number;
+  comments?: number;
+  shares?: number;
+  conversions?: string;
+}
+
+export interface PublishArchiveRecord {
+  publishedUrl?: string;
+  publishedAt?: string;
+  metrics: PublishMetrics;
+  archived: boolean;
+  archivedAt?: string;
+  notes?: string;
+}
+
+export const PLATFORM_CREATOR_URLS: Record<PlatformId, { label: string; url: string }> = {
+  douyin: { label: "抖音创作者服务平台", url: "https://creator.douyin.com/" },
+  toutiao: { label: "头条号创作平台", url: "https://mp.toutiao.com/" },
+  kuaishou: { label: "快手创作者服务平台", url: "https://cp.kuaishou.com/" },
+  wechat: { label: "微信公众平台", url: "https://mp.weixin.qq.com/" },
+};
+
 export interface CopywritingResult {
   id: string;
   platform: PlatformId;
@@ -144,6 +170,11 @@ export interface CopywritingResult {
   isPublished?: boolean;
   publishedAt?: string;
   isViral?: boolean;
+  activityId?: string;
+  activityTitle?: string;
+  redactionRecords?: TextRedactionRecord[];
+  reviewState?: PublishReviewState;
+  publishArchive?: PublishArchiveRecord;
   trendInsights?: DouyinTrendInsights;
   skillTraces?: SkillTraceItem[];
 }

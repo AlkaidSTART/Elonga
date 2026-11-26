@@ -33,8 +33,13 @@ export async function runCopywritingSkillsWorkflow(
 ): Promise<WorkflowOutput> {
   const skillTraces: SkillTraceItem[] = [];
 
-  // Skill 1: 抖音爆款文案调研（若前置接口已传入调研结果则直接复用，否则自动调用）
-  let trendInsights = input.trendInsights;
+  // Skill 1: 对应平台爆款趋势调研（仅当传入调研结果与当前平台一致时才复用，否则独立调用）
+  let trendInsights =
+    input.trendInsights &&
+    (!input.trendInsights.platform ||
+      input.trendInsights.platform === input.platform)
+      ? input.trendInsights
+      : undefined;
   if (trendInsights) {
     skillTraces.push({
       skillId: douyinTrendResearchSkill.id,
@@ -46,6 +51,7 @@ export async function runCopywritingSkillsWorkflow(
   } else {
     const t0 = Date.now();
     trendInsights = await douyinTrendResearchSkill.execute({
+      platform: input.platform,
       topic: input.topic,
       keywords: input.keywords,
       modelConfig: input.modelConfig,

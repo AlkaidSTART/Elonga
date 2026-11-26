@@ -100,7 +100,7 @@ export const useImageStudioStore = create<ImageStudioState>((set) => ({
   actions: [],
   redoStack: [],
 
-  autoCategories: ["text", "face", "qrcode"],
+  autoCategories: ["text"],
   isAutoDetecting: false,
   autoDetectMode: null,
   manualEnabled: true,

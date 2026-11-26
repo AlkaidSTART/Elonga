@@ -1,14 +1,18 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
+import Link from "next/link";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   ArrowRight,
+  Building2,
   Check,
   Copy,
   History,
   Loader2,
+  Lock,
   RotateCw,
+  ShieldCheck,
   SlidersHorizontal,
   Trash2,
 } from "lucide-react";
@@ -18,7 +22,11 @@ import {
   WORD_COUNTS,
   type PlatformId,
 } from "@/lib/platforms";
+import { buildActivityContextPayload } from "@/lib/organization";
+import { evaluatePublishReview } from "@/lib/publish-review";
 import type { DouyinTrendInsights } from "@/lib/skills/types";
+import { RedactionAndReviewPanel } from "@/components/compliance/RedactionAndReviewPanel";
+import { useOrganizationStore } from "@/store/useOrganizationStore";
 import { useWorkbenchStore } from "@/store/useWorkbenchStore";
 
 const QUICK_TOPICS = [
@@ -35,6 +43,7 @@ export function CopywritingWorkspace() {
     topic,
     keywords,
     targetAudience,
+    selectedActivityId,
     isGenerating,
     generationError,
     currentResult,
@@ -46,14 +55,31 @@ export function CopywritingWorkspace() {
     setTopic,
     setKeywords,
     setTargetAudience,
+    setSelectedActivityId,
     setIsGenerating,
     setGenerationError,
     setCurrentResult,
     updateCurrentBody,
+    updateCurrentResultPatch,
+    updateCurrentRedactionRecords,
+    updateCurrentReviewState,
     addToHistory,
     selectFromHistory,
     removeFromHistory,
   } = useWorkbenchStore();
+
+  const { profile: orgProfile, activities } = useOrganizationStore();
+
+  const selectedActivity = useMemo(
+    () => activities.find((a) => a.id === selectedActivityId) ?? null,
+    [activities, selectedActivityId]
+  );
+
+  const linkedResultActivity = useMemo(() => {
+    const id = currentResult?.activityId ?? selectedActivityId;
+    if (!id) return null;
+    return activities.find((a) => a.id === id) ?? null;
+  }, [activities, currentResult?.activityId, selectedActivityId]);
 
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
   const [showHistory, setShowHistory] = useState(false);
@@ -96,6 +122,7 @@ export function CopywritingWorkspace() {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
+            platform,
             topic,
             keywords,
             modelConfig: requestModelConfig,
@@ -110,6 +137,10 @@ export function CopywritingWorkspace() {
       }
 
       setGenerationStage("writing");
+      const activityContext = buildActivityContextPayload(
+        orgProfile,
+        selectedActivity
+      );
       const res = await fetch("/api/copywriting", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -120,6 +151,7 @@ export function CopywritingWorkspace() {
           topic,
           keywords,
           targetAudience,
+          activityContext,
           trendInsights,
           modelConfig: requestModelConfig,
         }),
@@ -143,10 +175,27 @@ export function CopywritingWorkspace() {
     }
   };
 
+  const activeTitle = currentResult
+    ? (currentResult.titles[selectedTitleIdx] ?? currentResult.titles[0] ?? "")
+    : "";
+
+  const reviewReport = useMemo(() => {
+    if (!currentResult) return null;
+    return evaluatePublishReview({
+      title: activeTitle,
+      hook: currentResult.hook,
+      body: currentResult.body,
+      orgRedlines: orgProfile.complianceRedlines,
+      redactionRecords: currentResult.redactionRecords,
+      reviewState: currentResult.reviewState,
+    });
+  }, [activeTitle, currentResult, orgProfile.complianceRedlines]);
+
   const handleCopyAll = () => {
     if (!currentResult) return;
-    const activeTitle =
-      currentResult.titles[selectedTitleIdx] ?? currentResult.titles[0] ?? "";
+    if (reviewReport && !reviewReport.isEligible) {
+      return;
+    }
     const fullText = [
       activeTitle ? `【标题】${activeTitle}` : "",
       currentResult.hook ? `\n${currentResult.hook}` : "",
@@ -331,6 +380,47 @@ export function CopywritingWorkspace() {
       {/* Sculptural Floating Command Bar */}
       <section className="mx-auto max-w-4xl">
         <div className="rounded-3xl bg-white p-3 shadow-[0_12px_36px_rgba(20,20,19,0.06)] ring-1 ring-black/[0.06] sm:p-4">
+          {/* Linked Organization Activity Archive Bar */}
+          <div className="mb-2.5 flex flex-wrap items-center justify-between gap-2 border-b border-[#F0EDE6] px-2 pb-2.5">
+            <div className="flex flex-wrap items-center gap-2 text-xs">
+              <span className="inline-flex items-center gap-1 font-medium text-[#0F6E5D]">
+                <Building2 className="h-3.5 w-3.5" />
+                <span>关联活动档案</span>
+              </span>
+              <select
+                value={selectedActivityId ?? ""}
+                onChange={(e) => {
+                  const nextId = e.target.value || null;
+                  setSelectedActivityId(nextId);
+                  const found = activities.find((a) => a.id === nextId);
+                  if (found) {
+                    if (!topic.trim()) setTopic(found.title);
+                    setContentType(found.category);
+                  }
+                }}
+                className="max-w-[260px] rounded-full border border-[#DFDCD2] bg-[#FAF9F6] px-3 py-1 text-xs text-[#141413] outline-none focus:border-[#0F6E5D]"
+              >
+                <option value="">不关联（仅读取机构基础档案）</option>
+                {activities.map((act) => (
+                  <option key={act.id} value={act.id}>
+                    {act.title}（{act.date}）
+                  </option>
+                ))}
+              </select>
+              {selectedActivity && (
+                <span className="text-[11px] text-zinc-500">
+                  AI 将自动读取人数、物资与现场亮点
+                </span>
+              )}
+            </div>
+            <Link
+              href="/organization"
+              className="text-[11px] font-medium text-zinc-500 underline-offset-2 hover:text-[#0F6E5D] hover:underline"
+            >
+              管理机构档案
+            </Link>
+          </div>
+
           <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
             <textarea
               rows={2}
@@ -475,14 +565,34 @@ export function CopywritingWorkspace() {
                   <button
                     type="button"
                     onClick={handleCopyAll}
-                    className="inline-flex items-center gap-1.5 rounded-full bg-[#161715] px-3.5 py-1 text-xs font-medium text-white transition hover:bg-zinc-800"
+                    disabled={Boolean(reviewReport && !reviewReport.isEligible)}
+                    title={
+                      reviewReport && !reviewReport.isEligible
+                        ? "请先在右侧完成「发布前审查」并处理全部风险与事实核对，获得发布资格后解锁复制"
+                        : "已获发布资格，点击复制全文去外部平台发布"
+                    }
+                    className={`inline-flex items-center gap-1.5 rounded-full px-3.5 py-1 text-xs font-medium transition ${
+                      reviewReport?.isEligible
+                        ? "bg-[#0F6E5D] text-white hover:bg-[#0B5649]"
+                        : "cursor-not-allowed bg-[#ECE9E1] text-zinc-500"
+                    }`}
                   >
-                    {copiedKey === "all" ? (
-                      <Check className="h-3 w-3 text-emerald-400" />
+                    {reviewReport?.isEligible ? (
+                      copiedKey === "all" ? (
+                        <Check className="h-3 w-3 text-emerald-300" />
+                      ) : (
+                        <ShieldCheck className="h-3 w-3" />
+                      )
                     ) : (
-                      <Copy className="h-3 w-3" />
+                      <Lock className="h-3 w-3" />
                     )}
-                    <span>{copiedKey === "all" ? "已复制" : "复制全文"}</span>
+                    <span>
+                      {reviewReport?.isEligible
+                        ? copiedKey === "all"
+                          ? "已复制"
+                          : "已获资格 · 复制全文"
+                        : "审查通过后解锁复制"}
+                    </span>
                   </button>
                 </div>
               </div>
@@ -561,8 +671,31 @@ export function CopywritingWorkspace() {
               />
             </article>
 
-            {/* Right 4 Cols: Open Hairline Margin Notes (No Cards) */}
+            {/* Right 4 Cols: Compliance Review + Text Redaction + Open Hairline Margin Notes */}
             <aside className="space-y-6 lg:col-span-4 lg:pt-2">
+              <RedactionAndReviewPanel
+                title={activeTitle}
+                hook={currentResult.hook}
+                body={currentResult.body}
+                onApplyTextChange={({ title: nextTitle, hook: nextHook, body: nextBody }) => {
+                  const nextTitles = [...currentResult.titles];
+                  if (nextTitles.length > 0) {
+                    nextTitles[selectedTitleIdx] = nextTitle;
+                  }
+                  updateCurrentResultPatch({
+                    titles: nextTitles,
+                    hook: nextHook,
+                    body: nextBody,
+                  });
+                }}
+                activity={linkedResultActivity}
+                orgRedlines={orgProfile.complianceRedlines}
+                redactionRecords={currentResult.redactionRecords ?? []}
+                onChangeRedactionRecords={updateCurrentRedactionRecords}
+                reviewState={currentResult.reviewState}
+                onChangeReviewState={updateCurrentReviewState}
+              />
+
               {/* Trend Keywords */}
               {currentResult.trendInsights && (
                 <div className="border-t border-[#DFDCD2] pt-4">

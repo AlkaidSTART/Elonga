@@ -5,6 +5,7 @@ import type {
   ToneId,
   WordCountId,
 } from "@/lib/platforms";
+import type { ActivityContextPayload } from "@/lib/organization";
 
 export interface ModelConfigPayload {
   apiKey?: string;
@@ -19,7 +20,9 @@ export interface DouyinViralSample {
   engagementHint: string;
 }
 
-export interface DouyinTrendInsights {
+export interface PlatformTrendInsights {
+  platform?: PlatformId;
+  platformName?: string;
   queryTopic: string;
   fetchedAt: string;
   source: "live-api" | "hot-board" | "llm-research" | "local-knowledge";
@@ -30,6 +33,8 @@ export interface DouyinTrendInsights {
   samples: DouyinViralSample[];
   summary: string;
 }
+
+export type DouyinTrendInsights = PlatformTrendInsights;
 
 export interface SkillTraceItem {
   skillId: string;
@@ -55,6 +60,7 @@ export interface CharityCopywritingInput {
   topic: string;
   keywords?: string;
   targetAudience?: string;
+  activityContext?: ActivityContextPayload;
   trendInsights?: DouyinTrendInsights;
   modelConfig?: ModelConfigPayload;
 }

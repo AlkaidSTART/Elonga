@@ -4,6 +4,8 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import {
   Brush,
   ChevronDown,
+  Eye,
+  EyeOff,
   Lasso,
   Loader2,
   Redo2,
@@ -39,11 +41,44 @@ const MOSAIC_TYPES: {
 const AUTO_CATEGORIES: {
   id: AutoRedactCategory;
   label: string;
+  beta?: boolean;
 }[] = [
   { id: "text", label: "文字/号码" },
-  { id: "face", label: "人脸/头像" },
-  { id: "qrcode", label: "二维码" },
+  { id: "face", label: "人脸/头像", beta: true },
+  { id: "qrcode", label: "二维码", beta: true },
 ];
+
+function getActionBounds(
+  action: RedactionAction
+): { x: number; y: number; w: number; h: number } | null {
+  if (action.shape === "rect" && action.rect) {
+    const x = Math.min(action.rect.x, action.rect.x + action.rect.w);
+    const y = Math.min(action.rect.y, action.rect.y + action.rect.h);
+    const w = Math.abs(action.rect.w);
+    const h = Math.abs(action.rect.h);
+    if (w < 1 || h < 1) return null;
+    return { x, y, w, h };
+  }
+  const pts = action.points ?? [];
+  if (pts.length === 0) return null;
+  let minX = pts[0].x;
+  let minY = pts[0].y;
+  let maxX = pts[0].x;
+  let maxY = pts[0].y;
+  for (const p of pts) {
+    if (p.x < minX) minX = p.x;
+    if (p.y < minY) minY = p.y;
+    if (p.x > maxX) maxX = p.x;
+    if (p.y > maxY) maxY = p.y;
+  }
+  const pad = action.shape === "brush" ? action.brushSize / 2 : 0;
+  return {
+    x: minX - pad,
+    y: minY - pad,
+    w: Math.max(8, maxX - minX + pad * 2),
+    h: Math.max(8, maxY - minY + pad * 2),
+  };
+}
 
 export function MosaicEditor() {
   const {
@@ -83,6 +118,9 @@ export function MosaicEditor() {
 
   const [isDrawing, setIsDrawing] = useState(false);
   const [showOriginal, setShowOriginal] = useState(false);
+  const [showMarkers, setShowMarkers] = useState(true);
+  const [hoveredActionId, setHoveredActionId] = useState<string | null>(null);
+  const [selectedActionId, setSelectedActionId] = useState<string | null>(null);
   const draftPointsRef = useRef<Point[]>([]);
   const draftRectRef = useRef<{ x: number; y: number; w: number; h: number } | null>(null);
 
@@ -203,12 +241,111 @@ export function MosaicEditor() {
     };
   }, []);
 
+  const drawRegionMarkers = useCallback(
+    (ctx: CanvasRenderingContext2D, canvasW: number, canvasH: number) => {
+      if (showOriginal || !showMarkers) return;
+
+      const autoList = actions.filter((a) => a.source === "auto");
+      const manualList = actions.filter((a) => a.source === "manual");
+      const highlightedId = hoveredActionId ?? selectedActionId;
+
+      const scaleUnit = Math.max(1, Math.min(canvasW, canvasH) / 640);
+      const fontSize = Math.round(13 * scaleUnit);
+      const padX = Math.round(6 * scaleUnit);
+      const badgeH = Math.round(20 * scaleUnit);
+
+      const drawOne = (
+        action: RedactionAction,
+        tagText: string,
+        isAuto: boolean
+      ) => {
+        const bounds = getActionBounds(action);
+        if (!bounds) return;
+
+        const isHighlighted = highlightedId === action.id;
+        const isDimmed = Boolean(highlightedId) && !isHighlighted;
+
+        ctx.save();
+        ctx.globalAlpha = isDimmed ? 0.35 : 1;
+
+        // Region outline
+        ctx.lineWidth = (isHighlighted ? 3 : 1.75) * scaleUnit;
+        ctx.strokeStyle = isHighlighted
+          ? "#F59E0B"
+          : isAuto
+            ? "rgba(52, 211, 153, 0.9)"
+            : "rgba(148, 163, 184, 0.75)";
+        if (isHighlighted) {
+          ctx.fillStyle = "rgba(245, 158, 11, 0.16)";
+          ctx.fillRect(bounds.x, bounds.y, bounds.w, bounds.h);
+          ctx.setLineDash([]);
+        } else {
+          ctx.setLineDash([5 * scaleUnit, 4 * scaleUnit]);
+        }
+        ctx.strokeRect(bounds.x, bounds.y, bounds.w, bounds.h);
+        ctx.setLineDash([]);
+
+        // Number badge positioned at top-left corner (clamped inside canvas)
+        ctx.font = `600 ${fontSize}px ui-monospace, SFMono-Regular, Menlo, monospace`;
+        const textW = ctx.measureText(tagText).width;
+        const badgeW = textW + padX * 2;
+        const bx = Math.max(2, Math.min(canvasW - badgeW - 2, bounds.x));
+        const by =
+          bounds.y - badgeH - 2 >= 2
+            ? bounds.y - badgeH - 2
+            : Math.min(canvasH - badgeH - 2, bounds.y + 2);
+
+        ctx.fillStyle = isHighlighted
+          ? "#F59E0B"
+          : isAuto
+            ? "#0F6E5D"
+            : "#334155";
+        ctx.beginPath();
+        ctx.roundRect(bx, by, badgeW, badgeH, 4 * scaleUnit);
+        ctx.fill();
+
+        ctx.fillStyle = isHighlighted ? "#141413" : "#FFFFFF";
+        ctx.textBaseline = "middle";
+        ctx.fillText(tagText, bx + padX, by + badgeH / 2 + 0.5);
+        ctx.restore();
+      };
+
+      // Draw non-highlighted first, then highlighted on top so it's never occluded
+      const entries: Array<{ action: RedactionAction; tag: string; isAuto: boolean }> = [
+        ...autoList.map((action, idx) => ({
+          action,
+          tag: `#${idx + 1}`,
+          isAuto: true,
+        })),
+        ...manualList.map((action, idx) => ({
+          action,
+          tag: `M${idx + 1}`,
+          isAuto: false,
+        })),
+      ];
+
+      for (const entry of entries) {
+        if (entry.action.id !== highlightedId) {
+          drawOne(entry.action, entry.tag, entry.isAuto);
+        }
+      }
+      for (const entry of entries) {
+        if (entry.action.id === highlightedId) {
+          drawOne(entry.action, entry.tag, entry.isAuto);
+        }
+      }
+    },
+    [actions, hoveredActionId, selectedActionId, showMarkers, showOriginal]
+  );
+
   const clearOverlay = useCallback(() => {
     const overlay = overlayRef.current;
     if (!overlay) return;
     const ctx = overlay.getContext("2d");
-    ctx?.clearRect(0, 0, overlay.width, overlay.height);
-  }, []);
+    if (!ctx) return;
+    ctx.clearRect(0, 0, overlay.width, overlay.height);
+    drawRegionMarkers(ctx, overlay.width, overlay.height);
+  }, [drawRegionMarkers]);
 
   const drawOverlayPreview = useCallback(
     (cursor?: Point) => {
@@ -218,6 +355,7 @@ export function MosaicEditor() {
       if (!ctx) return;
 
       ctx.clearRect(0, 0, overlay.width, overlay.height);
+      drawRegionMarkers(ctx, overlay.width, overlay.height);
 
       if (isDrawing && toolShape === "lasso" && draftPointsRef.current.length > 0) {
         const pts = draftPointsRef.current;
@@ -285,8 +423,15 @@ export function MosaicEditor() {
         ctx.restore();
       }
     },
-    [brushSize, isDrawing, manualEnabled, toolShape]
+    [brushSize, drawRegionMarkers, isDrawing, manualEnabled, toolShape]
   );
+
+  // Redraw numbered markers on overlay whenever actions, hover/selection, or visibility changes
+  useEffect(() => {
+    if (!isDrawing) {
+      clearOverlay();
+    }
+  }, [clearOverlay, isDrawing]);
 
   const handlePointerDown = (e: React.PointerEvent<HTMLCanvasElement>) => {
     if (!manualEnabled || showOriginal) return;
@@ -433,15 +578,34 @@ export function MosaicEditor() {
                 } · ${actions.length} 处`
               : `已处理 ${actions.length} 处`}
           </span>
-          <button
-            type="button"
-            onPointerDown={() => setShowOriginal(true)}
-            onPointerUp={() => setShowOriginal(false)}
-            onPointerLeave={() => setShowOriginal(false)}
-            className="rounded-full bg-white/[0.08] px-3 py-1 text-xs font-medium text-zinc-200 select-none transition hover:bg-white/[0.15]"
-          >
-            {showOriginal ? "原图" : "按住对比"}
-          </button>
+          <div className="flex items-center gap-2">
+            <button
+              type="button"
+              onClick={() => setShowMarkers((v) => !v)}
+              className={`inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium select-none transition ${
+                showMarkers
+                  ? "bg-[#0F6E5D]/25 text-[#34D399] ring-1 ring-[#34D399]/30"
+                  : "bg-white/[0.06] text-zinc-400 hover:bg-white/[0.12] hover:text-zinc-200"
+              }`}
+              title="切换画布上的打码编号标注（导出图片不会包含标注）"
+            >
+              {showMarkers ? (
+                <Eye className="h-3 w-3" />
+              ) : (
+                <EyeOff className="h-3 w-3" />
+              )}
+              <span>编号标注</span>
+            </button>
+            <button
+              type="button"
+              onPointerDown={() => setShowOriginal(true)}
+              onPointerUp={() => setShowOriginal(false)}
+              onPointerLeave={() => setShowOriginal(false)}
+              className="rounded-full bg-white/[0.08] px-3 py-1 text-xs font-medium text-zinc-200 select-none transition hover:bg-white/[0.15]"
+            >
+              {showOriginal ? "原图" : "按住对比"}
+            </button>
+          </div>
         </div>
 
         <div className="relative flex min-h-[460px] flex-1 items-center justify-center overflow-hidden rounded-2xl bg-black/40 p-3 ring-1 ring-white/[0.07]">
@@ -488,17 +652,32 @@ export function MosaicEditor() {
                   key={item.id}
                   type="button"
                   onClick={() => handleToggleCategory(item.id)}
-                  className={`rounded-xl px-2 py-2 text-[11px] font-medium transition ${
+                  className={`relative flex flex-col items-center justify-center rounded-xl px-2 py-2 text-[11px] font-medium transition ${
                     active
                       ? "bg-[#0F6E5D] text-white"
                       : "bg-white/[0.05] text-zinc-400 hover:bg-white/[0.1] hover:text-zinc-200"
                   }`}
                 >
-                  {item.label}
+                  <span>{item.label}</span>
+                  {item.beta && (
+                    <span
+                      className={`mt-0.5 rounded px-1 py-px font-mono text-[9px] leading-none ${
+                        active
+                          ? "bg-white/20 text-white"
+                          : "bg-amber-500/15 text-amber-400"
+                      }`}
+                    >
+                      Beta
+                    </span>
+                  )}
                 </button>
               );
             })}
           </div>
+
+          <p className="text-[10px] leading-relaxed text-zinc-500">
+            默认开启高置信度「文字/号码」识别；人脸与二维码为 Beta 能力，如出现误判可悬停下方编号定位后单独移除。
+          </p>
 
           <button
             type="button"
@@ -519,25 +698,60 @@ export function MosaicEditor() {
           </button>
 
           {autoActions.length > 0 && (
-            <div className="max-h-24 space-y-1 overflow-y-auto pr-1 pt-1">
-              {autoActions.map((act, idx) => (
-                <div
-                  key={act.id}
-                  className="flex items-center justify-between rounded-lg bg-black/30 px-2.5 py-1.5 text-[11px]"
-                >
-                  <span className="truncate text-zinc-300">
-                    #{idx + 1} {act.label || "敏感区域"}
-                  </span>
-                  <button
-                    type="button"
-                    onClick={() => removeActionById(act.id)}
-                    className="ml-2 rounded p-0.5 text-zinc-500 transition hover:text-white"
-                    title="移除"
+            <div className="max-h-32 space-y-1 overflow-y-auto pr-1 pt-1">
+              {autoActions.map((act, idx) => {
+                const isActive =
+                  hoveredActionId === act.id || selectedActionId === act.id;
+                return (
+                  <div
+                    key={act.id}
+                    onMouseEnter={() => setHoveredActionId(act.id)}
+                    onMouseLeave={() =>
+                      setHoveredActionId((prev) =>
+                        prev === act.id ? null : prev
+                      )
+                    }
+                    onClick={() =>
+                      setSelectedActionId((prev) =>
+                        prev === act.id ? null : act.id
+                      )
+                    }
+                    className={`flex cursor-pointer items-center justify-between rounded-lg px-2.5 py-1.5 text-[11px] transition ${
+                      isActive
+                        ? "bg-amber-500/15 ring-1 ring-amber-400/70"
+                        : "bg-black/30 hover:bg-white/[0.08]"
+                    }`}
                   >
-                    <X className="h-3 w-3" />
-                  </button>
-                </div>
-              ))}
+                    <div className="flex min-w-0 items-center gap-2">
+                      <span
+                        className={`shrink-0 rounded px-1.5 py-0.5 font-mono text-[10px] font-semibold ${
+                          isActive
+                            ? "bg-amber-400 text-[#141413]"
+                            : "bg-[#0F6E5D] text-white"
+                        }`}
+                      >
+                        #{idx + 1}
+                      </span>
+                      <span className="truncate text-zinc-200">
+                        {act.label || "敏感区域"}
+                      </span>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        if (hoveredActionId === act.id) setHoveredActionId(null);
+                        if (selectedActionId === act.id) setSelectedActionId(null);
+                        removeActionById(act.id);
+                      }}
+                      className="ml-2 rounded p-0.5 text-zinc-400 transition hover:bg-rose-500/20 hover:text-rose-300"
+                      title="移除此区域"
+                    >
+                      <X className="h-3 w-3" />
+                    </button>
+                  </div>
+                );
+              })}
             </div>
           )}
         </div>
@@ -696,24 +910,60 @@ export function MosaicEditor() {
               </div>
 
               {manualActions.length > 0 && (
-                <div className="max-h-24 space-y-1 overflow-y-auto pr-1">
-                  {manualActions.map((act, idx) => (
-                    <div
-                      key={act.id}
-                      className="flex items-center justify-between rounded-lg bg-black/30 px-2.5 py-1.5 text-[11px]"
-                    >
-                      <span className="truncate text-zinc-300">
-                        #{idx + 1} {act.label || "手动"}
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => removeActionById(act.id)}
-                        className="ml-2 rounded p-0.5 text-zinc-500 hover:text-white"
+                <div className="max-h-28 space-y-1 overflow-y-auto pr-1">
+                  {manualActions.map((act, idx) => {
+                    const isActive =
+                      hoveredActionId === act.id || selectedActionId === act.id;
+                    return (
+                      <div
+                        key={act.id}
+                        onMouseEnter={() => setHoveredActionId(act.id)}
+                        onMouseLeave={() =>
+                          setHoveredActionId((prev) =>
+                            prev === act.id ? null : prev
+                          )
+                        }
+                        onClick={() =>
+                          setSelectedActionId((prev) =>
+                            prev === act.id ? null : act.id
+                          )
+                        }
+                        className={`flex cursor-pointer items-center justify-between rounded-lg px-2.5 py-1.5 text-[11px] transition ${
+                          isActive
+                            ? "bg-amber-500/15 ring-1 ring-amber-400/70"
+                            : "bg-black/30 hover:bg-white/[0.08]"
+                        }`}
                       >
-                        <X className="h-3 w-3" />
-                      </button>
-                    </div>
-                  ))}
+                        <div className="flex min-w-0 items-center gap-2">
+                          <span
+                            className={`shrink-0 rounded px-1.5 py-0.5 font-mono text-[10px] font-semibold ${
+                              isActive
+                                ? "bg-amber-400 text-[#141413]"
+                                : "bg-slate-600 text-white"
+                            }`}
+                          >
+                            M{idx + 1}
+                          </span>
+                          <span className="truncate text-zinc-200">
+                            {act.label || "手动"}
+                          </span>
+                        </div>
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            if (hoveredActionId === act.id) setHoveredActionId(null);
+                            if (selectedActionId === act.id) setSelectedActionId(null);
+                            removeActionById(act.id);
+                          }}
+                          className="ml-2 rounded p-0.5 text-zinc-400 transition hover:bg-rose-500/20 hover:text-rose-300"
+                          title="移除此区域"
+                        >
+                          <X className="h-3 w-3" />
+                        </button>
+                      </div>
+                    );
+                  })}
                 </div>
               )}
             </div>

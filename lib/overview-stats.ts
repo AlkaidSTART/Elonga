@@ -20,7 +20,10 @@ export interface DailyTrendPoint {
 export interface OverviewStats {
   totalCreated: number;
   totalPublished: number;
+  totalArchived: number;
   totalViral: number;
+  totalViews: number;
+  totalLikes: number;
   publishRate: number;
   viralRate: number;
   activePlatformsCount: number;
@@ -29,7 +32,7 @@ export interface OverviewStats {
   dailyTrend: DailyTrendPoint[];
 }
 
-const PLATFORM_ORDER: PlatformId[] = ["douyin", "toutiao", "kuaishou", "wechat"];
+const PLATFORM_ORDER: PlatformId[] = ["douyin", "toutiao", "xiaohongshu", "wechat"];
 
 function formatShortDate(date: Date): string {
   const month = String(date.getMonth() + 1).padStart(2, "0");
@@ -58,9 +61,9 @@ export function buildDemoOverviewStats(today: Date | null): OverviewStats {
       sharePercent: 28,
     },
     {
-      id: "kuaishou",
-      name: PLATFORMS.kuaishou.name,
-      accentColor: "#EA580C",
+      id: "xiaohongshu",
+      name: PLATFORMS.xiaohongshu.name,
+      accentColor: "#E11D48",
       createdCount: 31,
       publishedCount: 25,
       viralCount: 7,
@@ -107,7 +110,10 @@ export function buildDemoOverviewStats(today: Date | null): OverviewStats {
   return {
     totalCreated,
     totalPublished,
+    totalArchived: 112,
     totalViral,
+    totalViews: 184600,
+    totalLikes: 12480,
     publishRate: Math.round((totalPublished / totalCreated) * 100),
     viralRate: Math.round((totalViral / totalCreated) * 100),
     activePlatformsCount: 4,
@@ -123,7 +129,18 @@ export function computeOverviewStats(
 ): OverviewStats {
   const totalCreated = history.length;
   const totalPublished = history.filter((item) => item.isPublished).length;
+  const totalArchived = history.filter(
+    (item) => item.publishArchive?.archived
+  ).length;
   const totalViral = history.filter((item) => item.isViral).length;
+  const totalViews = history.reduce(
+    (sum, item) => sum + (item.publishArchive?.metrics.views ?? 0),
+    0
+  );
+  const totalLikes = history.reduce(
+    (sum, item) => sum + (item.publishArchive?.metrics.likes ?? 0),
+    0
+  );
 
   const publishRate =
     totalCreated > 0 ? Math.round((totalPublished / totalCreated) * 100) : 0;
@@ -201,7 +218,10 @@ export function computeOverviewStats(
   return {
     totalCreated,
     totalPublished,
+    totalArchived,
     totalViral,
+    totalViews,
+    totalLikes,
     publishRate,
     viralRate,
     activePlatformsCount,

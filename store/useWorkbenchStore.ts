@@ -4,9 +4,12 @@ import type {
   ContentTypeId,
   CopywritingResult,
   PlatformId,
+  PublishArchiveRecord,
   ToneId,
   WordCountId,
 } from "@/lib/platforms";
+import type { TextRedactionRecord } from "@/lib/text-redaction";
+import type { PublishReviewState } from "@/lib/publish-review";
 
 export type WorkbenchTab = "copywriting" | "image-studio";
 
@@ -40,6 +43,7 @@ interface WorkbenchState {
   topic: string;
   keywords: string;
   targetAudience: string;
+  selectedActivityId: string | null;
 
   isGenerating: boolean;
   generationError: string | null;
@@ -56,15 +60,22 @@ interface WorkbenchState {
   setTopic: (topic: string) => void;
   setKeywords: (keywords: string) => void;
   setTargetAudience: (audience: string) => void;
+  setSelectedActivityId: (activityId: string | null) => void;
   setIsGenerating: (loading: boolean) => void;
   setGenerationError: (error: string | null) => void;
   setCurrentResult: (result: CopywritingResult | null) => void;
   updateCurrentBody: (body: string) => void;
+  updateCurrentResult: (partial: Partial<CopywritingResult>) => void;
+  updateCurrentResultPatch: (partial: Partial<CopywritingResult>) => void;
+  updateCurrentRedactionRecords: (records: TextRedactionRecord[]) => void;
+  updateCurrentReviewState: (reviewState: PublishReviewState) => void;
   addToHistory: (result: CopywritingResult) => void;
   selectFromHistory: (id: string) => void;
   removeFromHistory: (id: string) => void;
   togglePublished: (id: string) => void;
   toggleViral: (id: string) => void;
+  updatePublishArchive: (id: string, archive: PublishArchiveRecord) => void;
+  toggleArchived: (id: string) => void;
 }
 
 export const useWorkbenchStore = create<WorkbenchState>()(
@@ -81,6 +92,7 @@ export const useWorkbenchStore = create<WorkbenchState>()(
       topic: "",
       keywords: "",
       targetAudience: "",
+      selectedActivityId: null,
 
       isGenerating: false,
       generationError: null,
@@ -100,6 +112,7 @@ export const useWorkbenchStore = create<WorkbenchState>()(
       setTopic: (topic) => set({ topic }),
       setKeywords: (keywords) => set({ keywords }),
       setTargetAudience: (targetAudience) => set({ targetAudience }),
+      setSelectedActivityId: (selectedActivityId) => set({ selectedActivityId }),
       setIsGenerating: (isGenerating) => set({ isGenerating }),
       setGenerationError: (generationError) => set({ generationError }),
       setCurrentResult: (currentResult) => set({ currentResult }),
@@ -107,6 +120,50 @@ export const useWorkbenchStore = create<WorkbenchState>()(
         set((state) => {
           if (!state.currentResult) return state;
           const updated = { ...state.currentResult, body };
+          return {
+            currentResult: updated,
+            history: state.history.map((item) =>
+              item.id === updated.id ? updated : item
+            ),
+          };
+        }),
+      updateCurrentResult: (partial) =>
+        set((state) => {
+          if (!state.currentResult) return state;
+          const updated = { ...state.currentResult, ...partial };
+          return {
+            currentResult: updated,
+            history: state.history.map((item) =>
+              item.id === updated.id ? updated : item
+            ),
+          };
+        }),
+      updateCurrentResultPatch: (partial) =>
+        set((state) => {
+          if (!state.currentResult) return state;
+          const updated = { ...state.currentResult, ...partial };
+          return {
+            currentResult: updated,
+            history: state.history.map((item) =>
+              item.id === updated.id ? updated : item
+            ),
+          };
+        }),
+      updateCurrentRedactionRecords: (redactionRecords) =>
+        set((state) => {
+          if (!state.currentResult) return state;
+          const updated = { ...state.currentResult, redactionRecords };
+          return {
+            currentResult: updated,
+            history: state.history.map((item) =>
+              item.id === updated.id ? updated : item
+            ),
+          };
+        }),
+      updateCurrentReviewState: (reviewState) =>
+        set((state) => {
+          if (!state.currentResult) return state;
+          const updated = { ...state.currentResult, reviewState };
           return {
             currentResult: updated,
             history: state.history.map((item) =>
@@ -167,6 +224,67 @@ export const useWorkbenchStore = create<WorkbenchState>()(
               : null,
           };
         }),
+      updatePublishArchive: (id, archive) =>
+        set((state) => {
+          const updateItem = (item: CopywritingResult): CopywritingResult => {
+            if (item.id !== id) return item;
+            const publishedAt =
+              archive.publishedAt ||
+              item.publishedAt ||
+              new Date().toISOString();
+            return {
+              ...item,
+              isPublished: true,
+              publishedAt,
+              publishArchive: {
+                ...archive,
+                publishedAt,
+                archivedAt: archive.archived
+                  ? archive.archivedAt || new Date().toISOString()
+                  : undefined,
+              },
+            };
+          };
+          return {
+            history: state.history.map(updateItem),
+            currentResult: state.currentResult
+              ? updateItem(state.currentResult)
+              : null,
+          };
+        }),
+      toggleArchived: (id) =>
+        set((state) => {
+          const updateItem = (item: CopywritingResult): CopywritingResult => {
+            if (item.id !== id) return item;
+            const prev = item.publishArchive;
+            const nextArchived = !(prev?.archived ?? false);
+            return {
+              ...item,
+              isPublished: nextArchived ? true : item.isPublished,
+              publishedAt:
+                nextArchived && !item.publishedAt
+                  ? new Date().toISOString()
+                  : item.publishedAt,
+              publishArchive: {
+                publishedUrl: prev?.publishedUrl,
+                publishedAt:
+                  prev?.publishedAt ??
+                  item.publishedAt ??
+                  new Date().toISOString(),
+                metrics: prev?.metrics ?? {},
+                notes: prev?.notes,
+                archived: nextArchived,
+                archivedAt: nextArchived ? new Date().toISOString() : undefined,
+              },
+            };
+          };
+          return {
+            history: state.history.map(updateItem),
+            currentResult: state.currentResult
+              ? updateItem(state.currentResult)
+              : null,
+          };
+        }),
     }),
     {
       name: "jianyue-workbench-storage",
@@ -192,9 +310,31 @@ export const useWorkbenchStore = create<WorkbenchState>()(
             ? oldConfig.baseUrl
             : undefined;
 
+        const normalizePlatform = (p?: string): PlatformId => {
+          if (
+            p === "douyin" ||
+            p === "toutiao" ||
+            p === "xiaohongshu" ||
+            p === "wechat"
+          ) {
+            return p;
+          }
+          if (p === "kuaishou") return "xiaohongshu";
+          return "douyin";
+        };
+
+        const migratedHistory = Array.isArray(persisted?.history)
+          ? persisted.history.map((item) => ({
+              ...item,
+              platform: normalizePlatform(item.platform as string),
+            }))
+          : currentState.history;
+
         return {
           ...currentState,
           ...persisted,
+          platform: normalizePlatform(persisted?.platform as string | undefined),
+          history: migratedHistory,
           modelConfig: {
             ...DEFAULT_MODEL_CONFIG,
             ...(oldConfig ?? {}),

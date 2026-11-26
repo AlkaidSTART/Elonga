@@ -20,7 +20,7 @@ export const trafficOptimizerSkill: SkillDefinition<
   id: "traffic-optimizer",
   name: "公益推流与合规校验",
   description:
-    "统一清理表情符号、融合抖音热门推流标签并校验评论区互动钩子。",
+    "统一清理表情符号、融合平台热门推流标签并校验评论区互动钩子。",
   version: "1.0.0",
   async execute({ draft, trendInsights }) {
     const cleanedTitles = draft.titles.map(cleanText).filter(Boolean);

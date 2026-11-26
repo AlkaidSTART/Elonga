@@ -2,7 +2,7 @@
 
 import { useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
-import { ImagePlus, Sparkles } from "lucide-react";
+import { ImagePlus, RefreshCw, Sparkles } from "lucide-react";
 import { useImageStudioStore } from "@/store/useImageStudioStore";
 import { MosaicEditor } from "./MosaicEditor";
 import { Stylize2DPanel } from "./Stylize2DPanel";
@@ -225,9 +225,10 @@ export function ImageStudioWorkspace() {
           <button
             type="button"
             onClick={clearImage}
-            className="rounded-full bg-white/[0.08] px-3 py-1 text-xs font-medium text-zinc-300 transition hover:bg-white/[0.15] hover:text-white"
+            className="inline-flex items-center gap-1.5 rounded-full bg-white px-3.5 py-1.5 text-xs font-semibold text-[#141413] shadow-sm transition hover:bg-zinc-200 active:scale-[0.98]"
           >
-            换图
+            <RefreshCw className="h-3.5 w-3.5" />
+            <span>更换图片</span>
           </button>
         </div>
       </div>

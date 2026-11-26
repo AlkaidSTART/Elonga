@@ -1,5 +1,5 @@
-import { CopywritingWorkspace } from "@/components/copywriting/CopywritingWorkspace";
+import { redirect } from "next/navigation";
 
 export default function CopywritingPage() {
-  return <CopywritingWorkspace />;
+  redirect("/workflow");
 }

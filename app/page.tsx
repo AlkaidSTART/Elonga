@@ -1,12 +1,16 @@
 "use client";
 
-import { useMemo, useSyncExternalStore } from "react";
+import { useMemo, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowUpRight, FileBarChart2 } from "lucide-react";
 import type { EChartsOption } from "echarts";
 import { EChartBox } from "@/components/charts/EChartBox";
-import { buildDemoOverviewStats } from "@/lib/overview-stats";
+import {
+  buildDemoOverviewStats,
+  computeOverviewStats,
+} from "@/lib/overview-stats";
+import { useWorkbenchStore } from "@/store/useWorkbenchStore";
 
 const CONTAINER_VARIANTS = {
   hidden: { opacity: 0 },
@@ -36,6 +40,9 @@ const getClientTodayKey = () => {
 const getServerTodayKey = () => null;
 
 export default function OverviewPage() {
+  const history = useWorkbenchStore((s) => s.history);
+  const [dataMode, setDataMode] = useState<"auto" | "live" | "demo">("auto");
+
   const todayKey = useSyncExternalStore(
     emptySubscribe,
     getClientTodayKey,
@@ -47,7 +54,16 @@ export default function OverviewPage() {
     return new Date(y, m - 1, d);
   }, [todayKey]);
 
-  const stats = useMemo(() => buildDemoOverviewStats(today), [today]);
+  const effectiveMode: "live" | "demo" =
+    dataMode === "auto" ? (history.length > 0 ? "live" : "demo") : dataMode;
+
+  const stats = useMemo(
+    () =>
+      effectiveMode === "live"
+        ? computeOverviewStats(history, today)
+        : buildDemoOverviewStats(today),
+    [effectiveMode, history, today]
+  );
 
   const platformBarOption = useMemo<EChartsOption>(
     () => ({
@@ -234,7 +250,7 @@ export default function OverviewPage() {
           href="/workflow"
           className="group inline-flex items-center gap-1.5 rounded-md bg-[#1D4ED8] px-3.5 py-2 text-xs font-medium text-white shadow-2xs transition hover:bg-[#1E40AF]"
         >
-          <span>新建图文流程</span>
+          <span>开始内容创作</span>
           <ArrowUpRight className="h-3.5 w-3.5 transition-transform group-hover:-translate-y-0.5 group-hover:translate-x-0.5" />
         </Link>
       </motion.header>
@@ -252,15 +268,27 @@ export default function OverviewPage() {
               <span>累计已发布内容</span>
             </div>
             <span className="rounded border border-white/10 bg-white/[0.04] px-2 py-0.5 font-mono text-[10px] tracking-wider text-slate-400 uppercase">
-              LIVE METRICS
+              {effectiveMode === "live" ? "LIVE ARCHIVE" : "DEMO METRICS"}
             </span>
           </div>
 
-          <div className="my-7 flex items-baseline gap-2.5">
-            <span className="font-mono text-5xl font-semibold tracking-tight tabular-nums text-white sm:text-6xl">
-              {stats.totalPublished}
-            </span>
-            <span className="text-sm text-slate-400">条</span>
+          <div className="my-7 flex flex-wrap items-baseline justify-between gap-4">
+            <div className="flex items-baseline gap-2.5">
+              <span className="font-mono text-5xl font-semibold tracking-tight tabular-nums text-white sm:text-6xl">
+                {stats.totalPublished}
+              </span>
+              <span className="text-sm text-slate-400">
+                条（已归档 {stats.totalArchived}）
+              </span>
+            </div>
+            <div className="text-right">
+              <span className="block text-[11px] text-slate-400">
+                回填总播放 / 阅读
+              </span>
+              <span className="font-mono text-xl font-semibold tabular-nums text-sky-300">
+                {stats.totalViews.toLocaleString("zh-CN")}
+              </span>
+            </div>
           </div>
 
           <div className="grid grid-cols-3 gap-4 border-t border-white/10 pt-5 text-xs">

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, MotionConfig, motion } from "framer-motion";
 import {
+  Building2,
   ChevronLeft,
   ChevronRight,
   History,
@@ -13,19 +14,38 @@ import {
   Menu,
   PenTool,
   SlidersHorizontal,
-  Workflow,
   X,
 } from "lucide-react";
 import { useWorkbenchStore } from "@/store/useWorkbenchStore";
 
 const NAV_ITEMS = [
-  { href: "/", label: "概览", icon: LayoutDashboard },
-  { href: "/copywriting", label: "推流文案", icon: PenTool },
+  { href: "/", label: "工作台概览", icon: LayoutDashboard },
+  { href: "/organization", label: "机构中心", icon: Building2 },
+  { href: "/workflow", label: "内容创作", icon: PenTool },
   { href: "/image-studio", label: "图片工坊", icon: ImageIcon },
-  { href: "/workflow", label: "图文工作流", icon: Workflow },
   { href: "/history", label: "创作记录", icon: History },
   { href: "/settings", label: "模型配置", icon: SlidersHorizontal },
 ] as const;
+
+function BrandMark() {
+  return (
+    <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-[5px] bg-[#0F172A] text-white">
+      <svg
+        width="13"
+        height="13"
+        viewBox="0 0 16 16"
+        fill="none"
+        xmlns="http://www.w3.org/2000/svg"
+        aria-hidden="true"
+      >
+        <path
+          d="M3 3.25H13V5.25H5.25V7H11.5V9H5.25V10.75H13V12.75H3V3.25Z"
+          fill="currentColor"
+        />
+      </svg>
+    </span>
+  );
+}
 
 export function AppShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
@@ -40,17 +60,17 @@ export function AppShell({ children }: { children: React.ReactNode }) {
 
   return (
     <MotionConfig reducedMotion="user">
-      <div className="flex min-h-screen bg-[#F7F8FA] text-[#0F172A]">
+      <div className="flex min-h-screen bg-[#F6F7F9] text-[#0F172A]">
         {/* Desktop Sidebar */}
         <motion.aside
           initial={false}
-          animate={{ width: collapsed ? 64 : 224 }}
-          transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
-          className="sticky top-0 hidden h-screen shrink-0 flex-col overflow-hidden border-r border-[#E4E7EC] bg-white lg:flex"
+          animate={{ width: collapsed ? 64 : 228 }}
+          transition={{ duration: 0.16, ease: [0.16, 1, 0.3, 1] }}
+          className="sticky top-0 hidden h-screen shrink-0 flex-col overflow-hidden border-r border-[#E2E8F0] bg-white lg:flex"
         >
           {/* Brand Header */}
           <div
-            className={`flex h-14 items-center border-b border-[#E4E7EC] ${
+            className={`flex h-14 items-center border-b border-[#E2E8F0] ${
               collapsed ? "justify-center px-2" : "justify-between px-4"
             }`}
           >
@@ -60,22 +80,22 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                   initial={{ opacity: 0, width: 0 }}
                   animate={{ opacity: 1, width: "auto" }}
                   exit={{ opacity: 0, width: 0 }}
-                  transition={{ duration: 0.14 }}
+                  transition={{ duration: 0.12 }}
                   className="overflow-hidden"
                 >
                   <Link
                     href="/"
                     className="flex items-center gap-2.5 whitespace-nowrap"
                   >
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
-                      src="/elonga-logo.png"
-                      alt="Elonga Logo"
-                      className="h-6 w-6 shrink-0 object-contain"
-                    />
-                    <span className="text-[16px] font-semibold tracking-tight text-[#0F172A]">
-                      Elonga
-                    </span>
+                    <BrandMark />
+                    <div className="flex items-baseline gap-1.5">
+                      <span className="text-[15px] font-semibold tracking-tight text-[#0F172A]">
+                        Elonga
+                      </span>
+                      <span className="font-mono text-[10px] font-medium tracking-wider text-slate-400 uppercase">
+                        PRO
+                      </span>
+                    </div>
                   </Link>
                 </motion.div>
               )}
@@ -117,7 +137,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                   {active && (
                     <motion.div
                       layoutId="sidebarActiveBar"
-                      transition={{ duration: 0.16, ease: [0.16, 1, 0.3, 1] }}
+                      transition={{ duration: 0.14, ease: [0.16, 1, 0.3, 1] }}
                       className="absolute left-0 top-1.5 bottom-1.5 w-[2.5px] rounded-r-xs bg-[#1D4ED8]"
                     />
                   )}
@@ -137,7 +157,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                       >
                         <span>{item.label}</span>
                         {item.href === "/history" && historyCount > 0 && (
-                          <span className="rounded bg-slate-200/70 px-1.5 py-0.5 font-mono text-[10px] leading-none text-slate-600 tabular-nums">
+                          <span className="rounded border border-[#E2E8F0] bg-white px-1.5 py-0.5 font-mono text-[10px] leading-none text-slate-600 tabular-nums">
                             {historyCount}
                           </span>
                         )}
@@ -148,18 +168,22 @@ export function AppShell({ children }: { children: React.ReactNode }) {
               );
             })}
           </nav>
+
+          {/* Subtle Workspace Footer */}
+          {!collapsed && (
+            <div className="border-t border-[#E2E8F0] px-4 py-3">
+              <div className="font-mono text-[10px] tracking-wider text-slate-400 uppercase">
+                CONTENT WORKBENCH
+              </div>
+            </div>
+          )}
         </motion.aside>
 
         {/* Mobile Header & Drawer */}
-        <div className="flex flex-1 flex-col min-w-0 bg-[#F7F8FA]">
-          <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-[#E4E7EC] bg-white/95 px-4 backdrop-blur-sm lg:hidden">
+        <div className="flex min-w-0 flex-1 flex-col bg-[#F6F7F9]">
+          <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-[#E2E8F0] bg-white/95 px-4 backdrop-blur-sm lg:hidden">
             <Link href="/" className="flex items-center gap-2">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="/elonga-logo.png"
-                alt="Elonga Logo"
-                className="h-6 w-6 object-contain"
-              />
+              <BrandMark />
               <span className="text-[15px] font-semibold tracking-tight text-[#0F172A]">
                 Elonga
               </span>
@@ -182,23 +206,18 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                   onClick={() => setMobileOpen(false)}
-                  className="fixed inset-0 bg-slate-950/30 backdrop-blur-xs"
+                  className="fixed inset-0 bg-slate-950/35 backdrop-blur-xs"
                 />
                 <motion.aside
                   initial={{ x: "-100%" }}
                   animate={{ x: 0 }}
                   exit={{ x: "-100%" }}
-                  transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
-                  className="fixed inset-y-0 left-0 flex w-60 flex-col border-r border-[#E4E7EC] bg-white shadow-xl"
+                  transition={{ duration: 0.18, ease: [0.16, 1, 0.3, 1] }}
+                  className="fixed inset-y-0 left-0 flex w-60 flex-col border-r border-[#E2E8F0] bg-white shadow-xl"
                 >
-                  <div className="flex h-14 items-center justify-between border-b border-[#E4E7EC] px-4">
+                  <div className="flex h-14 items-center justify-between border-b border-[#E2E8F0] px-4">
                     <div className="flex items-center gap-2">
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img
-                        src="/elonga-logo.png"
-                        alt="Elonga Logo"
-                        className="h-6 w-6 object-contain"
-                      />
+                      <BrandMark />
                       <span className="text-[15px] font-semibold text-[#0F172A]">
                         Elonga
                       </span>

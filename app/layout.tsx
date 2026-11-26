@@ -28,7 +28,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="zh-CN"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full bg-[#F7F8FA] text-[#0F172A] selection:bg-[#1D4ED8]/12 selection:text-[#1D4ED8]">
+      <body className="min-h-full bg-[#F6F7F9] text-[#0F172A] selection:bg-[#1D4ED8]/15 selection:text-[#1D4ED8]">
         <AppShell>{children}</AppShell>
       </body>
     </html>
