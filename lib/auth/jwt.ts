@@ -173,10 +173,18 @@ export async function verifySessionJwt(
 }
 
 export function getAuthCookieOptions(maxAgeSeconds: number) {
+  const secureEnv = process.env.AUTH_COOKIE_SECURE?.trim().toLowerCase();
+  const secure =
+    secureEnv === "true"
+      ? true
+      : secureEnv === "false"
+        ? false
+        : process.env.NODE_ENV === "production";
+
   return {
     httpOnly: true,
     sameSite: "lax" as const,
-    secure: process.env.NODE_ENV === "production",
+    secure,
     path: "/",
     maxAge: maxAgeSeconds,
   };

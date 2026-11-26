@@ -1,5 +1,6 @@
 "use client";
 
+import { BrandLogo } from "@/components/BrandLogo";
 import { useWorkbenchStore } from "@/store/useWorkbenchStore";
 
 export function Header() {
@@ -14,13 +15,16 @@ export function Header() {
     <header className="sticky top-0 z-30 border-b border-neutral-200/80 bg-white/90 backdrop-blur-md">
       <div className="mx-auto flex h-16 max-w-7xl items-center justify-between px-4 sm:px-6 lg:px-8">
         {/* Brand */}
-        <div className="leading-tight">
-          <h1 className="text-[15px] font-semibold tracking-tight text-neutral-900">
-            简悦创作台
-          </h1>
-          <p className="hidden text-xs text-neutral-500 sm:block">
-            多平台推流文案与视觉工坊
-          </p>
+        <div className="flex items-center gap-2.5 leading-tight">
+          <BrandLogo size={26} />
+          <div>
+            <h1 className="text-[15px] font-semibold tracking-tight text-neutral-900">
+              Elonga
+            </h1>
+            <p className="hidden text-xs text-neutral-500 sm:block">
+              多平台推流文案与视觉工坊
+            </p>
+          </div>
         </div>
 
         {/* Center Segmented Navigation */}

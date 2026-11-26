@@ -1,0 +1,94 @@
+services:
+  mysql:
+    image: mysql:8.0
+    container_name: elonga-mysql
+    restart: unless-stopped
+    environment:
+      TZ: Asia/Shanghai
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-elonga_root_2026}
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-elonga}
+      MYSQL_USER: ${MYSQL_USER:-elonga}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-elonga_pass_2026}
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+      - --default-authentication-plugin=mysql_native_password
+    ports:
+      - "${MYSQL_PORT:-3306}:3306"
+    volumes:
+      - mysql_data:/var/lib/mysql
+      - ./docker/mysql/init.sql:/docker-entrypoint-initdb.d/01-init.sql:ro
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -u$$MYSQL_USER -p$$MYSQL_PASSWORD --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 20s
+    networks:
+      - elonga-net
+
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: elonga-app:latest
+    container_name: elonga-app
+    restart: unless-stopped
+    depends_on:
+      mysql:
+        condition: service_healthy
+    ports:
+      - "${APP_PORT:-3000}:3000"
+    environment:
+      NODE_ENV: production
+      TZ: Asia/Shanghai
+      PORT: 3000
+      HOSTNAME: 0.0.0.0
+
+      # MySQL connection
+      MYSQL_HOST: mysql
+      MYSQL_PORT: 3306
+      MYSQL_DATABASE: ${MYSQL_DATABASE:-elonga}
+      MYSQL_USER: ${MYSQL_USER:-elonga}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD:-elonga_pass_2026}
+      DATABASE_URL: mysql://${MYSQL_USER:-elonga}:${MYSQL_PASSWORD:-elonga_pass_2026}@mysql:3306/${MYSQL_DATABASE:-elonga}
+
+      # Auth & Session
+      JWT_SECRET: ${JWT_SECRET:-elonga-docker-jwt-secret-please-change-2026}
+      AUTH_COOKIE_SECURE: ${AUTH_COOKIE_SECURE:-false}
+      AUTH_ADMIN_PASSWORD: ${AUTH_ADMIN_PASSWORD:-elonga2026}
+      AUTH_EDITOR_PASSWORD: ${AUTH_EDITOR_PASSWORD:-editor2026}
+
+      # Optional AI & External APIs
+      DEEPSEEK_API_KEY: ${DEEPSEEK_API_KEY:-}
+      DEEPSEEK_BASE_URL: ${DEEPSEEK_BASE_URL:-}
+      DEEPSEEK_MODEL: ${DEEPSEEK_MODEL:-}
+      TEXT_API_KEY: ${TEXT_API_KEY:-}
+      TEXT_BASE_URL: ${TEXT_BASE_URL:-}
+      OPENAI_API_KEY: ${OPENAI_API_KEY:-}
+      IMAGE_API_KEY: ${IMAGE_API_KEY:-}
+      IMAGE_BASE_URL: ${IMAGE_BASE_URL:-}
+      IMAGE_MODEL: ${IMAGE_MODEL:-}
+      ARK_API_KEY: ${ARK_API_KEY:-}
+      ARK_BASE_URL: ${ARK_BASE_URL:-}
+      VISION_API_KEY: ${VISION_API_KEY:-}
+      VISION_BASE_URL: ${VISION_BASE_URL:-}
+      VISION_MODEL: ${VISION_MODEL:-}
+      DOUYIN_TRENDS_API_URL: ${DOUYIN_TRENDS_API_URL:-}
+      DOUYIN_TRENDS_API_KEY: ${DOUYIN_TRENDS_API_KEY:-}
+    healthcheck:
+      test: ["CMD-SHELL", "wget -qO- http://127.0.0.1:3000/api/health >/dev/null 2>&1 || exit 1"]
+      interval: 15s
+      timeout: 5s
+      retries: 5
+      start_period: 20s
+    networks:
+      - elonga-net
+
+volumes:
+  mysql_data:
+    driver: local
+
+networks:
+  elonga-net:
+    driver: bridge

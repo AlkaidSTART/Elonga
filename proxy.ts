@@ -12,8 +12,8 @@ function getSafeRedirectPath(raw: string | null): string {
 export async function proxy(request: NextRequest) {
   const { pathname, search } = request.nextUrl;
 
-  // Auth endpoints are always accessible
-  if (pathname.startsWith("/api/auth")) {
+  // Auth and healthcheck endpoints are always accessible
+  if (pathname.startsWith("/api/auth") || pathname === "/api/health") {
     return NextResponse.next();
   }
 
