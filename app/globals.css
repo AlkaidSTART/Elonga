@@ -1,15 +1,19 @@
 @import "tailwindcss";
 
 :root {
-  --background: #f7f8fa;
-  --foreground: #111827;
-  --surface: #ffffff;
-  --surface-muted: #f3f4f6;
-  --border-subtle: #e5e7eb;
-  --border-strong: #d1d5db;
-  --accent: #3451e5;
-  --accent-hover: #2740c7;
-  --ink: #111827;
+  --background: #f6f4ef;
+  --foreground: #181816;
+  --surface: #fcfbf8;
+  --surface-muted: #efece4;
+  --border-subtle: #e2ddd3;
+  --border-strong: #cfc8ba;
+  --accent: #1b4d3e;
+  --accent-hover: #143a2f;
+  --accent-soft: #e9f0ed;
+  --terracotta: #b85d3b;
+  --ink: #181816;
+  --ink-secondary: #57534e;
+  --ink-muted: #8c857b;
 }
 
 @theme inline {
@@ -38,12 +42,12 @@ body {
 
 .studio-grid-dark {
   background-image:
-    linear-gradient(to right, rgba(148, 163, 184, 0.05) 1px, transparent 1px),
-    linear-gradient(to bottom, rgba(148, 163, 184, 0.05) 1px, transparent 1px);
+    linear-gradient(to right, rgba(226, 221, 211, 0.045) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(226, 221, 211, 0.045) 1px, transparent 1px);
   background-size: 24px 24px;
 }
 
-/* Minimalist scrollbars */
+/* Minimalist warm scrollbars */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
@@ -54,10 +58,10 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #d1d5db;
+  background: #d5cfc3;
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #9ca3af;
+  background: #b5aea0;
 }

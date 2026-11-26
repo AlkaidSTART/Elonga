@@ -309,23 +309,23 @@ export function RedactionAndReviewPanel({
   const confirmedSet = new Set(reviewState?.confirmedFactKeys ?? []);
 
   return (
-    <section className="space-y-4 rounded-lg border border-[#E2E8F0] bg-white p-4 shadow-[0_1px_2px_rgba(15,23,42,0.03)]">
+    <section className="space-y-4">
       {/* Top Status Banner + Mode Switcher */}
-      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#F1F5F9] pb-3">
-        <div className="flex items-center gap-0.5 rounded-md border border-[#E2E8F0] bg-[#F1F5F9] p-0.5">
+      <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#E2DDD3] pb-3">
+        <div className="flex items-center gap-0.5 rounded border border-[#E2DDD3] bg-[#EFECE4] p-0.5">
           <button
             type="button"
             onClick={() => setActiveTab("review")}
-            className={`inline-flex items-center gap-1.5 rounded-[5px] px-2.5 py-1 text-xs font-medium transition ${
+            className={`inline-flex items-center gap-1.5 rounded-[3px] px-2.5 py-1 text-xs font-medium transition ${
               activeTab === "review"
-                ? "bg-white text-[#0F172A] shadow-2xs"
-                : "text-slate-500 hover:text-[#0F172A]"
+                ? "bg-[#FCFBF8] text-[#181816]"
+                : "text-[#78716C] hover:text-[#181816]"
             }`}
           >
             <FileCheck2 className="h-3.5 w-3.5" />
             <span>发布审查</span>
             {report.unresolvedRiskCount + report.unconfirmedFactCount > 0 && (
-              <span className="rounded bg-amber-100 px-1 py-px font-mono text-[10px] leading-tight text-amber-800">
+              <span className="rounded bg-[#FBF3EC] px-1 py-px font-mono text-[10px] leading-tight text-[#9A4A22]">
                 {report.unresolvedRiskCount + report.unconfirmedFactCount}
               </span>
             )}
@@ -334,20 +334,20 @@ export function RedactionAndReviewPanel({
           <button
             type="button"
             onClick={() => setActiveTab("redaction")}
-            className={`inline-flex items-center gap-1.5 rounded-[5px] px-2.5 py-1 text-xs font-medium transition ${
+            className={`inline-flex items-center gap-1.5 rounded-[3px] px-2.5 py-1 text-xs font-medium transition ${
               activeTab === "redaction"
-                ? "bg-white text-[#0F172A] shadow-2xs"
-                : "text-slate-500 hover:text-[#0F172A]"
+                ? "bg-[#FCFBF8] text-[#181816]"
+                : "text-[#78716C] hover:text-[#181816]"
             }`}
           >
             <EyeOff className="h-3.5 w-3.5" />
             <span>编辑脱敏</span>
             {report.privacyMatches.length > 0 ? (
-              <span className="rounded bg-rose-100 px-1 py-px font-mono text-[10px] leading-tight text-rose-700">
+              <span className="rounded bg-[#FDF2F2] px-1 py-px font-mono text-[10px] leading-tight text-[#B42318]">
                 {report.privacyMatches.length}
               </span>
             ) : redactionRecords.length > 0 ? (
-              <span className="rounded bg-emerald-100 px-1 py-px font-mono text-[10px] leading-tight text-emerald-700">
+              <span className="rounded bg-[#E9F0ED] px-1 py-px font-mono text-[10px] leading-tight text-[#1B4D3E]">
                 {redactionRecords.length}
               </span>
             ) : null}
@@ -356,7 +356,7 @@ export function RedactionAndReviewPanel({
 
         {/* Eligibility Badge / Action */}
         {report.isEligible ? (
-          <span className="inline-flex items-center gap-1 rounded border border-emerald-200 bg-emerald-50 px-2 py-0.5 text-[11px] font-medium text-emerald-700">
+          <span className="inline-flex items-center gap-1 rounded border border-[#1B4D3E]/25 bg-[#E9F0ED] px-2 py-0.5 text-[11px] font-medium text-[#1B4D3E]">
             <ShieldCheck className="h-3.5 w-3.5" />
             <span>已获发布资格</span>
           </span>
@@ -364,7 +364,7 @@ export function RedactionAndReviewPanel({
           <button
             type="button"
             onClick={handleInitiateReview}
-            className="inline-flex items-center gap-1 rounded-md bg-[#1D4ED8] px-2.5 py-1 text-[11px] font-medium text-white transition hover:bg-[#1E40AF]"
+            className="inline-flex items-center gap-1 rounded bg-[#1B4D3E] px-2.5 py-1 text-[11px] font-medium text-[#FCFBF8] transition hover:bg-[#143A2F]"
           >
             <FileCheck2 className="h-3 w-3" />
             <span>
@@ -380,17 +380,17 @@ export function RedactionAndReviewPanel({
       {activeTab === "review" && (
         <div className="space-y-4">
           {!reviewState?.checkedAt ? (
-            <div className="rounded-md border border-dashed border-[#CBD5E1] bg-[#F8FAFC] p-4 text-center">
-              <p className="text-xs font-medium text-[#0F172A]">
+            <div className="border border-dashed border-[#D5CFC3] bg-[#FCFBF8]/60 p-4 text-center">
+              <p className="text-xs font-medium text-[#181816]">
                 尚未发起发布前检查
               </p>
-              <p className="mt-1 text-[11px] leading-relaxed text-slate-500">
+              <p className="mt-1 text-[11px] leading-relaxed text-[#78716C]">
                 系统将同步脱敏状态、扫描合规风险，并标注金额与人数等事实数据供人工核对。
               </p>
               <button
                 type="button"
                 onClick={handleInitiateReview}
-                className="mt-3 inline-flex items-center gap-1.5 rounded-md bg-[#0F172A] px-3.5 py-1.5 text-xs font-medium text-white transition hover:bg-slate-800"
+                className="mt-3 inline-flex items-center gap-1.5 rounded bg-[#181816] px-3.5 py-1.5 text-xs font-medium text-[#FCFBF8] transition hover:bg-[#2F2E2A]"
               >
                 <FileCheck2 className="h-3.5 w-3.5" />
                 <span>立即发起发布前检查</span>

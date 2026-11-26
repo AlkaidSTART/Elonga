@@ -30,7 +30,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
       lang="zh-CN"
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
-      <body className="min-h-full bg-[#F7F8FA] text-[#111827] selection:bg-[#3451E5]/15 selection:text-[#3451E5]">
+      <body className="min-h-full bg-[#F6F4EF] text-[#181816] selection:bg-[#1B4D3E]/15 selection:text-[#1B4D3E]">
         <AppShell>{children}</AppShell>
       </body>
     </html>

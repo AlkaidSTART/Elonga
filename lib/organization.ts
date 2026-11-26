@@ -32,18 +32,18 @@ export const ACTIVITY_STATUS_META: Record<
 > = {
   planned: {
     label: "筹备中",
-    badgeClass: "border-slate-200 bg-slate-50 text-slate-600",
-    dotClass: "bg-slate-400",
+    badgeClass: "border-[#D5CFC3] bg-[#EFECE4]/70 text-[#57534E]",
+    dotClass: "bg-[#8C857B]",
   },
   ongoing: {
     label: "进行中",
-    badgeClass: "border-blue-200 bg-blue-50 text-blue-700",
-    dotClass: "bg-blue-600",
+    badgeClass: "border-[#C46D3B]/30 bg-[#FBF3EC] text-[#9A4A22]",
+    dotClass: "bg-[#B85D3B]",
   },
   completed: {
     label: "已完成",
-    badgeClass: "border-emerald-200 bg-emerald-50 text-emerald-700",
-    dotClass: "bg-emerald-600",
+    badgeClass: "border-[#1B4D3E]/25 bg-[#E9F0ED] text-[#1B4D3E]",
+    dotClass: "bg-[#1B4D3E]",
   },
 };
 

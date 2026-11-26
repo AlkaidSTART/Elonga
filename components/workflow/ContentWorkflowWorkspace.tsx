@@ -661,12 +661,17 @@ export function ContentWorkflowWorkspace() {
       : undefined;
 
   return (
-    <div className="space-y-5">
+    <div className="space-y-7">
       {/* Top Page Header */}
-      <header className="flex flex-wrap items-center justify-between gap-4 border-b border-[#E5E7EB] pb-4">
-        <h1 className="text-lg font-semibold tracking-tight text-[#111827]">
-          内容创作
-        </h1>
+      <header className="flex flex-wrap items-end justify-between gap-4 border-b border-[#181816]/15 pb-5">
+        <div>
+          <h1 className="font-editorial text-2xl font-semibold tracking-tight text-[#181816]">
+            内容创作
+          </h1>
+          <p className="mt-1 text-xs text-[#78716C]">
+            关联机构档案、自动调研平台风向并生成可审查的合规图文稿件
+          </p>
+        </div>
 
         <ol className="flex items-center gap-4 sm:gap-5">
           {pipelineSteps.map((step, idx) => {
@@ -678,15 +683,15 @@ export function ContentWorkflowWorkspace() {
                 key={step.id}
                 className={`flex items-center gap-1.5 text-xs transition-colors ${
                   isActive
-                    ? "font-semibold text-[#1D4ED8]"
+                    ? "font-semibold text-[#1B4D3E]"
                     : isCompleted
-                      ? "text-[#0F172A]"
-                      : "text-slate-400"
+                      ? "text-[#181816]"
+                      : "text-[#8C857B]"
                 }`}
               >
                 <span className="font-mono text-[10px]">
                   {isCompleted ? (
-                    <Check className="h-3 w-3 text-[#1D4ED8]" />
+                    <Check className="h-3 w-3 text-[#1B4D3E]" />
                   ) : (
                     step.num
                   )}
@@ -698,13 +703,13 @@ export function ContentWorkflowWorkspace() {
         </ol>
       </header>
 
-      {/* Primary Structured Composer Panel */}
-      <section className="divide-y divide-[#F1F5F9] rounded-lg border border-[#E2E8F0] bg-white shadow-[0_1px_2px_rgba(15,23,42,0.03)]">
+      {/* Primary Flush Editorial Composer Band (No Heavy Card Box) */}
+      <section className="divide-y divide-[#E2DDD3] border-b border-[#E2DDD3] pb-2">
         {/* Row 1: Activity Archive Context Bar */}
-        <div className="flex flex-wrap items-center justify-between gap-2 bg-[#F8FAFC] px-4 py-2.5 text-xs">
+        <div className="flex flex-wrap items-center justify-between gap-2 pb-3.5 text-xs">
           <div className="flex flex-wrap items-center gap-2.5">
-            <span className="inline-flex items-center gap-1.5 font-medium text-slate-700">
-              <Building2 className="h-3.5 w-3.5 text-[#1D4ED8]" />
+            <span className="inline-flex items-center gap-1.5 font-medium text-[#57534E]">
+              <Building2 className="h-3.5 w-3.5 text-[#1B4D3E]" />
               <span>关联活动档案</span>
             </span>
             <select
@@ -718,7 +723,7 @@ export function ContentWorkflowWorkspace() {
                   setContentType(found.category);
                 }
               }}
-              className="max-w-[300px] rounded-md border border-[#D5DAE2] bg-white px-2.5 py-1 text-xs text-[#0F172A] outline-none transition focus:border-[#1D4ED8]"
+              className="max-w-[320px] rounded border border-[#D5CFC3] bg-[#FCFBF8] px-2.5 py-1 text-xs text-[#181816] outline-none transition focus:border-[#1B4D3E]"
             >
               <option value="">不关联（仅读取机构基础档案）</option>
               {activities.map((act) => (
@@ -728,7 +733,7 @@ export function ContentWorkflowWorkspace() {
               ))}
             </select>
             {selectedActivity && (
-              <span className="text-[11px] text-slate-500">
+              <span className="text-[11px] text-[#78716C]">
                 已载入：
                 {selectedActivity.participantCount || selectedActivity.location}
               </span>
@@ -736,27 +741,27 @@ export function ContentWorkflowWorkspace() {
           </div>
           <Link
             href="/organization"
-            className="text-[11px] font-medium text-slate-500 transition hover:text-[#1D4ED8] hover:underline"
+            className="text-[11px] font-medium text-[#57534E] transition hover:text-[#1B4D3E] hover:underline"
           >
             管理机构档案
           </Link>
         </div>
 
         {/* Row 2: Main Topic Input + Platform Selector + Action */}
-        <div className="space-y-3 p-4">
+        <div className="space-y-3 py-4">
           <div className="flex flex-col gap-2.5 lg:flex-row lg:items-center">
-            <div className="flex flex-1 items-center gap-2 rounded-md border border-[#D5DAE2] bg-white px-3 py-1.5 transition focus-within:border-[#1D4ED8] focus-within:ring-2 focus-within:ring-[#1D4ED8]/10">
+            <div className="flex flex-1 items-center gap-2 rounded border border-[#D5CFC3] bg-[#FCFBF8] px-3 py-2 transition focus-within:border-[#1B4D3E]">
               <input
                 type="text"
                 value={topic}
                 onChange={(e) => setTopic(e.target.value)}
                 placeholder={`输入${activePlatformMeta.name}创作主题...`}
-                className="w-full bg-transparent text-sm text-[#0F172A] outline-none placeholder:text-slate-400"
+                className="w-full bg-transparent text-sm text-[#181816] outline-none placeholder:text-[#A8A29E]"
               />
               <button
                 type="button"
                 onClick={handleAutoSelectTopic}
-                className="shrink-0 rounded border border-[#E2E8F0] bg-[#F8FAFC] px-2 py-0.5 text-[11px] font-medium text-slate-600 transition hover:border-slate-300 hover:bg-slate-100 hover:text-[#0F172A]"
+                className="shrink-0 rounded border border-[#E2DDD3] bg-[#F6F4EF] px-2 py-0.5 text-[11px] font-medium text-[#57534E] transition hover:border-[#181816] hover:text-[#181816]"
               >
                 自动匹配
               </button>
@@ -764,7 +769,7 @@ export function ContentWorkflowWorkspace() {
 
             <div className="flex flex-wrap items-center gap-2">
               {/* Platform Segmented Control */}
-              <div className="flex items-center gap-0.5 rounded-md border border-[#E2E8F0] bg-[#F1F5F9] p-0.5">
+              <div className="flex items-center gap-0.5 rounded border border-[#E2DDD3] bg-[#EFECE4] p-0.5">
                 {(Object.keys(PLATFORMS) as PlatformId[]).map((pid) => {
                   const meta = PLATFORMS[pid];
                   const active = platform === pid;
@@ -773,10 +778,10 @@ export function ContentWorkflowWorkspace() {
                       key={pid}
                       type="button"
                       onClick={() => setPlatform(pid)}
-                      className={`rounded-[5px] px-2.5 py-1 text-xs font-medium transition ${
+                      className={`rounded-[3px] px-2.5 py-1 text-xs font-medium transition ${
                         active
-                          ? "bg-white text-[#0F172A] shadow-2xs"
-                          : "text-slate-500 hover:text-[#0F172A]"
+                          ? "bg-[#FCFBF8] text-[#181816]"
+                          : "text-[#78716C] hover:text-[#181816]"
                       }`}
                     >
                       {meta.name}
@@ -788,10 +793,10 @@ export function ContentWorkflowWorkspace() {
               <button
                 type="button"
                 onClick={() => setOptionsExpanded((v) => !v)}
-                className={`inline-flex h-8 w-8 items-center justify-center rounded-md border text-xs font-medium transition ${
+                className={`inline-flex h-8 w-8 items-center justify-center rounded border text-xs font-medium transition ${
                   optionsExpanded
-                    ? "border-[#0F172A] bg-[#0F172A] text-white"
-                    : "border-[#E2E8F0] bg-white text-slate-600 hover:bg-slate-50 hover:text-[#0F172A]"
+                    ? "border-[#181816] bg-[#181816] text-[#FCFBF8]"
+                    : "border-[#D5CFC3] bg-[#FCFBF8] text-[#57534E] hover:border-[#181816] hover:text-[#181816]"
                 }`}
                 title="高级参数"
               >
@@ -802,7 +807,7 @@ export function ContentWorkflowWorkspace() {
                 type="button"
                 onClick={() => void handleRunWorkflow()}
                 disabled={isRunning}
-                className="inline-flex h-8 items-center justify-center gap-1.5 rounded-md bg-[#1D4ED8] px-4 text-xs font-medium text-white shadow-2xs transition hover:bg-[#1E40AF] disabled:opacity-60"
+                className="inline-flex h-8 items-center justify-center gap-1.5 rounded bg-[#1B4D3E] px-4 text-xs font-medium text-[#FCFBF8] transition hover:bg-[#143A2F] disabled:opacity-60"
               >
                 {isRunning ? (
                   <>
@@ -830,21 +835,21 @@ export function ContentWorkflowWorkspace() {
           {/* Quick Topic Presets + Platform Spec */}
           <div className="flex flex-wrap items-center justify-between gap-2">
             <div className="flex flex-wrap items-center gap-1.5">
-              <span className="text-[11px] text-slate-400">快速主题：</span>
+              <span className="text-[11px] text-[#8C857B]">快速主题：</span>
               {QUICK_TOPICS.map((sample) => (
                 <button
                   key={sample.label}
                   type="button"
                   onClick={() => setTopic(sample.text)}
-                  className="rounded border border-[#E2E8F0] bg-[#F8FAFC] px-2 py-0.5 text-[11px] text-slate-600 transition hover:border-slate-300 hover:bg-white hover:text-[#0F172A]"
+                  className="rounded border border-[#E2DDD3] bg-[#FCFBF8] px-2 py-0.5 text-[11px] text-[#57534E] transition hover:border-[#1B4D3E] hover:text-[#1B4D3E]"
                 >
                   {sample.label}
                 </button>
               ))}
             </div>
-            <span className="text-[11px] text-slate-400">
-              {activePlatformMeta.name} · {activePlatformMeta.tagline}（建议{" "}
-              {activePlatformMeta.recommendedLength}）
+            <span className="text-[11px] text-[#8C857B]">
+              {activePlatformMeta.name} · {activePlatformMeta.tagline} · 建议{" "}
+              {activePlatformMeta.recommendedLength}
             </span>
           </div>
 
@@ -858,13 +863,13 @@ export function ContentWorkflowWorkspace() {
                 transition={{ duration: 0.14 }}
                 className="overflow-hidden"
               >
-                <div className="grid grid-cols-2 gap-2.5 border-t border-[#F1F5F9] pt-3 sm:grid-cols-5">
+                <div className="grid grid-cols-2 gap-2.5 border-t border-[#E2DDD3] pt-3 sm:grid-cols-5">
                   <select
                     value={contentType}
                     onChange={(e) =>
                       setContentType(e.target.value as ContentTypeId)
                     }
-                    className="rounded-md border border-[#D5DAE2] bg-white px-2.5 py-1.5 text-xs text-[#0F172A] outline-none focus:border-[#1D4ED8]"
+                    className="rounded border border-[#D5CFC3] bg-[#FCFBF8] px-2.5 py-1.5 text-xs text-[#181816] outline-none focus:border-[#1B4D3E]"
                   >
                     {CONTENT_TYPES.map((ct) => (
                       <option key={ct.id} value={ct.id}>
@@ -875,7 +880,7 @@ export function ContentWorkflowWorkspace() {
                   <select
                     value={tone}
                     onChange={(e) => setTone(e.target.value as ToneId)}
-                    className="rounded-md border border-[#D5DAE2] bg-white px-2.5 py-1.5 text-xs text-[#0F172A] outline-none focus:border-[#1D4ED8]"
+                    className="rounded border border-[#D5CFC3] bg-[#FCFBF8] px-2.5 py-1.5 text-xs text-[#181816] outline-none focus:border-[#1B4D3E]"
                   >
                     {TONES.map((t) => (
                       <option key={t.id} value={t.id}>
@@ -888,7 +893,7 @@ export function ContentWorkflowWorkspace() {
                     onChange={(e) =>
                       setWordCount(e.target.value as WordCountId)
                     }
-                    className="rounded-md border border-[#D5DAE2] bg-white px-2.5 py-1.5 text-xs text-[#0F172A] outline-none focus:border-[#1D4ED8]"
+                    className="rounded border border-[#D5CFC3] bg-[#FCFBF8] px-2.5 py-1.5 text-xs text-[#181816] outline-none focus:border-[#1B4D3E]"
                   >
                     {WORD_COUNTS.map((wc) => (
                       <option key={wc.id} value={wc.id}>
@@ -901,21 +906,21 @@ export function ContentWorkflowWorkspace() {
                     value={keywords}
                     onChange={(e) => setKeywords(e.target.value)}
                     placeholder="核心关键词"
-                    className="rounded-md border border-[#D5DAE2] bg-white px-2.5 py-1.5 text-xs text-[#0F172A] outline-none placeholder:text-slate-400 focus:border-[#1D4ED8]"
+                    className="rounded border border-[#D5CFC3] bg-[#FCFBF8] px-2.5 py-1.5 text-xs text-[#181816] outline-none placeholder:text-[#A8A29E] focus:border-[#1B4D3E]"
                   />
                   <input
                     type="text"
                     value={targetAudience}
                     onChange={(e) => setTargetAudience(e.target.value)}
                     placeholder="目标受众"
-                    className="rounded-md border border-[#D5DAE2] bg-white px-2.5 py-1.5 text-xs text-[#0F172A] outline-none placeholder:text-slate-400 focus:border-[#1D4ED8]"
+                    className="rounded border border-[#D5CFC3] bg-[#FCFBF8] px-2.5 py-1.5 text-xs text-[#181816] outline-none placeholder:text-[#A8A29E] focus:border-[#1B4D3E]"
                   />
                 </div>
               </motion.div>
             )}
           </AnimatePresence>
 
-          {errorMsg && <p className="text-xs text-rose-600">{errorMsg}</p>}
+          {errorMsg && <p className="text-xs text-[#B42318]">{errorMsg}</p>}
         </div>
 
         {/* Row 3: Optional Attachable Image Strip */}
@@ -931,8 +936,8 @@ export function ContentWorkflowWorkspace() {
             handleFiles(e.dataTransfer.files);
           }}
           className={`transition ${
-            images.length === 0 ? "px-4 py-2.5" : "p-3.5"
-          } ${isDragging ? "bg-[#EFF6FF]/60 ring-2 ring-inset ring-[#1D4ED8]" : "bg-[#FAFBFD]"}`}
+            images.length === 0 ? "py-3" : "py-3.5"
+          } ${isDragging ? "bg-[#E9F0ED]/60 px-3 ring-1 ring-[#1B4D3E]" : ""}`}
         >
           <input
             ref={fileInputRef}
@@ -948,10 +953,10 @@ export function ContentWorkflowWorkspace() {
 
           {images.length === 0 ? (
             <div className="flex flex-wrap items-center justify-between gap-2">
-              <div className="flex items-center gap-2 text-xs text-slate-600">
-                <ImagePlus className="h-3.5 w-3.5 text-slate-400" />
-                <span className="font-medium text-[#0F172A]">附加配图</span>
-                <span className="text-slate-400">
+              <div className="flex items-center gap-2 text-xs text-[#57534E]">
+                <ImagePlus className="h-3.5 w-3.5 text-[#8C857B]" />
+                <span className="font-medium text-[#181816]">附加配图</span>
+                <span className="text-[#8C857B]">
                   可选 · 支持拖拽上传，自动隐私打码与 2D 风格化
                 </span>
               </div>
@@ -959,16 +964,16 @@ export function ContentWorkflowWorkspace() {
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="rounded-md border border-[#D5DAE2] bg-white px-2.5 py-1 text-xs font-medium text-[#0F172A] transition hover:border-[#0F172A] hover:bg-[#0F172A] hover:text-white"
+                  className="rounded border border-[#D5CFC3] bg-[#FCFBF8] px-2.5 py-1 text-xs font-medium text-[#181816] transition hover:border-[#181816]"
                 >
                   添加配图
                 </button>
                 <button
                   type="button"
                   onClick={handleLoadSamples}
-                  className="inline-flex items-center gap-1 rounded-md border border-[#E2E8F0] bg-white px-2.5 py-1 text-xs font-medium text-slate-600 transition hover:bg-slate-50 hover:text-[#0F172A]"
+                  className="inline-flex items-center gap-1 rounded border border-[#E2DDD3] bg-transparent px-2.5 py-1 text-xs font-medium text-[#57534E] transition hover:border-[#D5CFC3] hover:text-[#181816]"
                 >
-                  <FileImage className="h-3 w-3 text-slate-400" />
+                  <FileImage className="h-3 w-3 text-[#8C857B]" />
                   <span>载入示例图</span>
                 </button>
               </div>
@@ -978,7 +983,7 @@ export function ContentWorkflowWorkspace() {
               <button
                 type="button"
                 onClick={() => fileInputRef.current?.click()}
-                className="flex h-24 w-24 shrink-0 flex-col items-center justify-center gap-1.5 rounded-md border border-dashed border-[#CBD5E1] bg-white text-slate-500 transition hover:border-[#1D4ED8] hover:text-[#1D4ED8]"
+                className="flex h-24 w-24 shrink-0 flex-col items-center justify-center gap-1.5 rounded border border-dashed border-[#CFC8BA] bg-[#FCFBF8] text-[#78716C] transition hover:border-[#1B4D3E] hover:text-[#1B4D3E]"
               >
                 <ImagePlus className="h-4 w-4" />
                 <span className="text-[11px] font-medium">继续加图</span>
@@ -987,13 +992,13 @@ export function ContentWorkflowWorkspace() {
               {images.map((item) => (
                 <div
                   key={item.id}
-                  className="group relative flex h-24 shrink-0 items-center gap-2.5 rounded-md border border-[#E2E8F0] bg-white p-2 pr-3"
+                  className="group relative flex h-24 shrink-0 items-center gap-2.5 rounded border border-[#E2DDD3] bg-[#FCFBF8] p-2 pr-3"
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
                     src={item.processedUrl}
                     alt={item.name}
-                    className="h-20 w-20 shrink-0 rounded border border-[#E2E8F0] object-cover"
+                    className="h-20 w-20 shrink-0 rounded border border-[#E2DDD3] object-cover"
                   />
 
                   <div className="flex w-36 flex-col justify-between self-stretch py-0.5">
@@ -1005,12 +1010,12 @@ export function ContentWorkflowWorkspace() {
                           updateImageItem(item.id, { caption: e.target.value })
                         }
                         placeholder="图注..."
-                        className="w-full truncate bg-transparent text-xs font-medium text-[#0F172A] outline-none"
+                        className="w-full truncate bg-transparent text-xs font-medium text-[#181816] outline-none"
                       />
                       <button
                         type="button"
                         onClick={() => removeImageItem(item.id)}
-                        className="rounded p-0.5 text-slate-400 transition hover:bg-rose-50 hover:text-rose-600"
+                        className="rounded p-0.5 text-[#8C857B] transition hover:bg-[#FDF2F2] hover:text-[#B42318]"
                         aria-label="删除"
                       >
                         <X className="h-3 w-3" />
@@ -1027,8 +1032,8 @@ export function ContentWorkflowWorkspace() {
                         }
                         className={`rounded px-1.5 py-0.5 text-[10px] font-medium transition ${
                           item.enableRedact
-                            ? "bg-[#0F172A] text-white"
-                            : "bg-slate-100 text-slate-500 hover:text-slate-700"
+                            ? "bg-[#181816] text-[#FCFBF8]"
+                            : "bg-[#EFECE4] text-[#78716C] hover:text-[#181816]"
                         }`}
                       >
                         打码
@@ -1042,8 +1047,8 @@ export function ContentWorkflowWorkspace() {
                         }
                         className={`rounded px-1.5 py-0.5 text-[10px] font-medium transition ${
                           item.enableStylize
-                            ? "bg-[#1D4ED8] text-white"
-                            : "bg-slate-100 text-slate-500 hover:text-slate-700"
+                            ? "bg-[#1B4D3E] text-[#FCFBF8]"
+                            : "bg-[#EFECE4] text-[#78716C] hover:text-[#181816]"
                         }`}
                       >
                         2D
@@ -1056,7 +1061,7 @@ export function ContentWorkflowWorkspace() {
                               stylePreset: e.target.value as Style2DPreset,
                             })
                           }
-                          className="rounded border border-[#E2E8F0] bg-[#F8FAFC] px-1 py-0.5 text-[10px] text-slate-700 outline-none"
+                          className="rounded border border-[#E2DDD3] bg-[#F6F4EF] px-1 py-0.5 text-[10px] text-[#57534E] outline-none"
                         >
                           {STYLE_PRESETS.map((p) => (
                             <option key={p.id} value={p.id}>
@@ -1074,7 +1079,7 @@ export function ContentWorkflowWorkspace() {
                 type="button"
                 onClick={() => void processAllImages()}
                 disabled={isRunning}
-                className="shrink-0 rounded-md bg-[#0F172A] px-3 py-2 text-[11px] font-medium text-white transition hover:bg-slate-800 disabled:opacity-40"
+                className="shrink-0 rounded bg-[#181816] px-3 py-2 text-[11px] font-medium text-[#FCFBF8] transition hover:bg-[#2F2E2A] disabled:opacity-40"
               >
                 预览处理
               </button>
@@ -1083,7 +1088,7 @@ export function ContentWorkflowWorkspace() {
         </div>
       </section>
 
-      {/* Editorial Publication Canvas + Compliance & Research Rail */}
+      {/* Editorial Publication Canvas + Unified Hairline Inspector Rail */}
       <AnimatePresence mode="wait">
         {!assembledDoc ? (
           <motion.div
@@ -1091,14 +1096,14 @@ export function ContentWorkflowWorkspace() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="flex min-h-[260px] flex-col items-center justify-center rounded-lg border border-dashed border-[#CBD5E1] bg-white/60 text-center"
+            className="flex min-h-[280px] flex-col items-center justify-center border border-dashed border-[#D5CFC3] bg-[#FCFBF8]/60 px-6 py-14 text-center"
           >
-            <div className="h-6 w-px bg-[#CBD5E1]" />
-            <p className="mt-3 text-sm font-medium text-slate-500">
+            <div className="h-7 w-px bg-[#CFC8BA]" />
+            <p className="mt-4 font-editorial text-base font-medium text-[#57534E]">
               成稿将在此呈现
             </p>
-            <p className="mt-1 text-xs text-slate-400">
-              选择活动档案或输入主题，点击「生成推流文案」启动创作流程
+            <p className="mt-1.5 max-w-md text-xs leading-relaxed text-[#8C857B]">
+              关联上方活动档案或输入主题，点击「生成推流文案」即可启动趋势调研、撰文与合规审查流程
             </p>
           </motion.div>
         ) : (
@@ -1107,20 +1112,20 @@ export function ContentWorkflowWorkspace() {
             initial={{ opacity: 0, y: 6 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.16, ease: [0.16, 1, 0.3, 1] }}
-            className="grid grid-cols-1 items-start gap-6 lg:grid-cols-12"
+            className="grid grid-cols-1 items-start gap-8 lg:grid-cols-12"
           >
             {/* Main Publication Column (8 cols) */}
-            <div className="space-y-3.5 lg:col-span-8">
+            <div className="space-y-4 lg:col-span-8">
               {/* Document Toolbar */}
               <div className="flex flex-wrap items-center justify-between gap-3">
-                <div className="flex items-center gap-0.5 rounded-md border border-[#E2E8F0] bg-[#F1F5F9] p-0.5">
+                <div className="flex items-center gap-0.5 rounded border border-[#E2DDD3] bg-[#EFECE4] p-0.5">
                   <button
                     type="button"
                     onClick={() => setDocViewMode("preview")}
-                    className={`rounded-[5px] px-3 py-1 text-xs font-medium transition ${
+                    className={`rounded-[3px] px-3 py-1 text-xs font-medium transition ${
                       docViewMode === "preview"
-                        ? "bg-white text-[#0F172A] shadow-2xs"
-                        : "text-slate-500 hover:text-[#0F172A]"
+                        ? "bg-[#FCFBF8] text-[#181816]"
+                        : "text-[#78716C] hover:text-[#181816]"
                     }`}
                   >
                     预览
@@ -1128,10 +1133,10 @@ export function ContentWorkflowWorkspace() {
                   <button
                     type="button"
                     onClick={() => setDocViewMode("edit")}
-                    className={`rounded-[5px] px-3 py-1 text-xs font-medium transition ${
+                    className={`rounded-[3px] px-3 py-1 text-xs font-medium transition ${
                       docViewMode === "edit"
-                        ? "bg-white text-[#0F172A] shadow-2xs"
-                        : "text-slate-500 hover:text-[#0F172A]"
+                        ? "bg-[#FCFBF8] text-[#181816]"
+                        : "text-[#78716C] hover:text-[#181816]"
                     }`}
                   >
                     编辑
@@ -1140,10 +1145,10 @@ export function ContentWorkflowWorkspace() {
                     <button
                       type="button"
                       onClick={() => setTitlesExpanded((v) => !v)}
-                      className={`rounded-[5px] px-3 py-1 text-xs font-medium transition ${
+                      className={`rounded-[3px] px-3 py-1 text-xs font-medium transition ${
                         titlesExpanded
-                          ? "bg-[#0F172A] text-white"
-                          : "text-slate-500 hover:text-[#0F172A]"
+                          ? "bg-[#181816] text-[#FCFBF8]"
+                          : "text-[#78716C] hover:text-[#181816]"
                       }`}
                     >
                       备选标题 ({candidateTitles.length})
@@ -1164,7 +1169,7 @@ export function ContentWorkflowWorkspace() {
                         ? "完成右侧「发布前审查」获得发布资格后解锁导出"
                         : "导出 DOCX"
                     }
-                    className="inline-flex items-center gap-1 rounded-md border border-[#E2E8F0] bg-white px-2.5 py-1.5 text-xs font-medium text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-45"
+                    className="inline-flex items-center gap-1 rounded border border-[#D5CFC3] bg-[#FCFBF8] px-2.5 py-1.5 text-xs font-medium text-[#57534E] transition hover:border-[#181816] hover:text-[#181816] disabled:cursor-not-allowed disabled:opacity-45"
                   >
                     {isExportingDocx && (
                       <Loader2 className="h-3 w-3 animate-spin" />
@@ -1178,7 +1183,7 @@ export function ContentWorkflowWorkspace() {
                       exportDocumentAsPdf(assembledDoc);
                     }}
                     disabled={Boolean(reviewReport && !reviewReport.isEligible)}
-                    className="rounded-md border border-[#E2E8F0] bg-white px-2.5 py-1.5 text-xs font-medium text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-45"
+                    className="rounded border border-[#D5CFC3] bg-[#FCFBF8] px-2.5 py-1.5 text-xs font-medium text-[#57534E] transition hover:border-[#181816] hover:text-[#181816] disabled:cursor-not-allowed disabled:opacity-45"
                   >
                     PDF
                   </button>
@@ -1189,7 +1194,7 @@ export function ContentWorkflowWorkspace() {
                       exportDocumentAsMarkdown(assembledDoc);
                     }}
                     disabled={Boolean(reviewReport && !reviewReport.isEligible)}
-                    className="rounded-md border border-[#E2E8F0] bg-white px-2.5 py-1.5 text-xs font-medium text-slate-700 transition hover:bg-slate-50 disabled:cursor-not-allowed disabled:opacity-45"
+                    className="rounded border border-[#D5CFC3] bg-[#FCFBF8] px-2.5 py-1.5 text-xs font-medium text-[#57534E] transition hover:border-[#181816] hover:text-[#181816] disabled:cursor-not-allowed disabled:opacity-45"
                   >
                     MD
                   </button>
@@ -1202,15 +1207,15 @@ export function ContentWorkflowWorkspace() {
                         ? "完成右侧「发布前审查」获得发布资格后解锁复制"
                         : "已获发布资格，复制全文去外部平台发布"
                     }
-                    className={`inline-flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-medium transition ${
+                    className={`inline-flex items-center gap-1.5 rounded px-3 py-1.5 text-xs font-medium transition ${
                       reviewReport?.isEligible
-                        ? "bg-[#1D4ED8] text-white hover:bg-[#1E40AF]"
-                        : "cursor-not-allowed border border-[#E2E8F0] bg-[#F1F5F9] text-slate-500"
+                        ? "bg-[#1B4D3E] text-[#FCFBF8] hover:bg-[#143A2F]"
+                        : "cursor-not-allowed border border-[#E2DDD3] bg-[#EFECE4] text-[#8C857B]"
                     }`}
                   >
                     {reviewReport?.isEligible ? (
                       copiedKey === "full" ? (
-                        <Check className="h-3 w-3 text-emerald-300" />
+                        <Check className="h-3 w-3 text-[#86EFAC]" />
                       ) : (
                         <ShieldCheck className="h-3 w-3" />
                       )
@@ -1244,10 +1249,10 @@ export function ContentWorkflowWorkspace() {
                           key={i}
                           type="button"
                           onClick={() => handleTitleChange(t)}
-                          className={`rounded-md border px-2.5 py-1 text-xs transition ${
+                          className={`rounded border px-2.5 py-1 text-xs transition ${
                             active
-                              ? "border-[#1D4ED8] bg-[#EFF6FF] font-medium text-[#1D4ED8]"
-                              : "border-[#E2E8F0] bg-white text-slate-600 hover:border-slate-300 hover:text-[#0F172A]"
+                              ? "border-[#1B4D3E] bg-[#E9F0ED] font-medium text-[#1B4D3E]"
+                              : "border-[#E2DDD3] bg-[#FCFBF8] text-[#57534E] hover:border-[#181816] hover:text-[#181816]"
                           }`}
                         >
                           {t}
@@ -1258,28 +1263,28 @@ export function ContentWorkflowWorkspace() {
                 )}
               </AnimatePresence>
 
-              {/* Publication Sheet */}
-              <div className="rounded-lg border border-[#E2E8F0] bg-white p-7 shadow-[0_1px_2px_rgba(15,23,42,0.03)] sm:p-9">
+              {/* Warm Ivory Editorial Publication Sheet */}
+              <div className="border-t-2 border-[#181816] bg-[#FCFBF8] px-7 py-8 sm:px-10 sm:py-10">
                 {docViewMode === "edit" ? (
                   <div className="space-y-5">
                     <input
                       type="text"
                       value={assembledDoc.title}
                       onChange={(e) => handleTitleChange(e.target.value)}
-                      className="w-full border-b border-[#E2E8F0] pb-3 font-editorial text-2xl font-semibold text-[#0F172A] outline-none focus:border-[#1D4ED8]"
+                      className="w-full border-b border-[#E2DDD3] pb-3 font-editorial text-2xl font-semibold text-[#181816] outline-none focus:border-[#1B4D3E]"
                     />
                     <textarea
                       rows={16}
                       value={assembledDoc.body}
                       onChange={(e) => handleBodyChange(e.target.value)}
-                      className="w-full resize-y bg-transparent text-[15px] leading-8 text-slate-800 outline-none"
+                      className="w-full resize-y bg-transparent text-[15px] leading-8 text-[#292524] outline-none"
                     />
                   </div>
                 ) : (
                   <article className="space-y-6">
-                    <header className="space-y-3 border-b border-[#F1F5F9] pb-5">
-                      <div className="flex items-center gap-2.5 text-[11px] text-slate-400">
-                        <span className="rounded bg-[#0F172A] px-2 py-0.5 font-medium text-white">
+                    <header className="space-y-3 border-b border-[#E2DDD3] pb-5">
+                      <div className="flex items-center gap-2.5 text-[11px] text-[#8C857B]">
+                        <span className="rounded bg-[#181816] px-2 py-0.5 font-medium text-[#FCFBF8]">
                           {assembledDoc.platformName}
                         </span>
                         <span className="font-mono tabular-nums">
@@ -1291,15 +1296,15 @@ export function ContentWorkflowWorkspace() {
                           )}
                         </span>
                       </div>
-                      <h2 className="font-editorial text-2xl font-semibold leading-snug text-[#0F172A] sm:text-[28px]">
+                      <h2 className="font-editorial text-2xl font-semibold leading-snug text-[#181816] sm:text-[28px]">
                         {assembledDoc.title}
                       </h2>
                     </header>
 
                     {assembledDoc.hook && (
-                      <div className="border-l-2 border-[#1D4ED8] bg-[#F8FAFC] py-2.5 pl-4 pr-3">
+                      <div className="border-l-2 border-[#1B4D3E] bg-[#F6F4EF] py-3 pl-4 pr-3.5">
                         <div className="mb-1 flex items-center justify-between">
-                          <span className="text-[11px] font-semibold text-[#1D4ED8]">
+                          <span className="text-[11px] font-semibold text-[#1B4D3E]">
                             {assembledDoc.platform === "douyin"
                               ? "前 3 秒钩子"
                               : "黄金开头"}
@@ -1309,12 +1314,12 @@ export function ContentWorkflowWorkspace() {
                             onClick={() =>
                               void handleCopyText(assembledDoc.hook!, "hook")
                             }
-                            className="text-[11px] text-slate-400 transition hover:text-[#0F172A]"
+                            className="text-[11px] text-[#8C857B] transition hover:text-[#181816]"
                           >
                             {copiedKey === "hook" ? "已复制" : "复制"}
                           </button>
                         </div>
-                        <p className="text-[15px] font-medium leading-relaxed text-[#0F172A]">
+                        <p className="text-[15px] font-medium leading-relaxed text-[#181816]">
                           {assembledDoc.hook}
                         </p>
                       </div>
@@ -1325,7 +1330,7 @@ export function ContentWorkflowWorkspace() {
                         block.type === "paragraph" ? (
                           <p
                             key={idx}
-                            className="whitespace-pre-wrap text-[15px] leading-8 text-slate-800"
+                            className="whitespace-pre-wrap text-[15px] leading-8 text-[#292524]"
                           >
                             {block.text}
                           </p>
@@ -1335,10 +1340,10 @@ export function ContentWorkflowWorkspace() {
                             <img
                               src={block.image.dataUrl}
                               alt={block.image.caption || block.image.name}
-                              className="mx-auto max-h-96 rounded-md border border-[#E2E8F0] object-contain"
+                              className="mx-auto max-h-96 rounded border border-[#E2DDD3] object-contain"
                             />
                             {block.image.caption && (
-                              <figcaption className="mt-2 text-center text-xs text-slate-400">
+                              <figcaption className="mt-2 text-center text-xs text-[#8C857B]">
                                 {block.image.caption}
                               </figcaption>
                             )}
@@ -1348,11 +1353,11 @@ export function ContentWorkflowWorkspace() {
                     </div>
 
                     {assembledDoc.tags.length > 0 && (
-                      <footer className="flex flex-wrap items-center gap-2 border-t border-[#F1F5F9] pt-5">
+                      <footer className="flex flex-wrap items-center gap-2 border-t border-[#E2DDD3] pt-5">
                         {assembledDoc.tags.map((tag) => (
                           <span
                             key={tag}
-                            className="rounded bg-[#EFF6FF] px-2 py-0.5 text-xs font-medium text-[#1D4ED8]"
+                            className="rounded bg-[#E9F0ED] px-2 py-0.5 text-xs font-medium text-[#1B4D3E]"
                           >
                             #{tag.replace(/^#/, "")}
                           </span>
@@ -1364,56 +1369,58 @@ export function ContentWorkflowWorkspace() {
               </div>
             </div>
 
-            {/* Right 4 Cols: Compliance Review + Text Redaction + Platform Research */}
-            <aside className="space-y-4 lg:col-span-4 lg:pt-11">
-              <RedactionAndReviewPanel
-                title={assembledDoc.title}
-                hook={assembledDoc.hook ?? ""}
-                body={assembledDoc.body}
-                onApplyTextChange={({
-                  title: nextTitle,
-                  hook: nextHook,
-                  body: nextBody,
-                }) => {
-                  if (currentResult) {
-                    const nextTitles =
-                      currentResult.titles.length > 0
-                        ? [nextTitle, ...currentResult.titles.slice(1)]
-                        : [nextTitle];
-                    updateCurrentResultPatch({
-                      titles: nextTitles,
-                      hook: nextHook,
-                      body: nextBody,
-                    });
-                  }
-                }}
-                activity={linkedResultActivity}
-                orgRedlines={orgProfile.complianceRedlines}
-                unredactedImageCount={unredactedImageCount}
-                redactionRecords={currentResult?.redactionRecords ?? []}
-                onChangeRedactionRecords={updateCurrentRedactionRecords}
-                reviewState={currentResult?.reviewState}
-                onChangeReviewState={updateCurrentReviewState}
-              />
+            {/* Right 4 Cols: Unified Hairline Inspector Rail (Zero Stacked Cards) */}
+            <aside className="divide-y divide-[#E2DDD3] border-t border-[#E2DDD3] pt-6 lg:col-span-4 lg:border-l lg:border-t-0 lg:pl-7 lg:pt-11">
+              <div className="pb-6">
+                <RedactionAndReviewPanel
+                  title={assembledDoc.title}
+                  hook={assembledDoc.hook ?? ""}
+                  body={assembledDoc.body}
+                  onApplyTextChange={({
+                    title: nextTitle,
+                    hook: nextHook,
+                    body: nextBody,
+                  }) => {
+                    if (currentResult) {
+                      const nextTitles =
+                        currentResult.titles.length > 0
+                          ? [nextTitle, ...currentResult.titles.slice(1)]
+                          : [nextTitle];
+                      updateCurrentResultPatch({
+                        titles: nextTitles,
+                        hook: nextHook,
+                        body: nextBody,
+                      });
+                    }
+                  }}
+                  activity={linkedResultActivity}
+                  orgRedlines={orgProfile.complianceRedlines}
+                  unredactedImageCount={unredactedImageCount}
+                  redactionRecords={currentResult?.redactionRecords ?? []}
+                  onChangeRedactionRecords={updateCurrentRedactionRecords}
+                  reviewState={currentResult?.reviewState}
+                  onChangeReviewState={updateCurrentReviewState}
+                />
+              </div>
 
               {matchedTrendInsights && (
-                <div className="rounded-lg border border-[#E2E8F0] bg-white p-4 shadow-[0_1px_2px_rgba(15,23,42,0.03)]">
+                <div className="py-5">
                   <div className="mb-2 flex items-center justify-between gap-2">
-                    <span className="text-xs font-semibold text-[#0F172A]">
+                    <span className="text-xs font-semibold text-[#181816]">
                       {docPlatformMeta.name}调研参考
                     </span>
-                    <span className="rounded bg-[#EFF6FF] px-1.5 py-0.5 text-[10px] font-medium text-[#1D4ED8]">
+                    <span className="rounded bg-[#E9F0ED] px-1.5 py-0.5 text-[10px] font-medium text-[#1B4D3E]">
                       {matchedTrendInsights.sourceLabel}
                     </span>
                   </div>
-                  <p className="mb-3 text-xs leading-relaxed text-slate-500">
+                  <p className="mb-3 text-xs leading-relaxed text-[#57534E]">
                     {matchedTrendInsights.summary}
                   </p>
                   <div className="flex flex-wrap gap-1.5">
                     {matchedTrendInsights.hotKeywords.map((kw) => (
                       <span
                         key={kw}
-                        className="rounded border border-[#E2E8F0] bg-[#F8FAFC] px-2 py-0.5 text-[11px] text-slate-700"
+                        className="rounded border border-[#E2DDD3] bg-[#FCFBF8] px-2 py-0.5 text-[11px] text-[#57534E]"
                       >
                         {kw}
                       </span>
@@ -1423,26 +1430,26 @@ export function ContentWorkflowWorkspace() {
               )}
 
               {currentResult?.cta && (
-                <div className="rounded-lg border border-[#E2E8F0] bg-white p-4 shadow-[0_1px_2px_rgba(15,23,42,0.03)]">
-                  <span className="mb-1.5 block text-xs font-semibold text-[#0F172A]">
+                <div className="py-5">
+                  <span className="mb-1.5 block text-xs font-semibold text-[#181816]">
                     互动引导
                   </span>
-                  <p className="text-xs leading-relaxed text-slate-600">
+                  <p className="text-xs leading-relaxed text-[#57534E]">
                     {currentResult.cta}
                   </p>
                 </div>
               )}
 
               {assembledDoc.algorithmTips.length > 0 && (
-                <div className="rounded-lg border border-[#E2E8F0] bg-white p-4 shadow-[0_1px_2px_rgba(15,23,42,0.03)]">
-                  <span className="mb-2 block text-xs font-semibold text-[#0F172A]">
+                <div className="py-5">
+                  <span className="mb-2 block text-xs font-semibold text-[#181816]">
                     {docPlatformMeta.name}发布建议
                   </span>
                   <ul className="space-y-1.5">
                     {assembledDoc.algorithmTips.map((tip, i) => (
                       <li
                         key={i}
-                        className="text-xs leading-relaxed text-slate-500"
+                        className="text-xs leading-relaxed text-[#57534E]"
                       >
                         — {tip}
                       </li>
