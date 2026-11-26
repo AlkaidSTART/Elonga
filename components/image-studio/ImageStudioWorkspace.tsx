@@ -14,12 +14,12 @@ function createSampleImageDataUrl(): string {
   canvas.height = 640;
   const ctx = canvas.getContext("2d")!;
 
-  // Deep slate studio backdrop
-  ctx.fillStyle = "#0F172A";
+  // Warm editorial paper studio backdrop
+  ctx.fillStyle = "#EFECE4";
   ctx.fillRect(0, 0, 960, 640);
 
   // Subtle architectural grid
-  ctx.strokeStyle = "rgba(148, 163, 184, 0.08)";
+  ctx.strokeStyle = "rgba(24, 24, 22, 0.05)";
   ctx.lineWidth = 1;
   for (let x = 0; x <= 960; x += 40) {
     ctx.beginPath();
@@ -34,31 +34,31 @@ function createSampleImageDataUrl(): string {
     ctx.stroke();
   }
 
-  // Top cobalt bar
-  ctx.fillStyle = "#1D4ED8";
+  // Top pine green bar
+  ctx.fillStyle = "#1B4D3E";
   ctx.fillRect(0, 0, 960, 6);
 
   // Clean document card for redaction / stylize testing
-  ctx.fillStyle = "#FFFFFF";
+  ctx.fillStyle = "#FCFBF8";
   ctx.fillRect(72, 76, 816, 488);
-  ctx.strokeStyle = "#CBD5E1";
+  ctx.strokeStyle = "#D5CFC3";
   ctx.lineWidth = 2;
   ctx.strokeRect(72, 76, 816, 488);
 
   // Card header
-  ctx.fillStyle = "#F8FAFC";
+  ctx.fillStyle = "#F6F4EF";
   ctx.fillRect(73, 77, 814, 88);
-  ctx.fillStyle = "#E2E8F0";
+  ctx.fillStyle = "#E2DDD3";
   ctx.fillRect(73, 165, 814, 1);
 
-  ctx.fillStyle = "#1D4ED8";
+  ctx.fillStyle = "#1B4D3E";
   ctx.fillRect(108, 108, 4, 26);
 
-  ctx.fillStyle = "#0F172A";
+  ctx.fillStyle = "#181816";
   ctx.font = "600 24px -apple-system, BlinkMacSystemFont, sans-serif";
   ctx.fillText("公益物资交接单 · 现场核验样本", 126, 129);
 
-  ctx.fillStyle = "#64748B";
+  ctx.fillStyle = "#8C857B";
   ctx.font = "500 13px -apple-system, BlinkMacSystemFont, sans-serif";
   ctx.fillText("示例样本 · 960×640", 720, 125);
 
@@ -72,16 +72,16 @@ function createSampleImageDataUrl(): string {
 
   rows.forEach(([k, v], i) => {
     const y = 224 + i * 64;
-    ctx.fillStyle = "#64748B";
+    ctx.fillStyle = "#78716C";
     ctx.font = "500 15px -apple-system, BlinkMacSystemFont, sans-serif";
     ctx.fillText(k, 108, y);
 
-    ctx.fillStyle = "#0F172A";
+    ctx.fillStyle = "#181816";
     ctx.font = "600 17px ui-monospace, SFMono-Regular, Menlo, monospace";
     ctx.fillText(v, 280, y);
 
     if (i < rows.length - 1) {
-      ctx.fillStyle = "#F1F5F9";
+      ctx.fillStyle = "#E2DDD3";
       ctx.fillRect(108, y + 22, 744, 1);
     }
   });
@@ -140,7 +140,7 @@ export function ImageStudioWorkspace() {
             图片工坊
           </h1>
           <p className="mt-1 text-xs text-[#78716C]">
-            公益现场素材的隐私保护打码与二维插画风格化暗房
+            公益现场素材的隐私保护打码与二维插画风格化工作台
           </p>
         </header>
 
@@ -195,7 +195,7 @@ export function ImageStudioWorkspace() {
             </div>
 
             <h2 className="font-editorial text-lg font-semibold text-[#181816]">
-              拖放或选择本地图片进入暗房
+              拖放或选择本地图片进入工作台
             </h2>
             <p className="mt-1.5 text-xs text-[#78716C]">
               载入后将自动扫描敏感信息区域，随时可切换至二维风格化
@@ -236,69 +236,96 @@ export function ImageStudioWorkspace() {
   }
 
   return (
-    <div className="overflow-hidden rounded border border-[#2E2C27] bg-[#161513] text-[#F5F2EB]">
-      {/* Editor Top Bar */}
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#2E2C27] bg-[#1E1D1A] px-5 py-3">
-        <div className="flex items-center gap-4">
-          <span className="font-editorial text-sm font-semibold tracking-tight text-[#FCFBF8]">
-            图片工坊
-          </span>
-
-          <div className="flex items-center gap-0.5 rounded border border-[#2E2C27] bg-[#161513] p-0.5">
-            <button
-              type="button"
-              onClick={() => setActiveMode("mosaic")}
-              className={`rounded-[3px] px-3 py-1 text-xs font-medium transition ${
-                activeMode === "mosaic"
-                  ? "bg-[#1B4D3E] text-[#FCFBF8]"
-                  : "text-[#A8A29E] hover:text-[#FCFBF8]"
-              }`}
-            >
-              智能打码
-            </button>
-            <button
-              type="button"
-              onClick={() => setActiveMode("stylize")}
-              className={`rounded-[3px] px-3 py-1 text-xs font-medium transition ${
-                activeMode === "stylize"
-                  ? "bg-[#1B4D3E] text-[#FCFBF8]"
-                  : "text-[#A8A29E] hover:text-[#FCFBF8]"
-              }`}
-            >
-              二维风格化
-            </button>
+    <div className="space-y-6">
+      {/* Editorial Masthead Header */}
+      <header className="flex flex-col gap-4 border-b border-[#181816]/15 pb-4 sm:flex-row sm:items-end sm:justify-between">
+        <div className="min-w-0">
+          <div className="flex flex-wrap items-baseline gap-3">
+            <h1 className="font-editorial text-2xl font-semibold tracking-tight text-[#181816]">
+              图片工坊
+            </h1>
+            {imageMeta && (
+              <div className="flex items-center gap-2 font-mono text-[11px] text-[#8C857B] tabular-nums">
+                <span className="max-w-[200px] truncate text-[#57534E]">
+                  {imageMeta.name}
+                </span>
+                <span aria-hidden="true">·</span>
+                <span>
+                  {imageMeta.width}×{imageMeta.height}
+                </span>
+              </div>
+            )}
           </div>
+          <p className="mt-1 text-xs text-[#78716C]">
+            {activeMode === "mosaic"
+              ? "智能识别并遮盖敏感文字、号码与人像，导出纯净合规素材"
+              : "将现场实拍转为柔和插画或绘本风格，兼顾隐私保护与叙事温度"}
+          </p>
         </div>
 
-        <div className="flex items-center gap-3">
-          {imageMeta && (
-            <span className="hidden font-mono text-[11px] text-[#8C857B] tabular-nums sm:inline">
-              {imageMeta.width}×{imageMeta.height}
-            </span>
-          )}
+        <div className="flex flex-wrap items-center gap-2.5">
+          {/* Segmented Mode Switcher matching Elonga Editorial style */}
+          <div className="relative flex items-center gap-0.5 rounded-md border border-[#E2DDD3] bg-[#EFECE4] p-0.5">
+            {(
+              [
+                { id: "mosaic", label: "智能打码" },
+                { id: "stylize", label: "二维风格化" },
+              ] as const
+            ).map((tab) => {
+              const isSelected = activeMode === tab.id;
+              return (
+                <button
+                  key={tab.id}
+                  type="button"
+                  onClick={() => setActiveMode(tab.id)}
+                  className={`relative rounded-[4px] px-3 py-1 text-xs font-medium transition-colors ${
+                    isSelected
+                      ? "text-[#1B4D3E]"
+                      : "text-[#78716C] hover:text-[#181816]"
+                  }`}
+                >
+                  {isSelected && (
+                    <motion.span
+                      layoutId="imageStudioModePill"
+                      transition={{
+                        type: "spring",
+                        stiffness: 480,
+                        damping: 36,
+                      }}
+                      className="absolute inset-0 rounded-[4px] bg-[#FCFBF8] shadow-[0_1px_2px_rgba(24,24,22,0.06)]"
+                    />
+                  )}
+                  <span className="relative z-10">{tab.label}</span>
+                </button>
+              );
+            })}
+          </div>
+
           <button
             type="button"
             onClick={clearImage}
-            className="inline-flex items-center gap-1.5 rounded border border-[#3A3731] bg-[#262420] px-3 py-1.5 text-xs font-medium text-[#E7E2D8] transition hover:border-[#8C857B] hover:text-white"
+            className="inline-flex items-center gap-1.5 rounded border border-[#D5CFC3] bg-[#FCFBF8] px-3 py-1.5 text-xs font-medium text-[#181816] transition hover:border-[#181816] hover:bg-[#EFECE4]/50"
           >
-            <RefreshCw className="h-3.5 w-3.5" />
+            <RefreshCw className="h-3.5 w-3.5 text-[#78716C]" />
             <span>更换图片</span>
           </button>
         </div>
-      </div>
+      </header>
 
-      {/* Editor Body */}
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={activeMode}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.14 }}
-        >
-          {activeMode === "mosaic" ? <MosaicEditor /> : <Stylize2DPanel />}
-        </motion.div>
-      </AnimatePresence>
+      {/* Editorial Studio Desk Surface */}
+      <div className="overflow-hidden rounded-lg border border-[#E2DDD3] bg-[#FCFBF8] shadow-[0_1px_3px_rgba(24,24,22,0.04)]">
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeMode}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.14 }}
+          >
+            {activeMode === "mosaic" ? <MosaicEditor /> : <Stylize2DPanel />}
+          </motion.div>
+        </AnimatePresence>
+      </div>
     </div>
   );
 }

@@ -40,6 +40,13 @@ body {
   font-variant-numeric: tabular-nums;
 }
 
+.studio-grid-light {
+  background-image:
+    linear-gradient(to right, rgba(24, 24, 22, 0.045) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(24, 24, 22, 0.045) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
 .studio-grid-dark {
   background-image:
     linear-gradient(to right, rgba(226, 221, 211, 0.045) 1px, transparent 1px),
