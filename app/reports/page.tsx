@@ -83,52 +83,52 @@ export default function ReportsPage() {
       tooltip: {
         trigger: "axis",
         axisPointer: { type: "shadow" },
-        backgroundColor: "#FFFFFF",
-        borderColor: "#E5E7EB",
+        backgroundColor: "#FCFBF8",
+        borderColor: "#E2DDD3",
         borderWidth: 1,
-        textStyle: { color: "#111827", fontSize: 12 },
+        textStyle: { color: "#181816", fontSize: 12 },
       },
       legend: {
         top: 0,
         right: 0,
         itemWidth: 8,
         itemHeight: 8,
-        textStyle: { color: "#64748B", fontSize: 11 },
+        textStyle: { color: "#57534E", fontSize: 11 },
       },
-      grid: { left: 6, right: 8, top: 30, bottom: 4, containLabel: true },
+      grid: { left: 6, right: 12, top: 30, bottom: 4, containLabel: true },
       xAxis: {
         type: "category",
         data: snapshot.platformBreakdown.map((p) => p.platformName),
-        axisLine: { lineStyle: { color: "#E2E8F0" } },
+        axisLine: { lineStyle: { color: "#DDD7CA" } },
         axisTick: { show: false },
-        axisLabel: { color: "#475569", fontSize: 11 },
+        axisLabel: { color: "#57534E", fontSize: 11 },
       },
       yAxis: {
         type: "value",
         minInterval: 1,
-        splitLine: { lineStyle: { color: "#F1F5F9" } },
-        axisLabel: { color: "#94A3B8", fontSize: 11 },
+        splitLine: { lineStyle: { color: "#EAE5DC", type: "dashed" } },
+        axisLabel: { color: "#8C857B", fontSize: 11 },
       },
       series: [
         {
           name: "已发布",
           type: "bar",
-          barMaxWidth: 16,
-          itemStyle: { color: "#1D4ED8", borderRadius: [2, 2, 0, 0] },
+          barMaxWidth: 14,
+          itemStyle: { color: "#1B4D3E", borderRadius: [2, 2, 0, 0] },
           data: snapshot.platformBreakdown.map((p) => p.publishedCount),
         },
         {
           name: "已归档",
           type: "bar",
-          barMaxWidth: 16,
-          itemStyle: { color: "#059669", borderRadius: [2, 2, 0, 0] },
+          barMaxWidth: 14,
+          itemStyle: { color: "#C4BEB2", borderRadius: [2, 2, 0, 0] },
           data: snapshot.platformBreakdown.map((p) => p.archivedCount),
         },
         {
           name: "爆款",
           type: "bar",
-          barMaxWidth: 16,
-          itemStyle: { color: "#D97706", borderRadius: [2, 2, 0, 0] },
+          barMaxWidth: 14,
+          itemStyle: { color: "#B85D3B", borderRadius: [2, 2, 0, 0] },
           data: snapshot.platformBreakdown.map((p) => p.viralCount),
         },
       ],
@@ -219,14 +219,14 @@ export default function ReportsPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-9">
       {/* Header */}
-      <header className="flex flex-col gap-4 border-b border-[#E5E7EB] pb-4 sm:flex-row sm:items-center sm:justify-between">
+      <header className="flex flex-col gap-4 border-b border-[#181816]/15 pb-5 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="text-lg font-semibold tracking-tight text-[#111827]">
+          <h1 className="font-editorial text-2xl font-semibold tracking-tight text-[#181816]">
             运营月报
           </h1>
-          <p className="mt-0.5 text-xs text-gray-500">
+          <p className="mt-1 text-xs text-[#78716C]">
             汇总当月活动档案与发布数据，生成可编辑与导出的月度报告
           </p>
         </div>
@@ -239,17 +239,17 @@ export default function ReportsPage() {
               setSelectedMonthOverride(e.target.value);
               setActiveReportId(null);
             }}
-            className="rounded-md border border-[#E5E7EB] bg-white px-3 py-1.5 font-mono text-xs text-[#111827] outline-none focus:border-[#3451E5]"
+            className="rounded border border-[#D5CFC3] bg-[#FCFBF8] px-3 py-1.5 font-mono text-xs text-[#181816] outline-none focus:border-[#1B4D3E]"
           />
 
-          <div className="flex items-center gap-0.5 rounded-md border border-[#E5E7EB] bg-[#F3F4F6] p-0.5">
+          <div className="flex items-center gap-0.5 rounded border border-[#E2DDD3] bg-[#EFECE4] p-0.5">
             <button
               type="button"
               onClick={() => setFocus("internal")}
-              className={`rounded-[5px] px-2.5 py-1 text-xs font-medium transition ${
+              className={`rounded-[3px] px-2.5 py-1 text-xs font-medium transition ${
                 focus === "internal"
-                  ? "bg-white text-[#111827] shadow-2xs"
-                  : "text-gray-500 hover:text-[#111827]"
+                  ? "bg-[#FCFBF8] text-[#181816]"
+                  : "text-[#78716C] hover:text-[#181816]"
               }`}
             >
               对内复盘
@@ -257,10 +257,10 @@ export default function ReportsPage() {
             <button
               type="button"
               onClick={() => setFocus("donor")}
-              className={`rounded-[5px] px-2.5 py-1 text-xs font-medium transition ${
+              className={`rounded-[3px] px-2.5 py-1 text-xs font-medium transition ${
                 focus === "donor"
-                  ? "bg-white text-[#111827] shadow-2xs"
-                  : "text-gray-500 hover:text-[#111827]"
+                  ? "bg-[#FCFBF8] text-[#181816]"
+                  : "text-[#78716C] hover:text-[#181816]"
               }`}
             >
               对外汇报
@@ -271,7 +271,7 @@ export default function ReportsPage() {
             type="button"
             disabled={isGenerating}
             onClick={() => void handleGenerateReport()}
-            className="inline-flex items-center gap-1.5 rounded-md bg-[#3451E5] px-3.5 py-1.5 text-xs font-medium text-white transition hover:bg-[#2740C7] disabled:opacity-60"
+            className="inline-flex items-center gap-1.5 rounded bg-[#1B4D3E] px-4 py-1.5 text-xs font-medium text-[#FCFBF8] transition hover:bg-[#143A2F] disabled:opacity-60"
           >
             {isGenerating ? (
               <>
@@ -289,80 +289,80 @@ export default function ReportsPage() {
       </header>
 
       {errorMsg && (
-        <p className="rounded-md border border-rose-200 bg-rose-50 px-3 py-2 text-xs text-rose-700">
+        <p className="border-l-2 border-[#B42318] bg-[#FDF2F2] px-3.5 py-2 text-xs text-[#B42318]">
           {errorMsg}
         </p>
       )}
 
-      {/* Monthly Live Data Snapshot Band */}
-      <section className="grid grid-cols-1 gap-5 lg:grid-cols-12">
-        <div className="grid grid-cols-2 gap-3 sm:grid-cols-4 lg:col-span-7">
-          <div className="rounded-lg border border-[#E4E7EC] bg-white p-4">
-            <span className="text-[11px] font-medium text-slate-500">
+      {/* Monthly Live Data Snapshot Band (Flush Hairline Grid, Zero Stretched KPI Cards) */}
+      <section className="grid grid-cols-1 gap-8 border-b border-[#E2DDD3] pb-8 lg:grid-cols-12 lg:items-center lg:gap-0 lg:divide-x lg:divide-[#E2DDD3]">
+        <div className="grid grid-cols-2 gap-x-6 gap-y-6 sm:grid-cols-4 lg:col-span-7 lg:pr-8">
+          <div>
+            <span className="text-[11px] font-medium text-[#78716C]">
               本月建档活动
             </span>
-            <p className="mt-2 font-mono text-2xl font-semibold text-[#0F172A] tabular-nums">
+            <p className="mt-2 font-editorial text-3xl font-semibold text-[#181816] tabular-nums">
               {snapshot.activitiesCount}
             </p>
             <Link
               href="/organization"
-              className="mt-1 inline-block text-[11px] text-[#1D4ED8] hover:underline"
+              className="mt-1 inline-block text-[11px] font-medium text-[#1B4D3E] hover:underline"
             >
               管理档案 →
             </Link>
           </div>
 
-          <div className="rounded-lg border border-[#E4E7EC] bg-white p-4">
-            <span className="text-[11px] font-medium text-slate-500">
+          <div>
+            <span className="text-[11px] font-medium text-[#78716C]">
               已发布 / 已归档
             </span>
-            <p className="mt-2 font-mono text-2xl font-semibold text-[#0F172A] tabular-nums">
+            <p className="mt-2 font-editorial text-3xl font-semibold text-[#181816] tabular-nums">
               {snapshot.publishedCount}
-              <span className="text-sm font-normal text-slate-400">
+              <span className="text-base font-normal text-[#8C857B]">
                 {" "}
                 / {snapshot.archivedCount}
               </span>
             </p>
-            <span className="mt-1 block text-[11px] text-slate-400">
+            <span className="mt-1 block text-[11px] text-[#8C857B]">
               审查通过 {snapshot.reviewApprovedCount} 篇
             </span>
           </div>
 
-          <div className="rounded-lg border border-[#E4E7EC] bg-white p-4">
-            <span className="text-[11px] font-medium text-slate-500">
+          <div>
+            <span className="text-[11px] font-medium text-[#78716C]">
               回填总播放/阅读
             </span>
-            <p className="mt-2 font-mono text-2xl font-semibold text-[#0F172A] tabular-nums">
+            <p className="mt-2 font-editorial text-3xl font-semibold text-[#181816] tabular-nums">
               {snapshot.totalViews.toLocaleString("zh-CN")}
             </p>
             <Link
               href="/history"
-              className="mt-1 inline-block text-[11px] text-[#1D4ED8] hover:underline"
+              className="mt-1 inline-block text-[11px] font-medium text-[#1B4D3E] hover:underline"
             >
               去回填数据 →
             </Link>
           </div>
 
-          <div className="rounded-lg border border-[#E4E7EC] bg-white p-4">
-            <span className="text-[11px] font-medium text-slate-500">
+          <div>
+            <span className="text-[11px] font-medium text-[#78716C]">
               总互动（赞/评/转）
             </span>
-            <p className="mt-2 font-mono text-2xl font-semibold text-[#0F172A] tabular-nums">
+            <p className="mt-2 font-editorial text-3xl font-semibold text-[#181816] tabular-nums">
               {(
                 snapshot.totalLikes +
                 snapshot.totalComments +
                 snapshot.totalShares
               ).toLocaleString("zh-CN")}
             </p>
-            <span className="mt-1 block text-[11px] text-slate-400">
+            <span className="mt-1 block text-[11px] text-[#B85D3B]">
               爆款 {snapshot.viralCount} 篇
             </span>
           </div>
         </div>
 
-        <div className="rounded-lg border border-[#E5E7EB] bg-white p-4 lg:col-span-5">
+        <div className="lg:col-span-5 lg:pl-8">
           <div className="mb-2 flex items-center justify-between">
-            <span className="text-xs font-semibold text-[#111827]">
+            <span className="text-xs font-semibold text-[#181816]">
               {selectedMonth} 渠道分布
             </span>
           </div>
@@ -370,42 +370,42 @@ export default function ReportsPage() {
         </div>
       </section>
 
-      {/* Report Viewer + History Sidebar */}
-      <section className="grid grid-cols-1 items-start gap-6 lg:grid-cols-12">
+      {/* Report Manuscript + Saved Index Sidebar (Hairline Divided) */}
+      <section className="grid grid-cols-1 items-start gap-8 lg:grid-cols-12">
         {/* Main Report Manuscript */}
-        <div className="rounded-lg border border-[#E5E7EB] bg-white p-6 lg:col-span-8">
+        <div className="lg:col-span-8">
           {!activeReport ? (
-            <div className="flex min-h-[300px] flex-col items-center justify-center text-center">
-              <FileBarChart2 className="h-8 w-8 text-gray-300" />
-              <p className="mt-3 text-sm font-medium text-gray-600">
+            <div className="flex min-h-[300px] flex-col items-center justify-center border border-dashed border-[#D5CFC3] bg-[#FCFBF8]/60 px-6 py-12 text-center">
+              <FileBarChart2 className="h-7 w-7 text-[#CFC8BA]" />
+              <p className="mt-3 font-editorial text-base font-medium text-[#57534E]">
                 尚未生成 {selectedMonth} 月报
               </p>
-              <p className="mt-1 max-w-md text-xs leading-relaxed text-gray-400">
+              <p className="mt-1.5 max-w-md text-xs leading-relaxed text-[#8C857B]">
                 系统将自动汇总本月「机构中心」活动档案与「创作记录」中已发布/归档的稿件及回填数据，一键生成可编辑、可导出的月报。
               </p>
               <button
                 type="button"
                 disabled={isGenerating}
                 onClick={() => void handleGenerateReport()}
-                className="mt-4 inline-flex items-center gap-1.5 rounded-md bg-[#3451E5] px-4 py-2 text-xs font-medium text-white hover:bg-[#2740C7]"
+                className="mt-5 inline-flex items-center gap-1.5 rounded bg-[#1B4D3E] px-4 py-2 text-xs font-medium text-[#FCFBF8] hover:bg-[#143A2F]"
               >
                 <FileBarChart2 className="h-3.5 w-3.5" />
                 <span>立即生成 {selectedMonth} 月报</span>
               </button>
             </div>
           ) : (
-            <div className="space-y-5">
+            <div className="space-y-5 border-t-2 border-[#181816] bg-[#FCFBF8] p-7 sm:p-9">
               {/* Toolbar */}
-              <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#F1F3F6] pb-4">
+              <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#E2DDD3] pb-4">
                 <div className="flex items-center gap-2">
-                  <div className="flex items-center gap-0.5 rounded-md border border-[#E4E7EC] bg-[#F1F3F6] p-0.5">
+                  <div className="flex items-center gap-0.5 rounded border border-[#E2DDD3] bg-[#EFECE4] p-0.5">
                     <button
                       type="button"
                       onClick={() => setViewMode("preview")}
-                      className={`rounded-[5px] px-2.5 py-1 text-xs font-medium ${
+                      className={`rounded-[3px] px-2.5 py-1 text-xs font-medium ${
                         viewMode === "preview"
-                          ? "bg-white text-[#0F172A] shadow-2xs"
-                          : "text-slate-500"
+                          ? "bg-[#FCFBF8] text-[#181816]"
+                          : "text-[#78716C]"
                       }`}
                     >
                       预览
@@ -413,16 +413,16 @@ export default function ReportsPage() {
                     <button
                       type="button"
                       onClick={() => setViewMode("edit")}
-                      className={`rounded-[5px] px-2.5 py-1 text-xs font-medium ${
+                      className={`rounded-[3px] px-2.5 py-1 text-xs font-medium ${
                         viewMode === "edit"
-                          ? "bg-white text-[#0F172A] shadow-2xs"
-                          : "text-slate-500"
+                          ? "bg-[#FCFBF8] text-[#181816]"
+                          : "text-[#78716C]"
                       }`}
                     >
                       编辑
                     </button>
                   </div>
-                  <span className="rounded bg-slate-100 px-2 py-0.5 text-[11px] text-slate-600">
+                  <span className="rounded bg-[#EFECE4] px-2 py-0.5 text-[11px] text-[#57534E]">
                     {activeReport.mode === "ai" ? "AI 生成" : "本地汇总模板"}
                   </span>
                 </div>
@@ -432,7 +432,7 @@ export default function ReportsPage() {
                     type="button"
                     disabled={exportingDocx}
                     onClick={() => void handleExportDocx()}
-                    className="inline-flex items-center gap-1 rounded-md border border-[#E4E7EC] bg-white px-2.5 py-1 text-xs font-medium text-slate-700 hover:bg-slate-50 disabled:opacity-50"
+                    className="inline-flex items-center gap-1 rounded border border-[#D5CFC3] bg-[#FCFBF8] px-2.5 py-1 text-xs font-medium text-[#57534E] hover:border-[#181816] hover:text-[#181816] disabled:opacity-50"
                   >
                     <Download className="h-3 w-3" />
                     <span>Word (.docx)</span>
@@ -442,7 +442,7 @@ export default function ReportsPage() {
                     onClick={() =>
                       exportDocumentAsPdf(buildExportDoc(activeReport))
                     }
-                    className="rounded-md border border-[#E4E7EC] bg-white px-2.5 py-1 text-xs font-medium text-slate-700 hover:bg-slate-50"
+                    className="rounded border border-[#D5CFC3] bg-[#FCFBF8] px-2.5 py-1 text-xs font-medium text-[#57534E] hover:border-[#181816] hover:text-[#181816]"
                   >
                     PDF
                   </button>
@@ -451,17 +451,17 @@ export default function ReportsPage() {
                     onClick={() =>
                       exportDocumentAsMarkdown(buildExportDoc(activeReport))
                     }
-                    className="rounded-md border border-[#E4E7EC] bg-white px-2.5 py-1 text-xs font-medium text-slate-700 hover:bg-slate-50"
+                    className="rounded border border-[#D5CFC3] bg-[#FCFBF8] px-2.5 py-1 text-xs font-medium text-[#57534E] hover:border-[#181816] hover:text-[#181816]"
                   >
                     MD
                   </button>
                   <button
                     type="button"
                     onClick={() => void handleCopyReport()}
-                    className="inline-flex items-center gap-1 rounded-md bg-[#0F172A] px-3 py-1 text-xs font-medium text-white hover:bg-slate-800"
+                    className="inline-flex items-center gap-1 rounded bg-[#181816] px-3 py-1 text-xs font-medium text-[#FCFBF8] hover:bg-[#2F2E2A]"
                   >
                     {copied ? (
-                      <Check className="h-3 w-3 text-emerald-400" />
+                      <Check className="h-3 w-3 text-[#86EFAC]" />
                     ) : (
                       <Copy className="h-3 w-3" />
                     )}
@@ -480,7 +480,7 @@ export default function ReportsPage() {
                         title: e.target.value,
                       })
                     }
-                    className="w-full border-b border-[#E4E7EC] pb-2 text-lg font-semibold text-[#0F172A] outline-none focus:border-[#1D4ED8]"
+                    className="w-full border-b border-[#E2DDD3] pb-2 font-editorial text-xl font-semibold text-[#181816] outline-none focus:border-[#1B4D3E]"
                   />
                   <textarea
                     rows={3}
@@ -491,7 +491,7 @@ export default function ReportsPage() {
                       })
                     }
                     placeholder="月报核心摘要..."
-                    className="w-full resize-none rounded-md border border-[#E4E7EC] bg-[#F8FAFC] p-3 text-xs leading-relaxed text-[#0F172A] outline-none focus:border-[#1D4ED8]"
+                    className="w-full resize-none rounded border border-[#E2DDD3] bg-[#F6F4EF] p-3 text-xs leading-relaxed text-[#181816] outline-none focus:border-[#1B4D3E]"
                   />
                   <textarea
                     rows={18}
@@ -501,31 +501,31 @@ export default function ReportsPage() {
                         body: e.target.value,
                       })
                     }
-                    className="w-full resize-y rounded-md border border-[#E4E7EC] p-3 text-sm leading-7 text-slate-800 outline-none focus:border-[#1D4ED8]"
+                    className="w-full resize-y rounded border border-[#E2DDD3] bg-transparent p-3 text-sm leading-7 text-[#292524] outline-none focus:border-[#1B4D3E]"
                   />
                 </div>
               ) : (
                 <article className="space-y-5">
                   <div className="space-y-2">
-                    <h2 className="text-xl font-semibold tracking-tight text-[#0F172A]">
+                    <h2 className="font-editorial text-2xl font-semibold tracking-tight text-[#181816]">
                       {activeReport.title}
                     </h2>
-                    <p className="font-mono text-[11px] text-slate-400">
+                    <p className="font-mono text-[11px] text-[#8C857B]">
                       周期：{activeReport.month} · 生成于{" "}
                       {new Date(activeReport.updatedAt).toLocaleString("zh-CN")}
                     </p>
                   </div>
 
                   {activeReport.summary && (
-                    <div className="rounded-lg border-l-3 border-[#1D4ED8] bg-[#F8FAFC] p-4 text-xs leading-relaxed text-slate-700">
-                      <span className="mb-1 block font-semibold text-[#0F172A]">
+                    <div className="border-l-2 border-[#1B4D3E] bg-[#F6F4EF] p-4 text-xs leading-relaxed text-[#57534E]">
+                      <span className="mb-1 block font-semibold text-[#181816]">
                         核心摘要
                       </span>
                       {activeReport.summary}
                     </div>
                   )}
 
-                  <div className="whitespace-pre-wrap text-sm leading-7 text-slate-800">
+                  <div className="whitespace-pre-wrap text-sm leading-8 text-[#292524]">
                     {activeReport.body}
                   </div>
                 </article>
@@ -534,26 +534,24 @@ export default function ReportsPage() {
           )}
         </div>
 
-        {/* Saved Reports List */}
-        <aside className="rounded-lg border border-[#E4E7EC] bg-white p-5 lg:col-span-4">
-          <h3 className="mb-3 border-b border-[#F1F3F6] pb-2.5 text-xs font-semibold text-[#0F172A]">
+        {/* Saved Reports Index Rail */}
+        <aside className="border-t border-[#E2DDD3] pt-5 lg:col-span-4 lg:border-l lg:border-t-0 lg:pl-7 lg:pt-0">
+          <h3 className="mb-3 border-b border-[#E2DDD3] pb-2.5 text-xs font-semibold text-[#181816]">
             已保存月报（{reports.length}）
           </h3>
           {reports.length === 0 ? (
-            <p className="py-6 text-center text-xs text-slate-400">
+            <p className="py-8 text-center text-xs text-[#8C857B]">
               暂无已生成月报
             </p>
           ) : (
-            <div className="space-y-2">
+            <div className="divide-y divide-[#E2DDD3]">
               {reports.map((rep) => {
                 const isSelected = activeReport?.id === rep.id;
                 return (
                   <div
                     key={rep.id}
-                    className={`flex items-start justify-between gap-2 rounded-lg border p-3 transition ${
-                      isSelected
-                        ? "border-[#1D4ED8] bg-[#EFF6FF]/60"
-                        : "border-[#ECEEF2] hover:bg-slate-50"
+                    className={`flex items-start justify-between gap-2 py-3 transition ${
+                      isSelected ? "bg-[#E9F0ED]/50 px-2.5" : "hover:bg-[#FCFBF8]/70 px-1"
                     }`}
                   >
                     <button
@@ -565,21 +563,21 @@ export default function ReportsPage() {
                       className="min-w-0 flex-1 text-left"
                     >
                       <div className="flex items-center gap-1.5">
-                        <span className="font-mono text-[11px] font-semibold text-[#1D4ED8]">
+                        <span className="font-mono text-[11px] font-semibold text-[#1B4D3E]">
                           {rep.month}
                         </span>
-                        <span className="rounded bg-slate-100 px-1.5 py-0.2 text-[10px] text-slate-600">
+                        <span className="rounded bg-[#EFECE4] px-1.5 py-0.5 text-[10px] text-[#57534E]">
                           {rep.focus === "donor" ? "对外汇报" : "对内复盘"}
                         </span>
                       </div>
-                      <p className="mt-1 truncate text-xs font-medium text-[#0F172A]">
+                      <p className="mt-1 truncate text-xs font-medium text-[#181816]">
                         {rep.title}
                       </p>
                     </button>
                     <button
                       type="button"
                       onClick={() => deleteReport(rep.id)}
-                      className="rounded p-1 text-slate-400 hover:bg-rose-50 hover:text-rose-600"
+                      className="rounded p-1 text-[#8C857B] hover:bg-[#FDF2F2] hover:text-[#B42318]"
                       title="删除月报"
                     >
                       <Trash2 className="h-3.5 w-3.5" />

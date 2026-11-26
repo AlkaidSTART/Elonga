@@ -98,14 +98,14 @@ export function Stylize2DPanel() {
   return (
     <div className="grid grid-cols-1 lg:grid-cols-12">
       {/* Left/Main Preview Comparison Stage */}
-      <div className="flex flex-col bg-[#090D16] p-5 studio-grid-dark lg:col-span-8">
+      <div className="flex flex-col bg-[#141311] p-5 studio-grid-dark lg:col-span-8">
         <div className="mb-3.5 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="text-xs font-medium text-slate-300">
+            <span className="text-xs font-medium text-[#E7E2D8]">
               效果对比
             </span>
             {stylizeMode && (
-              <span className="rounded border border-slate-700 bg-slate-800/80 px-2 py-0.5 text-[10px] font-medium text-slate-300">
+              <span className="rounded border border-[#3A3731] bg-[#262420] px-2 py-0.5 text-[10px] font-medium text-[#E7E2D8]">
                 {stylizeMode === "ai" ? "AI 重绘" : "本地预览"}
               </span>
             )}
@@ -115,7 +115,7 @@ export function Stylize2DPanel() {
             <button
               type="button"
               onClick={handleDownload}
-              className="inline-flex items-center gap-1.5 rounded-md bg-[#3451E5] px-3 py-1.5 text-xs font-medium text-white transition hover:bg-[#2740C7]"
+              className="inline-flex items-center gap-1.5 rounded bg-[#1B4D3E] px-3 py-1.5 text-xs font-medium text-[#FCFBF8] transition hover:bg-[#246350]"
             >
               <Download className="h-3.5 w-3.5" />
               <span>下载成品</span>
@@ -124,11 +124,11 @@ export function Stylize2DPanel() {
         </div>
 
         <div className="grid flex-1 grid-cols-1 gap-4 md:grid-cols-2">
-          <div className="flex flex-col rounded-md border border-slate-800 bg-[#0F172A] p-3">
-            <span className="mb-2 text-xs text-slate-400">
+          <div className="flex flex-col rounded border border-[#2E2C27] bg-[#1E1D1A] p-3">
+            <span className="mb-2 text-xs text-[#A8A29E]">
               原图
             </span>
-            <div className="flex flex-1 items-center justify-center overflow-hidden rounded border border-slate-800/80 bg-black/50 p-2">
+            <div className="flex flex-1 items-center justify-center overflow-hidden rounded border border-[#2E2C27] bg-black/45 p-2">
               {originalImage && (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img
@@ -140,14 +140,14 @@ export function Stylize2DPanel() {
             </div>
           </div>
 
-          <div className="flex flex-col rounded-md border border-slate-800 bg-[#0F172A] p-3">
-            <span className="mb-2 text-xs text-slate-400">
+          <div className="flex flex-col rounded border border-[#2E2C27] bg-[#1E1D1A] p-3">
+            <span className="mb-2 text-xs text-[#A8A29E]">
               风格化结果
             </span>
-            <div className="flex min-h-[300px] flex-1 items-center justify-center overflow-hidden rounded border border-slate-800/80 bg-black/50 p-2">
+            <div className="flex min-h-[300px] flex-1 items-center justify-center overflow-hidden rounded border border-[#2E2C27] bg-black/45 p-2">
               {isStylizing ? (
-                <div className="flex flex-col items-center gap-2 text-slate-400">
-                  <Loader2 className="h-5 w-5 animate-spin text-[#3B82F6]" />
+                <div className="flex flex-col items-center gap-2 text-[#A8A29E]">
+                  <Loader2 className="h-5 w-5 animate-spin text-[#D4A373]" />
                   <span className="text-xs">渲染处理中...</span>
                 </div>
               ) : stylizedImage ? (
@@ -158,17 +158,17 @@ export function Stylize2DPanel() {
                   className="max-h-[420px] w-auto rounded-xs object-contain"
                 />
               ) : (
-                <span className="text-xs text-slate-500">等待生成</span>
+                <span className="text-xs text-[#78716C]">等待生成</span>
               )}
             </div>
           </div>
         </div>
       </div>
 
-      {/* Right Docked Dark Inspector */}
-      <aside className="divide-y divide-slate-800 border-t border-slate-800 bg-[#0F172A] lg:col-span-4 lg:border-l lg:border-t-0">
+      {/* Right Docked Warm Charcoal Inspector */}
+      <aside className="divide-y divide-[#2E2C27] border-t border-[#2E2C27] bg-[#1E1D1A] lg:col-span-4 lg:border-l lg:border-t-0">
         <div className="p-5">
-          <h3 className="mb-3 text-xs font-medium text-slate-300">风格预设</h3>
+          <h3 className="mb-3 text-xs font-medium text-[#E7E2D8]">风格预设</h3>
           <div className="grid grid-cols-2 gap-2">
             {PRESETS.map((preset) => {
               const active = stylePreset === preset.id;
@@ -177,14 +177,14 @@ export function Stylize2DPanel() {
                   key={preset.id}
                   type="button"
                   onClick={() => setStylePreset(preset.id)}
-                  className={`rounded-md border px-3 py-2.5 text-left transition ${
+                  className={`rounded border px-3 py-2.5 text-left transition ${
                     active
-                      ? "border-[#2563EB] bg-[#1D4ED8]/20 text-white"
-                      : "border-slate-800 bg-slate-900/70 text-slate-300 hover:border-slate-700 hover:bg-slate-800/80"
+                      ? "border-[#2A7B62] bg-[#1B4D3E]/50 text-[#FCFBF8]"
+                      : "border-[#2E2C27] bg-[#161513] text-[#E7E2D8] hover:border-[#4A463E]"
                   }`}
                 >
                   <div className="text-xs font-semibold">{preset.label}</div>
-                  <div className="mt-0.5 text-[10px] text-slate-400">
+                  <div className="mt-0.5 text-[10px] text-[#A8A29E]">
                     {preset.desc}
                   </div>
                 </button>
@@ -196,8 +196,8 @@ export function Stylize2DPanel() {
         <div className="space-y-4 p-5">
           <div>
             <div className="mb-1.5 flex items-center justify-between text-xs">
-              <span className="text-slate-400">风格化强度</span>
-              <span className="font-mono text-slate-300 tabular-nums">
+              <span className="text-[#A8A29E]">风格化强度</span>
+              <span className="font-mono text-[#E7E2D8] tabular-nums">
                 {Math.round(stylizeStrength * 100)}%
               </span>
             </div>
@@ -208,12 +208,12 @@ export function Stylize2DPanel() {
               step={0.05}
               value={stylizeStrength}
               onChange={(e) => setStylizeStrength(Number(e.target.value))}
-              className="w-full accent-[#2563EB]"
+              className="w-full accent-[#2A7B62]"
             />
           </div>
 
           <div>
-            <label className="mb-1.5 block text-xs text-slate-400">
+            <label className="mb-1.5 block text-xs text-[#A8A29E]">
               补充画面描述（选填）
             </label>
             <textarea
@@ -221,16 +221,16 @@ export function Stylize2DPanel() {
               value={stylePrompt}
               onChange={(e) => setStylePrompt(e.target.value)}
               placeholder="例如：保持主体构图、柔和自然光线..."
-              className="w-full resize-none rounded-md border border-slate-700/80 bg-[#0B1120] p-2.5 text-xs text-slate-100 outline-none placeholder:text-slate-500 focus:border-[#3B82F6]"
+              className="w-full resize-none rounded border border-[#3A3731] bg-[#161513] p-2.5 text-xs text-[#FCFBF8] outline-none placeholder:text-[#78716C] focus:border-[#2A7B62]"
             />
           </div>
 
           {!modelConfig.imageApiKey.trim() && (
-            <div className="flex items-center justify-between rounded-md border border-slate-800 bg-slate-900/80 px-3 py-2 text-[11px] text-slate-400">
+            <div className="flex items-center justify-between rounded border border-[#2E2C27] bg-[#161513] px-3 py-2 text-[11px] text-[#A8A29E]">
               <span>当前为本地预览模式</span>
               <Link
                 href="/settings"
-                className="font-medium text-[#60A5FA] hover:underline"
+                className="font-medium text-[#D4A373] hover:underline"
               >
                 配置密钥
               </Link>
@@ -238,7 +238,7 @@ export function Stylize2DPanel() {
           )}
 
           {stylizeError && (
-            <div className="rounded-md border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-xs text-rose-300">
+            <div className="rounded border border-rose-500/30 bg-rose-500/10 px-3 py-2 text-xs text-rose-300">
               {stylizeError}
             </div>
           )}
@@ -247,7 +247,7 @@ export function Stylize2DPanel() {
             type="button"
             disabled={isStylizing}
             onClick={handleStylize}
-            className="flex w-full items-center justify-center gap-2 rounded-md bg-[#1D4ED8] py-2.5 text-xs font-medium text-white transition hover:bg-[#1E40AF] disabled:opacity-60"
+            className="flex w-full items-center justify-center gap-2 rounded bg-[#1B4D3E] py-2.5 text-xs font-medium text-[#FCFBF8] transition hover:bg-[#246350] disabled:opacity-60"
           >
             {isStylizing ? (
               <>

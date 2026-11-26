@@ -177,14 +177,14 @@ export default function OrganizationPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-9">
       {/* Header */}
-      <header className="flex flex-col gap-4 border-b border-[#E5E7EB] pb-4 sm:flex-row sm:items-center sm:justify-between">
+      <header className="flex flex-col gap-4 border-b border-[#181816]/15 pb-5 sm:flex-row sm:items-end sm:justify-between">
         <div>
-          <h1 className="text-lg font-semibold tracking-tight text-[#111827]">
+          <h1 className="font-editorial text-2xl font-semibold tracking-tight text-[#181816]">
             机构中心
           </h1>
-          <p className="mt-0.5 text-xs text-gray-500">
+          <p className="mt-1 text-xs text-[#78716C]">
             维护机构基础信息与活动档案，供内容创作与月报自动读取
           </p>
         </div>
@@ -192,41 +192,49 @@ export default function OrganizationPage() {
         <button
           type="button"
           onClick={openCreateModal}
-          className="inline-flex items-center gap-1.5 rounded-md bg-[#3451E5] px-3.5 py-2 text-xs font-medium text-white transition hover:bg-[#2740C7]"
+          className="inline-flex items-center gap-1.5 rounded bg-[#1B4D3E] px-4 py-2 text-xs font-medium text-[#FCFBF8] transition hover:bg-[#143A2F]"
         >
           <FolderPlus className="h-3.5 w-3.5" />
           <span>新建活动档案</span>
         </button>
       </header>
 
-      {/* Organization Profile Card */}
-      <section className="rounded-lg border border-[#E4E7EC] bg-white p-6 shadow-[0_1px_2px_rgba(15,23,42,0.03)]">
-        <div className="mb-4 flex flex-wrap items-center justify-between gap-2 border-b border-[#F1F3F6] pb-3">
-          <div className="flex items-center gap-2">
-            <Building2 className="h-4 w-4 text-[#1D4ED8]" />
-            <h2 className="text-sm font-semibold text-[#0F172A]">
-              机构基础档案（AI 创作默认读取）
-            </h2>
+      {/* Organization Profile Band (Flush 2-Column Editorial Form, No Card Box) */}
+      <section className="grid grid-cols-1 gap-8 border-b border-[#E2DDD3] pb-9 lg:grid-cols-12">
+        <div className="flex flex-col justify-between gap-4 lg:col-span-4">
+          <div>
+            <div className="flex items-center gap-2">
+              <Building2 className="h-4 w-4 text-[#1B4D3E]" />
+              <h2 className="font-editorial text-base font-semibold text-[#181816]">
+                机构基础档案
+              </h2>
+            </div>
+            <p className="mt-1.5 text-xs leading-relaxed text-[#78716C]">
+              AI 创作与月报生成时默认读取机构名称、使命、默认传播口吻与合规红线禁用词。
+            </p>
           </div>
-          <button
-            type="button"
-            onClick={handleSaveProfile}
-            className="inline-flex items-center gap-1.5 rounded-md bg-[#0F172A] px-3 py-1.5 text-xs font-medium text-white transition hover:bg-slate-800"
-          >
-            {profileSaved ? (
-              <>
-                <Check className="h-3.5 w-3.5 text-emerald-400" />
-                <span>已保存</span>
-              </>
-            ) : (
-              <span>保存机构资料</span>
-            )}
-          </button>
+
+          <div>
+            <button
+              type="button"
+              onClick={handleSaveProfile}
+              className="inline-flex items-center gap-1.5 rounded bg-[#181816] px-4 py-2 text-xs font-medium text-[#FCFBF8] transition hover:bg-[#2F2E2A]"
+            >
+              {profileSaved ? (
+                <>
+                  <Check className="h-3.5 w-3.5 text-[#86EFAC]" />
+                  <span>已保存机构资料</span>
+                </>
+              ) : (
+                <span>保存机构资料</span>
+              )}
+            </button>
+          </div>
         </div>
 
-        <div className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        <div className="grid grid-cols-1 gap-4 md:grid-cols-2 lg:col-span-8">
           <label className="space-y-1.5">
-            <span className="block text-xs font-medium text-slate-600">
+            <span className="block text-xs font-medium text-[#57534E]">
               机构名称
             </span>
             <input
@@ -236,12 +244,12 @@ export default function OrganizationPage() {
                 setOrgForm((prev) => ({ ...prev, name: e.target.value }))
               }
               placeholder="例如：微光公益服务中心"
-              className="w-full rounded-md border border-[#E4E7EC] bg-[#F8FAFC] px-3 py-2 text-xs text-[#0F172A] outline-none transition focus:border-[#1D4ED8] focus:bg-white"
+              className="w-full rounded border border-[#D5CFC3] bg-[#FCFBF8] px-3 py-2 text-xs text-[#181816] outline-none transition focus:border-[#1B4D3E]"
             />
           </label>
 
           <label className="space-y-1.5">
-            <span className="block text-xs font-medium text-slate-600">
+            <span className="block text-xs font-medium text-[#57534E]">
               默认传播口吻
             </span>
             <select
@@ -252,7 +260,7 @@ export default function OrganizationPage() {
                   defaultTone: e.target.value as ToneId,
                 }))
               }
-              className="w-full rounded-md border border-[#E4E7EC] bg-[#F8FAFC] px-3 py-2 text-xs text-[#0F172A] outline-none transition focus:border-[#1D4ED8] focus:bg-white"
+              className="w-full rounded border border-[#D5CFC3] bg-[#FCFBF8] px-3 py-2 text-xs text-[#181816] outline-none transition focus:border-[#1B4D3E]"
             >
               {TONES.map((t) => (
                 <option key={t.id} value={t.id}>
@@ -263,7 +271,7 @@ export default function OrganizationPage() {
           </label>
 
           <label className="space-y-1.5 md:col-span-2">
-            <span className="block text-xs font-medium text-slate-600">
+            <span className="block text-xs font-medium text-[#57534E]">
               机构使命与简介
             </span>
             <textarea
@@ -273,12 +281,12 @@ export default function OrganizationPage() {
                 setOrgForm((prev) => ({ ...prev, mission: e.target.value }))
               }
               placeholder="简要描述机构服务领域、核心理念与公益定位，便于 AI 准确把握机构语调..."
-              className="w-full resize-none rounded-md border border-[#E4E7EC] bg-[#F8FAFC] px-3 py-2 text-xs leading-relaxed text-[#0F172A] outline-none transition focus:border-[#1D4ED8] focus:bg-white"
+              className="w-full resize-none rounded border border-[#D5CFC3] bg-[#FCFBF8] px-3 py-2 text-xs leading-relaxed text-[#181816] outline-none transition focus:border-[#1B4D3E]"
             />
           </label>
 
           <label className="space-y-1.5">
-            <span className="block text-xs font-medium text-slate-600">
+            <span className="block text-xs font-medium text-[#57534E]">
               固定落款 / 引导语参考
             </span>
             <input
@@ -291,14 +299,14 @@ export default function OrganizationPage() {
                 }))
               }
               placeholder="例如：微光汇聚，温暖同行..."
-              className="w-full rounded-md border border-[#E4E7EC] bg-[#F8FAFC] px-3 py-2 text-xs text-[#0F172A] outline-none transition focus:border-[#1D4ED8] focus:bg-white"
+              className="w-full rounded border border-[#D5CFC3] bg-[#FCFBF8] px-3 py-2 text-xs text-[#181816] outline-none transition focus:border-[#1B4D3E]"
             />
           </label>
 
           <label className="space-y-1.5">
-            <span className="flex items-center gap-1 text-xs font-medium text-slate-600">
-              <ShieldAlert className="h-3.5 w-3.5 text-amber-600" />
-              <span>机构红线禁用词（逗号分隔，自动同步至发布审查）</span>
+            <span className="flex items-center gap-1 text-xs font-medium text-[#57534E]">
+              <ShieldAlert className="h-3.5 w-3.5 text-[#B85D3B]" />
+              <span>机构红线禁用词（逗号分隔）</span>
             </span>
             <input
               type="text"
@@ -310,24 +318,24 @@ export default function OrganizationPage() {
                 }))
               }
               placeholder="例如：包治百病, 100%保证, 私下转账"
-              className="w-full rounded-md border border-[#E4E7EC] bg-[#F8FAFC] px-3 py-2 text-xs text-[#0F172A] outline-none transition focus:border-[#1D4ED8] focus:bg-white"
+              className="w-full rounded border border-[#D5CFC3] bg-[#FCFBF8] px-3 py-2 text-xs text-[#181816] outline-none transition focus:border-[#1B4D3E]"
             />
           </label>
         </div>
       </section>
 
-      {/* Activity Archives Section */}
+      {/* Activity Archives Ledger (Hairline List, Zero Nested Cards) */}
       <section className="space-y-4">
         <div className="flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
           <div className="flex flex-wrap items-center gap-3">
-            <h2 className="text-sm font-semibold text-[#0F172A]">
+            <h2 className="font-editorial text-base font-semibold text-[#181816]">
               活动建档库
-              <span className="ml-2 font-mono text-xs font-normal text-slate-400">
+              <span className="ml-2 font-mono text-xs font-normal text-[#8C857B]">
                 {activities.length} 项
               </span>
             </h2>
 
-            <div className="flex items-center gap-0.5 rounded-md border border-[#E4E7EC] bg-[#F1F3F6] p-0.5">
+            <div className="flex items-center gap-0.5 rounded border border-[#E2DDD3] bg-[#EFECE4] p-0.5">
               {(
                 [
                   { id: "all", label: "全部" },
@@ -340,10 +348,10 @@ export default function OrganizationPage() {
                   key={tab.id}
                   type="button"
                   onClick={() => setStatusFilter(tab.id)}
-                  className={`rounded-[5px] px-2.5 py-1 text-xs font-medium transition ${
+                  className={`rounded-[3px] px-2.5 py-1 text-xs font-medium transition ${
                     statusFilter === tab.id
-                      ? "bg-white text-[#0F172A] shadow-2xs"
-                      : "text-slate-500 hover:text-[#0F172A]"
+                      ? "bg-[#FCFBF8] text-[#181816]"
+                      : "text-[#78716C] hover:text-[#181816]"
                   }`}
                 >
                   {tab.label}
@@ -352,34 +360,34 @@ export default function OrganizationPage() {
             </div>
           </div>
 
-          <div className="relative w-full sm:w-64">
-            <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" />
+          <div className="relative w-full sm:w-72">
+            <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-[#8C857B]" />
             <input
               type="text"
               value={query}
               onChange={(e) => setQuery(e.target.value)}
               placeholder="检索活动名称、地点或物资..."
-              className="w-full rounded-md border border-[#E4E7EC] bg-white py-1.5 pl-8 pr-3 text-xs text-[#0F172A] outline-none transition placeholder:text-slate-400 focus:border-[#1D4ED8]"
+              className="w-full rounded border border-[#D5CFC3] bg-[#FCFBF8] py-1.5 pl-8 pr-3 text-xs text-[#181816] outline-none transition placeholder:text-[#A8A29E] focus:border-[#1B4D3E]"
             />
           </div>
         </div>
 
         {filteredActivities.length === 0 ? (
-          <div className="flex min-h-[220px] flex-col items-center justify-center rounded-lg border border-[#E4E7EC] bg-white text-center">
-            <p className="text-sm font-medium text-slate-400">
+          <div className="flex min-h-[200px] flex-col items-center justify-center border-y border-dashed border-[#D5CFC3] py-12 text-center">
+            <p className="text-sm font-medium text-[#78716C]">
               {activities.length === 0 ? "尚未建立活动档案" : "无匹配的活动档案"}
             </p>
             <button
               type="button"
               onClick={openCreateModal}
-              className="mt-3 inline-flex items-center gap-1 rounded-md border border-[#E4E7EC] px-3 py-1.5 text-xs font-medium text-[#0F172A] hover:bg-slate-50"
+              className="mt-3 inline-flex items-center gap-1 rounded border border-[#D5CFC3] bg-[#FCFBF8] px-3 py-1.5 text-xs font-medium text-[#181816] hover:border-[#181816]"
             >
               <FolderPlus className="h-3.5 w-3.5" />
               <span>立即新建活动档案</span>
             </button>
           </div>
         ) : (
-          <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+          <div className="divide-y divide-[#E2DDD3] border-y border-[#E2DDD3]">
             {filteredActivities.map((act) => {
               const statusMeta = ACTIVITY_STATUS_META[act.status];
               const categoryLabel =
@@ -389,105 +397,107 @@ export default function OrganizationPage() {
               return (
                 <article
                   key={act.id}
-                  className="flex flex-col justify-between rounded-lg border border-[#E4E7EC] bg-white p-5 shadow-[0_1px_2px_rgba(15,23,42,0.03)] transition hover:border-slate-300"
+                  className="grid grid-cols-1 gap-4 py-6 transition-colors hover:bg-[#FCFBF8]/70 lg:grid-cols-12 lg:px-2"
                 >
-                  <div className="space-y-3">
-                    <div className="flex items-start justify-between gap-3">
-                      <div className="space-y-1">
-                        <div className="flex flex-wrap items-center gap-2">
-                          <span
-                            className={`inline-flex items-center gap-1 rounded border px-1.5 py-0.5 text-[11px] font-medium ${statusMeta.badgeClass}`}
-                          >
-                            <span
-                              className={`h-1.5 w-1.5 rounded-full ${statusMeta.dotClass}`}
-                            />
-                            {statusMeta.label}
-                          </span>
-                          <span className="rounded bg-[#EFF6FF] px-1.5 py-0.5 text-[11px] font-medium text-[#1D4ED8]">
-                            {categoryLabel}
-                          </span>
-                          {linkedDrafts > 0 && (
-                            <span className="font-mono text-[11px] text-slate-400">
-                              关联 {linkedDrafts} 篇稿件
-                            </span>
-                          )}
-                        </div>
-                        <h3 className="text-[15px] font-semibold text-[#0F172A]">
-                          {act.title}
-                        </h3>
-                      </div>
-
-                      <div className="flex shrink-0 items-center gap-1">
-                        <button
-                          type="button"
-                          onClick={() => openEditModal(act)}
-                          className="rounded-md p-1.5 text-slate-400 transition hover:bg-slate-100 hover:text-[#0F172A]"
-                          title="编辑档案"
-                        >
-                          <Edit3 className="h-3.5 w-3.5" />
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => deleteActivity(act.id)}
-                          className="rounded-md p-1.5 text-slate-400 transition hover:bg-rose-50 hover:text-rose-600"
-                          title="删除档案"
-                        >
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </button>
-                      </div>
+                  {/* Left Date & Status Rail */}
+                  <div className="flex flex-row items-center gap-3 lg:col-span-2 lg:flex-col lg:items-start lg:gap-2">
+                    <span className="font-mono text-xs font-medium text-[#57534E] tabular-nums">
+                      {act.date || "待定日期"}
+                    </span>
+                    <div className="flex flex-wrap items-center gap-1.5">
+                      <span
+                        className={`inline-flex items-center gap-1 rounded border px-1.5 py-0.5 text-[11px] font-medium ${statusMeta.badgeClass}`}
+                      >
+                        <span
+                          className={`h-1.5 w-1.5 rounded-full ${statusMeta.dotClass}`}
+                        />
+                        {statusMeta.label}
+                      </span>
+                      <span className="rounded bg-[#EFECE4] px-1.5 py-0.5 text-[11px] font-medium text-[#57534E]">
+                        {categoryLabel}
+                      </span>
                     </div>
+                    {linkedDrafts > 0 && (
+                      <span className="font-mono text-[11px] text-[#8C857B]">
+                        关联 {linkedDrafts} 篇稿件
+                      </span>
+                    )}
+                  </div>
 
-                    <div className="grid grid-cols-1 gap-2 rounded-md bg-[#F8FAFC] p-3 text-xs text-slate-600 sm:grid-cols-2">
-                      <div className="flex items-center gap-1.5">
-                        <Calendar className="h-3.5 w-3.5 shrink-0 text-slate-400" />
-                        <span className="truncate">{act.date || "未填写日期"}</span>
-                      </div>
-                      <div className="flex items-center gap-1.5">
-                        <MapPin className="h-3.5 w-3.5 shrink-0 text-slate-400" />
-                        <span className="truncate">{act.location || "未填写地点"}</span>
-                      </div>
-                      <div className="flex items-center gap-1.5 sm:col-span-2">
-                        <Users className="h-3.5 w-3.5 shrink-0 text-slate-400" />
+                  {/* Center Editorial Details */}
+                  <div className="space-y-2.5 lg:col-span-7">
+                    <h3 className="font-editorial text-lg font-semibold text-[#181816]">
+                      {act.title}
+                    </h3>
+
+                    <div className="flex flex-wrap items-center gap-x-5 gap-y-1 text-xs text-[#57534E]">
+                      <span className="inline-flex items-center gap-1.5">
+                        <MapPin className="h-3.5 w-3.5 shrink-0 text-[#8C857B]" />
+                        <span>{act.location || "未填写地点"}</span>
+                      </span>
+                      <span className="inline-flex items-center gap-1.5">
+                        <Users className="h-3.5 w-3.5 shrink-0 text-[#8C857B]" />
                         <span>{act.participantCount || "未填写人数"}</span>
-                      </div>
-                      <div className="flex items-center gap-1.5 sm:col-span-2">
-                        <Wallet className="h-3.5 w-3.5 shrink-0 text-slate-400" />
+                      </span>
+                      <span className="inline-flex items-center gap-1.5">
+                        <Wallet className="h-3.5 w-3.5 shrink-0 text-[#8C857B]" />
                         <span>{act.fundOrGoods || "未填写善款/物资明细"}</span>
-                      </div>
+                      </span>
                     </div>
 
                     {act.highlights && (
-                      <p className="line-clamp-3 text-xs leading-relaxed text-slate-600">
+                      <p className="text-xs leading-relaxed text-[#57534E]">
                         {act.highlights}
                       </p>
                     )}
 
                     {act.notes && (
-                      <p className="rounded border border-amber-200/80 bg-amber-50/60 px-2.5 py-1.5 text-[11px] leading-relaxed text-amber-800">
+                      <p className="border-l-2 border-[#B85D3B] bg-[#FBF3EC]/60 py-1.5 pl-3 pr-2 text-[11px] leading-relaxed text-[#7C3A1D]">
                         隐私与合规备注：{act.notes}
                       </p>
                     )}
                   </div>
 
-                  <div className="mt-4 flex flex-wrap items-center justify-end gap-2 border-t border-[#F1F3F6] pt-3">
-                    <button
-                      type="button"
-                      onClick={() => handleUseInCopywriting(act)}
-                      className="inline-flex items-center gap-1.5 rounded-md border border-[#E4E7EC] bg-white px-2.5 py-1.5 text-xs font-medium text-[#0F172A] transition hover:border-[#0F172A] hover:bg-[#0F172A] hover:text-white"
-                    >
-                      <PenTool className="h-3 w-3" />
-                      <span>AI 写推流文案</span>
-                      <ArrowUpRight className="h-3 w-3" />
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => handleUseInWorkflow(act)}
-                      className="inline-flex items-center gap-1.5 rounded-md bg-[#1D4ED8] px-2.5 py-1.5 text-xs font-medium text-white transition hover:bg-[#1E40AF]"
-                    >
-                      <Workflow className="h-3 w-3" />
-                      <span>带入图文工作流</span>
-                      <ArrowUpRight className="h-3 w-3" />
-                    </button>
+                  {/* Right Actions */}
+                  <div className="flex flex-row items-center justify-between gap-2 lg:col-span-3 lg:flex-col lg:items-end lg:justify-between">
+                    <div className="flex items-center gap-1">
+                      <button
+                        type="button"
+                        onClick={() => openEditModal(act)}
+                        className="rounded p-1.5 text-[#8C857B] transition hover:bg-[#EFECE4] hover:text-[#181816]"
+                        title="编辑档案"
+                      >
+                        <Edit3 className="h-3.5 w-3.5" />
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => deleteActivity(act.id)}
+                        className="rounded p-1.5 text-[#8C857B] transition hover:bg-[#FDF2F2] hover:text-[#B42318]"
+                        title="删除档案"
+                      >
+                        <Trash2 className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+
+                    <div className="flex flex-wrap items-center justify-end gap-2">
+                      <button
+                        type="button"
+                        onClick={() => handleUseInCopywriting(act)}
+                        className="inline-flex items-center gap-1 rounded border border-[#D5CFC3] bg-[#FCFBF8] px-2.5 py-1.5 text-xs font-medium text-[#181816] transition hover:border-[#181816]"
+                      >
+                        <PenTool className="h-3 w-3" />
+                        <span>AI 写文案</span>
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => handleUseInWorkflow(act)}
+                        className="inline-flex items-center gap-1 rounded bg-[#1B4D3E] px-2.5 py-1.5 text-xs font-medium text-[#FCFBF8] transition hover:bg-[#143A2F]"
+                      >
+                        <Workflow className="h-3 w-3" />
+                        <span>图文工作流</span>
+                        <ArrowUpRight className="h-3 w-3" />
+                      </button>
+                    </div>
                   </div>
                 </article>
               );

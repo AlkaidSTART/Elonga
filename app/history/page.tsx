@@ -166,15 +166,20 @@ export default function HistoryPage() {
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-7">
       {/* Header & Filter Strip */}
-      <header className="flex flex-col gap-4 border-b border-[#E4E7EC] pb-4 sm:flex-row sm:items-center sm:justify-between">
-        <div className="flex flex-wrap items-center gap-4">
-          <h1 className="text-lg font-semibold tracking-tight text-[#0F172A]">
-            创作记录与稿件归档
-          </h1>
+      <header className="flex flex-col gap-4 border-b border-[#181816]/15 pb-5 sm:flex-row sm:items-end sm:justify-between">
+        <div className="space-y-3">
+          <div>
+            <h1 className="font-editorial text-2xl font-semibold tracking-tight text-[#181816]">
+              创作记录与稿件归档
+            </h1>
+            <p className="mt-1 text-xs text-[#78716C]">
+              管理所有已生成稿件的发布状态、数据回填与月报归档
+            </p>
+          </div>
 
-          <div className="flex flex-wrap items-center gap-0.5 rounded-md border border-[#E4E7EC] bg-[#F1F3F6] p-0.5">
+          <div className="inline-flex flex-wrap items-center gap-0.5 rounded border border-[#E2DDD3] bg-[#EFECE4] p-0.5">
             {(
               [
                 { id: "all", label: "全部" },
@@ -190,10 +195,10 @@ export default function HistoryPage() {
                   key={tab.id}
                   type="button"
                   onClick={() => setFilterMode(tab.id)}
-                  className={`rounded-[5px] px-2.5 py-1 text-xs font-medium transition ${
+                  className={`rounded-[3px] px-2.5 py-1 text-xs font-medium transition ${
                     active
-                      ? "bg-white text-[#0F172A] shadow-2xs"
-                      : "text-slate-500 hover:text-[#0F172A]"
+                      ? "bg-[#FCFBF8] text-[#181816]"
+                      : "text-[#78716C] hover:text-[#181816]"
                   }`}
                 >
                   {tab.label}
@@ -203,29 +208,44 @@ export default function HistoryPage() {
           </div>
         </div>
 
-        {/* Crisp Search Input */}
-        <div className="relative w-full sm:w-64">
-          <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-slate-400" />
+        {/* Crisp Search Input (widened so placeholder never clips) */}
+        <div className="relative w-full sm:w-72">
+          <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-[#8C857B]" />
           <input
             type="text"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             placeholder="检索标题、活动档案或平台..."
-            className="w-full rounded-md border border-[#E4E7EC] bg-white py-1.5 pl-8 pr-3 text-xs text-[#0F172A] outline-none transition placeholder:text-slate-400 focus:border-[#1D4ED8] focus:ring-2 focus:ring-[#1D4ED8]/10"
+            className="w-full rounded border border-[#D5CFC3] bg-[#FCFBF8] py-1.5 pl-8 pr-3 text-xs text-[#181816] outline-none transition placeholder:text-[#A8A29E] focus:border-[#1B4D3E]"
           />
         </div>
       </header>
 
-      {/* Structured Ledger Surface */}
+      {/* Flush Structured Editorial Ledger */}
       {filtered.length === 0 ? (
-        <div className="flex min-h-[280px] flex-col items-center justify-center rounded-lg border border-[#E4E7EC] bg-white text-center">
-          <div className="h-6 w-px bg-[#CBD5E1]" />
-          <p className="mt-3 text-sm font-medium text-slate-400">
+        <div className="flex min-h-[280px] flex-col items-center justify-center border border-dashed border-[#D5CFC3] bg-[#FCFBF8]/60 px-6 py-12 text-center">
+          <div className="h-7 w-px bg-[#CFC8BA]" />
+          <p className="mt-4 font-editorial text-base font-medium text-[#57534E]">
             {history.length === 0 ? "暂无创作记录" : "无匹配结果"}
           </p>
+          <p className="mt-1.5 text-xs text-[#8C857B]">
+            {history.length === 0
+              ? "在内容创作中生成第一篇推流稿件后，将自动沉淀至此台账"
+              : "尝试更换筛选状态或清空检索关键词"}
+          </p>
+          {history.length === 0 && (
+            <button
+              type="button"
+              onClick={() => router.push("/workflow")}
+              className="mt-5 inline-flex items-center gap-1.5 rounded bg-[#1B4D3E] px-4 py-2 text-xs font-medium text-[#FCFBF8] transition hover:bg-[#143A2F]"
+            >
+              <span>前往内容创作</span>
+              <ArrowUpRight className="h-3.5 w-3.5" />
+            </button>
+          )}
         </div>
       ) : (
-        <div className="divide-y divide-[#ECEEF2] overflow-hidden rounded-lg border border-[#E4E7EC] bg-white shadow-[0_1px_2px_rgba(15,23,42,0.03)]">
+        <div className="divide-y divide-[#E2DDD3] border-b border-[#E2DDD3]">
           <AnimatePresence>
             {filtered.map((item, idx) => {
               const p = PLATFORMS[item.platform];
@@ -246,36 +266,36 @@ export default function HistoryPage() {
                   animate={{ opacity: 1 }}
                   exit={{ opacity: 0 }}
                   transition={{ duration: 0.14 }}
-                  className="group flex flex-col justify-between gap-4 px-5 py-4 transition-colors hover:bg-[#F8FAFC] lg:flex-row lg:items-center"
+                  className="group flex flex-col justify-between gap-4 py-4 transition-colors hover:bg-[#FCFBF8]/70 lg:flex-row lg:items-center lg:px-2"
                 >
                   <div className="flex min-w-0 flex-1 items-baseline gap-4">
-                    <span className="hidden w-6 shrink-0 font-mono text-xs text-slate-400 tabular-nums sm:inline">
+                    <span className="hidden w-6 shrink-0 font-mono text-xs text-[#8C857B] tabular-nums sm:inline">
                       {String(idx + 1).padStart(2, "0")}
                     </span>
 
                     <div className="min-w-0 flex-1 space-y-1.5">
                       <div className="flex flex-wrap items-center gap-2">
-                        <span className="rounded bg-[#EFF6FF] px-1.5 py-0.5 text-[11px] font-medium text-[#1D4ED8]">
+                        <span className="rounded bg-[#E9F0ED] px-1.5 py-0.5 text-[11px] font-medium text-[#1B4D3E]">
                           {p.name}
                         </span>
                         {item.activityTitle && (
-                          <span className="max-w-[200px] truncate rounded bg-slate-100 px-1.5 py-0.5 text-[11px] text-slate-600">
+                          <span className="max-w-[200px] truncate rounded bg-[#EFECE4] px-1.5 py-0.5 text-[11px] text-[#57534E]">
                             档案：{item.activityTitle}
                           </span>
                         )}
                         {item.reviewState?.approvedAt && (
-                          <span className="inline-flex items-center gap-1 rounded border border-emerald-200 bg-emerald-50 px-1.5 py-0.5 text-[11px] font-medium text-emerald-700">
+                          <span className="inline-flex items-center gap-1 rounded border border-[#1B4D3E]/25 bg-[#E9F0ED] px-1.5 py-0.5 text-[11px] font-medium text-[#1B4D3E]">
                             <ShieldCheck className="h-3 w-3" />
                             已获发布资格
                           </span>
                         )}
                         {archive?.archived && (
-                          <span className="inline-flex items-center gap-1 rounded border border-indigo-200 bg-indigo-50 px-1.5 py-0.5 text-[11px] font-medium text-indigo-700">
+                          <span className="inline-flex items-center gap-1 rounded border border-[#D5CFC3] bg-[#FCFBF8] px-1.5 py-0.5 text-[11px] font-medium text-[#57534E]">
                             <Archive className="h-3 w-3" />
                             已归档
                           </span>
                         )}
-                        <span className="font-mono text-[11px] text-slate-400 tabular-nums">
+                        <span className="font-mono text-[11px] text-[#8C857B] tabular-nums">
                           {new Date(item.createdAt).toLocaleString("zh-CN", {
                             month: "2-digit",
                             day: "2-digit",
@@ -285,20 +305,20 @@ export default function HistoryPage() {
                         </span>
                       </div>
 
-                      <h3 className="truncate text-[14px] font-semibold text-[#0F172A]">
+                      <h3 className="truncate font-editorial text-[15px] font-semibold text-[#181816]">
                         {item.titles[0] || item.topic}
                       </h3>
-                      <p className="truncate text-xs text-slate-500">
+                      <p className="truncate text-xs text-[#78716C]">
                         {item.body}
                       </p>
 
                       {/* Backfilled Metrics & Link Strip */}
                       {(hasMetrics || archive?.publishedUrl) && (
-                        <div className="flex flex-wrap items-center gap-3 pt-0.5 text-[11px] text-slate-600">
+                        <div className="flex flex-wrap items-center gap-3 pt-0.5 text-[11px] text-[#57534E]">
                           {archive?.metrics.views !== undefined && (
                             <span className="font-mono">
                               播放/阅读{" "}
-                              <strong className="text-[#0F172A]">
+                              <strong className="text-[#181816]">
                                 {formatNumber(archive.metrics.views)}
                               </strong>
                             </span>
@@ -306,7 +326,7 @@ export default function HistoryPage() {
                           {archive?.metrics.likes !== undefined && (
                             <span className="font-mono">
                               点赞{" "}
-                              <strong className="text-[#0F172A]">
+                              <strong className="text-[#181816]">
                                 {formatNumber(archive.metrics.likes)}
                               </strong>
                             </span>
@@ -314,7 +334,7 @@ export default function HistoryPage() {
                           {archive?.metrics.comments !== undefined && (
                             <span className="font-mono">
                               评论{" "}
-                              <strong className="text-[#0F172A]">
+                              <strong className="text-[#181816]">
                                 {formatNumber(archive.metrics.comments)}
                               </strong>
                             </span>
@@ -322,13 +342,13 @@ export default function HistoryPage() {
                           {archive?.metrics.shares !== undefined && (
                             <span className="font-mono">
                               转发{" "}
-                              <strong className="text-[#0F172A]">
+                              <strong className="text-[#181816]">
                                 {formatNumber(archive.metrics.shares)}
                               </strong>
                             </span>
                           )}
                           {archive?.metrics.conversions && (
-                            <span className="rounded bg-amber-50 px-1.5 py-0.5 text-amber-800">
+                            <span className="rounded bg-[#FBF3EC] px-1.5 py-0.5 text-[#9A4A22]">
                               转化：{archive.metrics.conversions}
                             </span>
                           )}
@@ -337,7 +357,7 @@ export default function HistoryPage() {
                               href={archive.publishedUrl}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1 font-medium text-[#1D4ED8] hover:underline"
+                              className="inline-flex items-center gap-1 font-medium text-[#1B4D3E] hover:underline"
                             >
                               <ExternalLink className="h-3 w-3" />
                               <span>查看原帖</span>
@@ -352,10 +372,10 @@ export default function HistoryPage() {
                     <button
                       type="button"
                       onClick={() => openBackfillModal(item)}
-                      className={`inline-flex items-center gap-1 rounded-md border px-2.5 py-1 text-xs font-medium transition ${
+                      className={`inline-flex items-center gap-1 rounded border px-2.5 py-1 text-xs font-medium transition ${
                         archive?.archived
-                          ? "border-indigo-200 bg-indigo-50 text-indigo-700 hover:bg-indigo-100"
-                          : "border-[#1D4ED8]/30 bg-[#EFF6FF] text-[#1D4ED8] hover:bg-[#1D4ED8] hover:text-white"
+                          ? "border-[#D5CFC3] bg-[#EFECE4] text-[#181816] hover:border-[#181816]"
+                          : "border-[#1B4D3E]/35 bg-[#E9F0ED] text-[#1B4D3E] hover:bg-[#1B4D3E] hover:text-[#FCFBF8]"
                       }`}
                     >
                       <BarChart3 className="h-3 w-3" />
@@ -365,15 +385,15 @@ export default function HistoryPage() {
                     <button
                       type="button"
                       onClick={() => togglePublished(item.id)}
-                      className={`inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1 text-xs font-medium transition ${
+                      className={`inline-flex items-center gap-1.5 rounded border px-2.5 py-1 text-xs font-medium transition ${
                         item.isPublished
-                          ? "border-emerald-200 bg-emerald-50 text-emerald-700"
-                          : "border-[#E4E7EC] bg-white text-slate-500 hover:bg-slate-50 hover:text-[#0F172A]"
+                          ? "border-[#1B4D3E]/30 bg-[#E9F0ED] text-[#1B4D3E]"
+                          : "border-[#D5CFC3] bg-[#FCFBF8] text-[#78716C] hover:text-[#181816]"
                       }`}
                     >
                       <span
                         className={`h-1.5 w-1.5 rounded-full ${
-                          item.isPublished ? "bg-emerald-600" : "bg-slate-300"
+                          item.isPublished ? "bg-[#1B4D3E]" : "bg-[#CFC8BA]"
                         }`}
                       />
                       <span>已发布</span>
@@ -382,15 +402,15 @@ export default function HistoryPage() {
                     <button
                       type="button"
                       onClick={() => toggleViral(item.id)}
-                      className={`inline-flex items-center gap-1.5 rounded-md border px-2.5 py-1 text-xs font-medium transition ${
+                      className={`inline-flex items-center gap-1.5 rounded border px-2.5 py-1 text-xs font-medium transition ${
                         item.isViral
-                          ? "border-amber-200 bg-amber-50 text-amber-700"
-                          : "border-[#E4E7EC] bg-white text-slate-500 hover:bg-slate-50 hover:text-[#0F172A]"
+                          ? "border-[#B85D3B]/35 bg-[#FBF3EC] text-[#9A4A22]"
+                          : "border-[#D5CFC3] bg-[#FCFBF8] text-[#78716C] hover:text-[#181816]"
                       }`}
                     >
                       <span
                         className={`h-1.5 w-1.5 rounded-full ${
-                          item.isViral ? "bg-amber-500" : "bg-slate-300"
+                          item.isViral ? "bg-[#B85D3B]" : "bg-[#CFC8BA]"
                         }`}
                       />
                       <span>爆款</span>
@@ -399,7 +419,7 @@ export default function HistoryPage() {
                     <button
                       type="button"
                       onClick={() => handleOpenInEditor(item.id)}
-                      className="inline-flex items-center gap-1 rounded-md border border-[#E4E7EC] bg-white px-2.5 py-1 text-xs font-medium text-[#0F172A] transition hover:border-[#0F172A] hover:bg-[#0F172A] hover:text-white"
+                      className="inline-flex items-center gap-1 rounded border border-[#D5CFC3] bg-[#FCFBF8] px-2.5 py-1 text-xs font-medium text-[#181816] transition hover:border-[#181816] hover:bg-[#181816] hover:text-[#FCFBF8]"
                     >
                       <span>编辑</span>
                       <ArrowUpRight className="h-3 w-3" />
@@ -413,11 +433,11 @@ export default function HistoryPage() {
                           `${item.titles[0] || ""}\n\n${item.hook}\n\n${item.body}`
                         )
                       }
-                      className="rounded-md p-1.5 text-slate-400 transition hover:bg-slate-100 hover:text-[#0F172A]"
+                      className="rounded p-1.5 text-[#8C857B] transition hover:bg-[#EFECE4] hover:text-[#181816]"
                       title="复制文案"
                     >
                       {copiedId === item.id ? (
-                        <Check className="h-3.5 w-3.5 text-emerald-600" />
+                        <Check className="h-3.5 w-3.5 text-[#1B4D3E]" />
                       ) : (
                         <Copy className="h-3.5 w-3.5" />
                       )}
@@ -426,7 +446,7 @@ export default function HistoryPage() {
                     <button
                       type="button"
                       onClick={() => removeFromHistory(item.id)}
-                      className="rounded-md p-1.5 text-slate-400 transition hover:bg-rose-50 hover:text-rose-600"
+                      className="rounded p-1.5 text-[#8C857B] transition hover:bg-[#FDF2F2] hover:text-[#B42318]"
                       title="删除"
                     >
                       <Trash2 className="h-3.5 w-3.5" />

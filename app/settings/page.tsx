@@ -1,12 +1,14 @@
 "use client";
 
 import { useState } from "react";
-import { Check } from "lucide-react";
+import { Check, Eye, EyeOff } from "lucide-react";
 import { useWorkbenchStore } from "@/store/useWorkbenchStore";
 
 export default function SettingsPage() {
   const { modelConfig, updateModelConfig } = useWorkbenchStore();
   const [savedToast, setSavedToast] = useState(false);
+  const [showTextKey, setShowTextKey] = useState(false);
+  const [showImageKey, setShowImageKey] = useState(false);
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
@@ -19,15 +21,15 @@ export default function SettingsPage() {
   const hasAnyKey = hasTextKey || hasImageKey;
 
   return (
-    <form onSubmit={handleSave} className="mx-auto max-w-4xl space-y-6">
+    <form onSubmit={handleSave} className="mx-auto max-w-4xl space-y-8">
       {/* Header */}
-      <header className="flex items-center justify-between border-b border-[#E5E7EB] pb-4">
+      <header className="flex flex-wrap items-end justify-between gap-4 border-b border-[#181816]/15 pb-5">
         <div>
-          <h1 className="text-lg font-semibold tracking-tight text-[#111827]">
+          <h1 className="font-editorial text-2xl font-semibold tracking-tight text-[#181816]">
             模型配置
           </h1>
-          <p className="mt-0.5 text-xs text-gray-500">
-            配置文本与图像生成服务接口，密钥仅保存在本地浏览器
+          <p className="mt-1 text-xs text-[#78716C]">
+            配置文本与图像生成服务接口，密钥仅保存在当前浏览器本地存储
           </p>
         </div>
 
@@ -38,58 +40,74 @@ export default function SettingsPage() {
               onClick={() =>
                 updateModelConfig({ textApiKey: "", imageApiKey: "" })
               }
-              className="rounded-md border border-[#E5E7EB] bg-white px-3 py-1.5 text-xs font-medium text-gray-600 transition hover:bg-gray-50 hover:text-[#111827]"
+              className="rounded border border-[#D5CFC3] bg-[#FCFBF8] px-3.5 py-2 text-xs font-medium text-[#57534E] transition hover:border-[#181816] hover:text-[#181816]"
             >
               清空密钥
             </button>
           )}
           <button
             type="submit"
-            className="inline-flex items-center gap-1.5 rounded-md bg-[#3451E5] px-4 py-1.5 text-xs font-medium text-white transition hover:bg-[#2740C7]"
+            className="inline-flex items-center gap-1.5 rounded bg-[#1B4D3E] px-4 py-2 text-xs font-medium text-[#FCFBF8] transition hover:bg-[#143A2F]"
           >
             {savedToast && <Check className="h-3.5 w-3.5" />}
-            <span>{savedToast ? "已保存" : "保存配置"}</span>
+            <span>{savedToast ? "已保存配置" : "保存配置"}</span>
           </button>
         </div>
       </header>
 
-      {/* Structured Settings Container */}
-      <div className="divide-y divide-[#F3F4F6] rounded-lg border border-[#E5E7EB] bg-white">
+      {/* Flush Rule-Divided Settings Bands (Zero Outer Card Box) */}
+      <div className="divide-y divide-[#E2DDD3] border-b border-[#E2DDD3]">
         {/* Text Model Band */}
-        <section className="grid grid-cols-1 gap-6 p-6 sm:p-7 lg:grid-cols-12">
+        <section className="grid grid-cols-1 gap-6 pb-9 lg:grid-cols-12">
           <div className="lg:col-span-4">
             <div className="flex items-center gap-2">
-              <h2 className="text-sm font-semibold text-[#111827]">文本模型</h2>
+              <h2 className="font-editorial text-base font-semibold text-[#181816]">
+                文本模型
+              </h2>
               <span
-                className={`h-1.5 w-1.5 rounded-full ${
-                  hasTextKey ? "bg-emerald-500" : "bg-gray-300"
+                className={`h-2 w-2 rounded-full ${
+                  hasTextKey ? "bg-[#1B4D3E]" : "bg-[#CFC8BA]"
                 }`}
               />
             </div>
-            <p className="mt-1 text-xs text-gray-500">
-              兼容 DeepSeek 与 OpenAI 协议
+            <p className="mt-1.5 text-xs leading-relaxed text-[#78716C]">
+              用于多平台推流文案、趋势调研与月报汇总，兼容 DeepSeek 与 OpenAI 协议。
             </p>
           </div>
 
           <div className="space-y-4 lg:col-span-8">
             <div>
-              <label className="mb-1.5 block text-xs font-medium text-slate-600">
+              <label className="mb-1.5 block text-xs font-medium text-[#57534E]">
                 API Key
               </label>
-              <input
-                type="password"
-                value={modelConfig.textApiKey}
-                onChange={(e) =>
-                  updateModelConfig({ textApiKey: e.target.value })
-                }
-                placeholder="sk-..."
-                className="w-full rounded-md border border-[#D5DAE2] bg-white px-3 py-2 text-sm text-[#0F172A] outline-none transition placeholder:text-slate-400 focus:border-[#1D4ED8] focus:ring-2 focus:ring-[#1D4ED8]/10"
-              />
+              <div className="relative">
+                <input
+                  type={showTextKey ? "text" : "password"}
+                  value={modelConfig.textApiKey}
+                  onChange={(e) =>
+                    updateModelConfig({ textApiKey: e.target.value })
+                  }
+                  placeholder="sk-..."
+                  className="w-full rounded border border-[#D5CFC3] bg-[#FCFBF8] py-2 pl-3 pr-9 text-sm text-[#181816] outline-none transition placeholder:text-[#A8A29E] focus:border-[#1B4D3E]"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowTextKey((v) => !v)}
+                  aria-label={showTextKey ? "隐藏密钥" : "显示密钥"}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-[#8C857B] transition hover:text-[#181816]"
+                >
+                  {showTextKey ? (
+                    <EyeOff className="h-4 w-4" />
+                  ) : (
+                    <Eye className="h-4 w-4" />
+                  )}
+                </button>
+              </div>
             </div>
 
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <div>
-                <label className="mb-1.5 block text-xs font-medium text-slate-600">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-12">
+              <div className="sm:col-span-7">
+                <label className="mb-1.5 block text-xs font-medium text-[#57534E]">
                   Base URL
                 </label>
                 <input
@@ -99,12 +117,12 @@ export default function SettingsPage() {
                     updateModelConfig({ textBaseUrl: e.target.value })
                   }
                   placeholder="https://api.deepseek.com/v1"
-                  className="w-full rounded-md border border-[#D5DAE2] bg-white px-3 py-2 text-sm text-[#0F172A] outline-none transition placeholder:text-slate-400 focus:border-[#1D4ED8] focus:ring-2 focus:ring-[#1D4ED8]/10"
+                  className="w-full rounded border border-[#D5CFC3] bg-[#FCFBF8] px-3 py-2 font-mono text-xs text-[#181816] outline-none transition placeholder:text-[#A8A29E] focus:border-[#1B4D3E]"
                 />
               </div>
 
-              <div>
-                <label className="mb-1.5 block text-xs font-medium text-slate-600">
+              <div className="sm:col-span-5">
+                <label className="mb-1.5 block text-xs font-medium text-[#57534E]">
                   模型名称
                 </label>
                 <input
@@ -114,7 +132,7 @@ export default function SettingsPage() {
                     updateModelConfig({ textModel: e.target.value })
                   }
                   placeholder="deepseek-chat"
-                  className="w-full rounded-md border border-[#D5DAE2] bg-white px-3 py-2 text-sm text-[#0F172A] outline-none transition placeholder:text-slate-400 focus:border-[#1D4ED8] focus:ring-2 focus:ring-[#1D4ED8]/10"
+                  className="w-full rounded border border-[#D5CFC3] bg-[#FCFBF8] px-3 py-2 font-mono text-xs text-[#181816] outline-none transition placeholder:text-[#A8A29E] focus:border-[#1B4D3E]"
                 />
               </div>
             </div>
@@ -122,40 +140,56 @@ export default function SettingsPage() {
         </section>
 
         {/* Image Model Band */}
-        <section className="grid grid-cols-1 gap-6 p-6 sm:p-7 lg:grid-cols-12">
+        <section className="grid grid-cols-1 gap-6 py-9 lg:grid-cols-12">
           <div className="lg:col-span-4">
             <div className="flex items-center gap-2">
-              <h2 className="text-sm font-semibold text-[#111827]">生图模型</h2>
+              <h2 className="font-editorial text-base font-semibold text-[#181816]">
+                生图模型
+              </h2>
               <span
-                className={`h-1.5 w-1.5 rounded-full ${
-                  hasImageKey ? "bg-emerald-500" : "bg-gray-300"
+                className={`h-2 w-2 rounded-full ${
+                  hasImageKey ? "bg-[#1B4D3E]" : "bg-[#CFC8BA]"
                 }`}
               />
             </div>
-            <p className="mt-1 text-xs text-gray-500">
-              兼容 Seedream 与火山方舟接口
+            <p className="mt-1.5 text-xs leading-relaxed text-[#78716C]">
+              用于图片工坊二维风格化重绘，兼容 Seedream 与火山方舟接口。未配置时自动降级为本地滤镜预览。
             </p>
           </div>
 
           <div className="space-y-4 lg:col-span-8">
             <div>
-              <label className="mb-1.5 block text-xs font-medium text-slate-600">
+              <label className="mb-1.5 block text-xs font-medium text-[#57534E]">
                 API Key
               </label>
-              <input
-                type="password"
-                value={modelConfig.imageApiKey}
-                onChange={(e) =>
-                  updateModelConfig({ imageApiKey: e.target.value })
-                }
-                placeholder="输入密钥..."
-                className="w-full rounded-md border border-[#D5DAE2] bg-white px-3 py-2 text-sm text-[#0F172A] outline-none transition placeholder:text-slate-400 focus:border-[#1D4ED8] focus:ring-2 focus:ring-[#1D4ED8]/10"
-              />
+              <div className="relative">
+                <input
+                  type={showImageKey ? "text" : "password"}
+                  value={modelConfig.imageApiKey}
+                  onChange={(e) =>
+                    updateModelConfig({ imageApiKey: e.target.value })
+                  }
+                  placeholder="输入生图服务密钥..."
+                  className="w-full rounded border border-[#D5CFC3] bg-[#FCFBF8] py-2 pl-3 pr-9 text-sm text-[#181816] outline-none transition placeholder:text-[#A8A29E] focus:border-[#1B4D3E]"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowImageKey((v) => !v)}
+                  aria-label={showImageKey ? "隐藏密钥" : "显示密钥"}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 rounded p-1 text-[#8C857B] transition hover:text-[#181816]"
+                >
+                  {showImageKey ? (
+                    <EyeOff className="h-4 w-4" />
+                  ) : (
+                    <Eye className="h-4 w-4" />
+                  )}
+                </button>
+              </div>
             </div>
 
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-              <div>
-                <label className="mb-1.5 block text-xs font-medium text-slate-600">
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-12">
+              <div className="sm:col-span-6">
+                <label className="mb-1.5 block text-xs font-medium text-[#57534E]">
                   Base URL
                 </label>
                 <input
@@ -165,12 +199,12 @@ export default function SettingsPage() {
                     updateModelConfig({ imageBaseUrl: e.target.value })
                   }
                   placeholder="https://ark.cn-beijing.volces.com/api/v3"
-                  className="w-full rounded-md border border-[#D5DAE2] bg-white px-3 py-2 text-sm text-[#0F172A] outline-none transition placeholder:text-slate-400 focus:border-[#1D4ED8] focus:ring-2 focus:ring-[#1D4ED8]/10"
+                  className="w-full rounded border border-[#D5CFC3] bg-[#FCFBF8] px-3 py-2 font-mono text-[11.5px] text-[#181816] outline-none transition placeholder:text-[#A8A29E] focus:border-[#1B4D3E]"
                 />
               </div>
 
-              <div>
-                <label className="mb-1.5 block text-xs font-medium text-slate-600">
+              <div className="sm:col-span-6">
+                <label className="mb-1.5 block text-xs font-medium text-[#57534E]">
                   模型名称
                 </label>
                 <input
@@ -180,7 +214,7 @@ export default function SettingsPage() {
                     updateModelConfig({ imageModel: e.target.value })
                   }
                   placeholder="doubao-seedream-3-0-t2i-250415"
-                  className="w-full rounded-md border border-[#D5DAE2] bg-white px-3 py-2 text-sm text-[#0F172A] outline-none transition placeholder:text-slate-400 focus:border-[#1D4ED8] focus:ring-2 focus:ring-[#1D4ED8]/10"
+                  className="w-full rounded border border-[#D5CFC3] bg-[#FCFBF8] px-3 py-2 font-mono text-[11.5px] text-[#181816] outline-none transition placeholder:text-[#A8A29E] focus:border-[#1B4D3E]"
                 />
               </div>
             </div>

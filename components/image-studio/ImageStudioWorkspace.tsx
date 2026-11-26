@@ -133,69 +133,101 @@ export function ImageStudioWorkspace() {
 
   if (!originalImage) {
     return (
-      <div className="space-y-5">
-        <header className="flex items-center justify-between border-b border-[#E5E7EB] pb-4">
-          <div>
-            <h1 className="text-lg font-semibold tracking-tight text-[#111827]">
-              图片工坊
-            </h1>
-            <p className="mt-0.5 text-xs text-gray-500">
-              对现场素材进行隐私打码或二维风格化处理
-            </p>
-          </div>
+      <div className="space-y-8">
+        <header className="border-b border-[#181816]/15 pb-5">
+          <h1 className="font-editorial text-2xl font-semibold tracking-tight text-[#181816]">
+            图片工坊
+          </h1>
+          <p className="mt-1 text-xs text-[#78716C]">
+            公益现场素材的隐私保护打码与二维插画风格化暗房
+          </p>
         </header>
 
-        <div
-          onDragOver={(e) => {
-            e.preventDefault();
-            setIsDragging(true);
-          }}
-          onDragLeave={() => setIsDragging(false)}
-          onDrop={handleDrop}
-          className={`flex min-h-[calc(100vh-14rem)] flex-col items-center justify-center rounded-xl border border-dashed bg-white p-10 text-center transition-colors ${
-            isDragging
-              ? "border-[#3451E5] bg-[#EEF2FF]/40"
-              : "border-[#D1D5DB] hover:border-gray-400"
-          }`}
-        >
-          <div className="mb-4 flex h-12 w-12 items-center justify-center rounded-xl bg-[#F3F4F6] text-[#3451E5]">
-            <ImagePlus className="h-5 w-5" />
+        <div className="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:items-stretch">
+          {/* Left Editorial Capability Index (No Cards) */}
+          <div className="flex flex-col justify-between divide-y divide-[#E2DDD3] border-y border-[#E2DDD3] lg:col-span-5">
+            <div className="py-6">
+              <div className="flex items-baseline gap-3">
+                <span className="font-mono text-xs text-[#1B4D3E]">01</span>
+                <h2 className="font-editorial text-base font-semibold text-[#181816]">
+                  智能隐私打码
+                </h2>
+              </div>
+              <p className="mt-2 pl-7 text-xs leading-relaxed text-[#57534E]">
+                自动识别现场照片中的手机号、单据编号、人脸与二维码；支持柔焦模糊、像素马赛克与纯色遮盖，并可手动圈选、框选或画笔微调。
+              </p>
+            </div>
+
+            <div className="py-6">
+              <div className="flex items-baseline gap-3">
+                <span className="font-mono text-xs text-[#B85D3B]">02</span>
+                <h2 className="font-editorial text-base font-semibold text-[#181816]">
+                  二维风格化重绘
+                </h2>
+              </div>
+              <p className="mt-2 pl-7 text-xs leading-relaxed text-[#57534E]">
+                将实拍画面转为清新绘本、水彩手绘、扁平插画或日系动漫风格，在保护受助人肖像的同时保留现场温度与叙事张力。
+              </p>
+            </div>
+
+            <div className="py-4 text-[11px] text-[#8C857B]">
+              支持 JPG · PNG · WebP 本地处理，未配置生图密钥时亦可离线预览
+            </div>
           </div>
 
-          <h2 className="text-base font-semibold text-[#111827]">
-            拖放或选择本地图片
-          </h2>
-          <p className="mt-1.5 text-xs text-gray-500">
-            支持 JPG、PNG、WebP 格式，用于隐私信息打码与二维风格化
-          </p>
-
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            className="hidden"
-            onChange={(e) => {
-              const file = e.target.files?.[0];
-              if (file) loadFile(file);
+          {/* Right Tactile Dropzone */}
+          <div
+            onDragOver={(e) => {
+              e.preventDefault();
+              setIsDragging(true);
             }}
-          />
+            onDragLeave={() => setIsDragging(false)}
+            onDrop={handleDrop}
+            className={`flex min-h-[380px] flex-col items-center justify-center border border-dashed p-10 text-center transition-colors lg:col-span-7 ${
+              isDragging
+                ? "border-[#1B4D3E] bg-[#E9F0ED]/60"
+                : "border-[#CFC8BA] bg-[#EFECE4]/50 hover:border-[#8C857B]"
+            }`}
+          >
+            <div className="mb-4 flex h-11 w-11 items-center justify-center rounded border border-[#D5CFC3] bg-[#FCFBF8] text-[#1B4D3E]">
+              <ImagePlus className="h-5 w-5" />
+            </div>
 
-          <div className="mt-6 flex flex-wrap items-center justify-center gap-2.5">
-            <button
-              type="button"
-              onClick={() => fileInputRef.current?.click()}
-              className="rounded-md bg-[#3451E5] px-4 py-2 text-xs font-medium text-white transition hover:bg-[#2740C7]"
-            >
-              选择本地图片
-            </button>
-            <button
-              type="button"
-              onClick={handleLoadSample}
-              className="inline-flex items-center gap-1.5 rounded-md border border-[#E5E7EB] bg-white px-4 py-2 text-xs font-medium text-gray-700 transition hover:bg-gray-50"
-            >
-              <FileImage className="h-3.5 w-3.5 text-gray-400" />
-              <span>载入示例样本</span>
-            </button>
+            <h2 className="font-editorial text-lg font-semibold text-[#181816]">
+              拖放或选择本地图片进入暗房
+            </h2>
+            <p className="mt-1.5 text-xs text-[#78716C]">
+              载入后将自动扫描敏感信息区域，随时可切换至二维风格化
+            </p>
+
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={(e) => {
+                const file = e.target.files?.[0];
+                if (file) loadFile(file);
+              }}
+            />
+
+            <div className="mt-7 flex flex-wrap items-center justify-center gap-3">
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                className="rounded bg-[#1B4D3E] px-5 py-2 text-xs font-medium text-[#FCFBF8] transition hover:bg-[#143A2F]"
+              >
+                选择本地图片
+              </button>
+              <button
+                type="button"
+                onClick={handleLoadSample}
+                className="inline-flex items-center gap-1.5 rounded border border-[#D5CFC3] bg-[#FCFBF8] px-4 py-2 text-xs font-medium text-[#181816] transition hover:border-[#181816]"
+              >
+                <FileImage className="h-3.5 w-3.5 text-[#8C857B]" />
+                <span>载入示例样本</span>
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -203,22 +235,22 @@ export function ImageStudioWorkspace() {
   }
 
   return (
-    <div className="overflow-hidden rounded-lg border border-[#1E293B] bg-[#0B1120] text-slate-100 shadow-[0_4px_20px_rgba(15,23,42,0.12)]">
+    <div className="overflow-hidden rounded border border-[#2E2C27] bg-[#161513] text-[#F5F2EB]">
       {/* Editor Top Bar */}
-      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-slate-800 bg-[#0F172A] px-5 py-3">
+      <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#2E2C27] bg-[#1E1D1A] px-5 py-3">
         <div className="flex items-center gap-4">
-          <span className="text-sm font-semibold tracking-tight text-white">
+          <span className="font-editorial text-sm font-semibold tracking-tight text-[#FCFBF8]">
             图片工坊
           </span>
 
-          <div className="flex items-center gap-0.5 rounded-md border border-slate-800 bg-[#0B1120] p-0.5">
+          <div className="flex items-center gap-0.5 rounded border border-[#2E2C27] bg-[#161513] p-0.5">
             <button
               type="button"
               onClick={() => setActiveMode("mosaic")}
-              className={`rounded-[5px] px-3 py-1 text-xs font-medium transition ${
+              className={`rounded-[3px] px-3 py-1 text-xs font-medium transition ${
                 activeMode === "mosaic"
-                  ? "bg-[#3451E5] text-white"
-                  : "text-slate-400 hover:text-slate-200"
+                  ? "bg-[#1B4D3E] text-[#FCFBF8]"
+                  : "text-[#A8A29E] hover:text-[#FCFBF8]"
               }`}
             >
               智能打码
@@ -226,10 +258,10 @@ export function ImageStudioWorkspace() {
             <button
               type="button"
               onClick={() => setActiveMode("stylize")}
-              className={`rounded-[5px] px-3 py-1 text-xs font-medium transition ${
+              className={`rounded-[3px] px-3 py-1 text-xs font-medium transition ${
                 activeMode === "stylize"
-                  ? "bg-[#3451E5] text-white"
-                  : "text-slate-400 hover:text-slate-200"
+                  ? "bg-[#1B4D3E] text-[#FCFBF8]"
+                  : "text-[#A8A29E] hover:text-[#FCFBF8]"
               }`}
             >
               二维风格化
@@ -239,14 +271,14 @@ export function ImageStudioWorkspace() {
 
         <div className="flex items-center gap-3">
           {imageMeta && (
-            <span className="hidden font-mono text-[11px] text-slate-500 tabular-nums sm:inline">
+            <span className="hidden font-mono text-[11px] text-[#8C857B] tabular-nums sm:inline">
               {imageMeta.width}×{imageMeta.height}
             </span>
           )}
           <button
             type="button"
             onClick={clearImage}
-            className="inline-flex items-center gap-1.5 rounded-md border border-slate-700 bg-slate-800/80 px-3 py-1.5 text-xs font-medium text-slate-200 transition hover:bg-slate-700 hover:text-white"
+            className="inline-flex items-center gap-1.5 rounded border border-[#3A3731] bg-[#262420] px-3 py-1.5 text-xs font-medium text-[#E7E2D8] transition hover:border-[#8C857B] hover:text-white"
           >
             <RefreshCw className="h-3.5 w-3.5" />
             <span>更换图片</span>
