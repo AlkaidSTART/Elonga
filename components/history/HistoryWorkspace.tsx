@@ -48,7 +48,7 @@ function formatNumber(n?: number): string {
   return n.toLocaleString("zh-CN");
 }
 
-export default function HistoryPage() {
+export function HistoryWorkspace() {
   const router = useRouter();
   const {
     history,

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Check, Eye, EyeOff } from "lucide-react";
 import { useWorkbenchStore } from "@/store/useWorkbenchStore";
 
-export default function SettingsPage() {
+export function SettingsWorkspace() {
   const { modelConfig, updateModelConfig } = useWorkbenchStore();
   const [savedToast, setSavedToast] = useState(false);
   const [showTextKey, setShowTextKey] = useState(false);

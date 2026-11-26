@@ -68,7 +68,7 @@ function formatUnixTime(seconds?: number): string {
   }
 }
 
-export default function ProfilePage() {
+export function ProfileWorkspace() {
   const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 

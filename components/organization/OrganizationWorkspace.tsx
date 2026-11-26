@@ -55,7 +55,7 @@ function createEmptyForm(defaultDate = ""): ActivityFormState {
   };
 }
 
-export default function OrganizationPage() {
+export function OrganizationWorkspace() {
   const router = useRouter();
   const { profile, activities, updateProfile, addActivity, updateActivity, deleteActivity } =
     useOrganizationStore();

@@ -4,20 +4,13 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { AnimatePresence, MotionConfig, motion } from "framer-motion";
-import {
-  Building2,
-  ChevronLeft,
-  ChevronRight,
-  FileBarChart2,
-  History,
-  Image as ImageIcon,
-  LayoutDashboard,
-  Menu,
-  PenTool,
-  SlidersHorizontal,
-  X,
-} from "lucide-react";
+import { ChevronLeft, ChevronRight, Menu, X } from "lucide-react";
 import { BrandLogo } from "@/components/BrandLogo";
+import {
+  WORKSPACE_NAV_GROUPS,
+  isWorkspaceRouteActive,
+  resolveWorkspaceRoute,
+} from "@/components/layout/workspace-routes";
 import type { AuthUser } from "@/lib/auth/jwt";
 import {
   PROFILE_UPDATED_EVENT,
@@ -26,37 +19,7 @@ import {
 } from "@/store/useProfileStore";
 import { useWorkbenchStore } from "@/store/useWorkbenchStore";
 
-const NAV_GROUPS = [
-  {
-    label: "总览",
-    items: [
-      { href: "/", label: "工作台概览", icon: LayoutDashboard },
-      { href: "/reports", label: "运营月报", icon: FileBarChart2 },
-    ],
-  },
-  {
-    label: "创作",
-    items: [
-      { href: "/workflow", label: "内容创作", icon: PenTool },
-      { href: "/image-studio", label: "图片工坊", icon: ImageIcon },
-    ],
-  },
-  {
-    label: "资产",
-    items: [
-      { href: "/organization", label: "机构中心", icon: Building2 },
-      { href: "/history", label: "创作记录", icon: History },
-    ],
-  },
-  {
-    label: "系统",
-    items: [
-      { href: "/settings", label: "模型配置", icon: SlidersHorizontal },
-    ],
-  },
-] as const;
-
-export function AppShell({ children }: { children: React.ReactNode }) {
+export function AppShell({ children }: { children?: React.ReactNode }) {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
@@ -64,13 +27,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
   const historyCount = useWorkbenchStore((s) => s.history.length);
   const profilesByUserId = useProfileStore((s) => s.profilesByUserId);
 
-  const isAuthPage = pathname === "/login";
-
   useEffect(() => {
-    if (isAuthPage) {
-      return;
-    }
-
     let cancelled = false;
     const loadMe = () => {
       fetch("/api/auth/me", { credentials: "same-origin" })
@@ -92,16 +49,11 @@ export function AppShell({ children }: { children: React.ReactNode }) {
       cancelled = true;
       window.removeEventListener(PROFILE_UPDATED_EVENT, loadMe);
     };
-  }, [isAuthPage, pathname]);
+  }, [pathname]);
 
-  if (isAuthPage) {
-    return <MotionConfig reducedMotion="user">{children}</MotionConfig>;
-  }
-
-  const isActive = (href: string) => {
-    if (href === "/") return pathname === "/";
-    return pathname.startsWith(href);
-  };
+  const activeRoute = resolveWorkspaceRoute(pathname);
+  const ActiveView = activeRoute?.component;
+  const profileActive = isWorkspaceRouteActive(pathname, { href: "/profile" });
 
   const userInitial = currentUser?.name?.slice(0, 1) || "E";
   const userExtras = currentUser?.id ? profilesByUserId[currentUser.id] : undefined;
@@ -168,7 +120,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             aria-label="主导航"
             className="flex-1 space-y-5 overflow-y-auto px-3 py-4"
           >
-            {NAV_GROUPS.map((group) => (
+            {WORKSPACE_NAV_GROUPS.map((group) => (
               <div key={group.label}>
                 {!collapsed && (
                   <div className="mb-1.5 px-2.5 text-[10px] font-medium tracking-[0.14em] text-[#8C857B]">
@@ -178,7 +130,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 <div className="space-y-0.5">
                   {group.items.map((item) => {
                     const Icon = item.icon;
-                    const active = isActive(item.href);
+                    const active = isWorkspaceRouteActive(pathname, item);
                     return (
                       <Link
                         key={item.href}
@@ -230,7 +182,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                   title="个人中心"
                   aria-label="个人中心"
                   className={`relative flex h-8 w-8 items-center justify-center rounded transition ${
-                    isActive("/profile")
+                    profileActive
                       ? "bg-[#FCFBF8] ring-1 ring-[#1B4D3E]/30"
                       : "hover:bg-[#E5E0D5]"
                   }`}
@@ -265,12 +217,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 href="/profile"
                 title="进入个人中心"
                 className={`group relative flex items-center justify-between gap-2 rounded px-2.5 py-2 transition-colors ${
-                  isActive("/profile")
+                  profileActive
                     ? "bg-[#FCFBF8] text-[#1B4D3E]"
                     : "hover:bg-[#E7E2D8]/60"
                 }`}
               >
-                {isActive("/profile") && (
+                {profileActive && (
                   <span
                     aria-hidden="true"
                     className="absolute inset-y-1.5 left-0 w-[2.5px] rounded-r bg-[#1B4D3E]"
@@ -294,9 +246,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                   <div className="min-w-0 leading-tight">
                     <div
                       className={`truncate text-xs font-medium ${
-                        isActive("/profile")
-                          ? "text-[#1B4D3E]"
-                          : "text-[#181816]"
+                        profileActive ? "text-[#1B4D3E]" : "text-[#181816]"
                       }`}
                     >
                       {currentUser?.name ?? "工作区成员"}
@@ -308,7 +258,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                 </div>
                 <ChevronRight
                   className={`h-3.5 w-3.5 shrink-0 transition-colors ${
-                    isActive("/profile")
+                    profileActive
                       ? "text-[#1B4D3E]"
                       : "text-[#8C857B] group-hover:text-[#57534E]"
                   }`}
@@ -371,7 +321,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                     </button>
                   </div>
                   <nav className="flex-1 space-y-5 overflow-y-auto px-3 py-4">
-                    {NAV_GROUPS.map((group) => (
+                    {WORKSPACE_NAV_GROUPS.map((group) => (
                       <div key={group.label}>
                         <div className="mb-1.5 px-2.5 text-[10px] font-medium tracking-[0.14em] text-[#8C857B]">
                           {group.label}
@@ -379,7 +329,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                         <div className="space-y-0.5">
                           {group.items.map((item) => {
                             const Icon = item.icon;
-                            const active = isActive(item.href);
+                            const active = isWorkspaceRouteActive(pathname, item);
                             return (
                               <Link
                                 key={item.href}
@@ -417,12 +367,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                       href="/profile"
                       onClick={() => setMobileOpen(false)}
                       className={`relative flex items-center justify-between gap-2 rounded px-2.5 py-2 transition ${
-                        isActive("/profile")
+                        profileActive
                           ? "bg-[#FCFBF8] text-[#1B4D3E]"
                           : "hover:bg-[#E7E2D8]/60"
                       }`}
                     >
-                      {isActive("/profile") && (
+                      {profileActive && (
                         <span
                           aria-hidden="true"
                           className="absolute inset-y-1.5 left-0 w-[2.5px] rounded-r bg-[#1B4D3E]"
@@ -446,9 +396,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                         <div className="min-w-0 leading-tight">
                           <div
                             className={`truncate text-xs font-medium ${
-                              isActive("/profile")
-                                ? "text-[#1B4D3E]"
-                                : "text-[#181816]"
+                              profileActive ? "text-[#1B4D3E]" : "text-[#181816]"
                             }`}
                           >
                             {currentUser?.name ?? "工作区成员"}
@@ -460,9 +408,7 @@ export function AppShell({ children }: { children: React.ReactNode }) {
                       </div>
                       <ChevronRight
                         className={`h-3.5 w-3.5 shrink-0 ${
-                          isActive("/profile")
-                            ? "text-[#1B4D3E]"
-                            : "text-[#8C857B]"
+                          profileActive ? "text-[#1B4D3E]" : "text-[#8C857B]"
                         }`}
                       />
                     </Link>
@@ -472,9 +418,9 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             )}
           </AnimatePresence>
 
-          {/* Main Route Viewport */}
+          {/* Main Route Viewport: unified business view dispatch by route */}
           <main className="mx-auto w-full max-w-[1280px] flex-1 px-6 py-7 sm:px-9 lg:px-12 lg:py-9">
-            {children}
+            {ActiveView ? <ActiveView /> : children}
           </main>
         </div>
       </div>

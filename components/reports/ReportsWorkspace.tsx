@@ -40,7 +40,7 @@ function createReportId(month: string): string {
   return `rep_${month}_${Date.now()}_${Math.random().toString(36).slice(2, 6)}`;
 }
 
-export default function ReportsPage() {
+export function ReportsWorkspace() {
   const defaultMonth = useSyncExternalStore(
     emptySubscribe,
     getClientCurrentMonth,

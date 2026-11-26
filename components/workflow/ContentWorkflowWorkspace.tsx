@@ -281,6 +281,7 @@ export function ContentWorkflowWorkspace() {
 
   const [optionsExpanded, setOptionsExpanded] = useState(false);
   const [titlesExpanded, setTitlesExpanded] = useState(false);
+  const [rightTab, setRightTab] = useState<"manuscript" | "compliance" | "research">("manuscript");
 
   const candidateTitles = useMemo(
     () => currentResult?.titles ?? [],
@@ -661,7 +662,7 @@ export function ContentWorkflowWorkspace() {
       : undefined;
 
   return (
-    <div className="space-y-7">
+    <div className="space-y-8">
       {/* Top Page Header */}
       <header className="flex flex-wrap items-end justify-between gap-4 border-b border-[#181816]/15 pb-5">
         <div>
@@ -669,7 +670,7 @@ export function ContentWorkflowWorkspace() {
             内容创作
           </h1>
           <p className="mt-1 text-xs text-[#78716C]">
-            关联机构档案、自动调研平台风向并生成可审查的合规图文稿件
+            左侧编排选题与配图，右侧实时成稿、合规脱敏与导出
           </p>
         </div>
 
@@ -703,306 +704,192 @@ export function ContentWorkflowWorkspace() {
         </ol>
       </header>
 
-      {/* Primary Flush Editorial Composer Band (No Heavy Card Box) */}
-      <section className="divide-y divide-[#E2DDD3] border-b border-[#E2DDD3] pb-2">
-        {/* Row 1: Activity Archive Context Bar */}
-        <div className="flex flex-wrap items-center justify-between gap-2 pb-3.5 text-xs">
-          <div className="flex flex-wrap items-center gap-2.5">
-            <span className="inline-flex items-center gap-1.5 font-medium text-[#57534E]">
-              <Building2 className="h-3.5 w-3.5 text-[#1B4D3E]" />
-              <span>关联活动档案</span>
-            </span>
-            <select
-              value={selectedActivityId ?? ""}
-              onChange={(e) => {
-                const nextId = e.target.value || null;
-                setSelectedActivityId(nextId);
-                const found = activities.find((a) => a.id === nextId);
-                if (found) {
-                  setTopic(found.title);
-                  setContentType(found.category);
-                }
-              }}
-              className="max-w-[320px] rounded border border-[#D5CFC3] bg-[#FCFBF8] px-2.5 py-1 text-xs text-[#181816] outline-none transition focus:border-[#1B4D3E]"
-            >
-              <option value="">不关联（仅读取机构基础档案）</option>
-              {activities.map((act) => (
-                <option key={act.id} value={act.id}>
-                  {act.title}（{act.date}）
-                </option>
-              ))}
-            </select>
-            {selectedActivity && (
-              <span className="text-[11px] text-[#78716C]">
-                已载入：
-                {selectedActivity.participantCount || selectedActivity.location}
+      {/* Main Split Editorial Desk: Left Creation Brief (5) + Right Manuscript & Proof Sheet (7) */}
+      <div className="grid grid-cols-1 items-start gap-10 lg:grid-cols-12 lg:gap-0 lg:divide-x lg:divide-[#E2DDD3]">
+        {/* LEFT COLUMN: Structured Creation Brief */}
+        <section className="space-y-6 lg:col-span-5 lg:pr-9">
+          {/* Step 1: Target Channel */}
+          <div className="space-y-2.5">
+            <div className="flex items-baseline justify-between">
+              <span className="text-xs font-semibold text-[#181816]">
+                01 传播渠道
               </span>
-            )}
+              <span className="text-[11px] text-[#8C857B]">
+                建议 {activePlatformMeta.recommendedLength}
+              </span>
+            </div>
+            <div className="grid grid-cols-2 gap-1.5">
+              {(Object.keys(PLATFORMS) as PlatformId[]).map((pid) => {
+                const meta = PLATFORMS[pid];
+                const active = platform === pid;
+                return (
+                  <button
+                    key={pid}
+                    type="button"
+                    onClick={() => setPlatform(pid)}
+                    className={`flex flex-col items-start rounded border px-3 py-2 text-left transition ${
+                      active
+                        ? "border-[#1B4D3E] bg-[#E9F0ED]/70 text-[#1B4D3E]"
+                        : "border-[#E2DDD3] bg-[#FCFBF8] text-[#57534E] hover:border-[#CFC8BA] hover:text-[#181816]"
+                    }`}
+                  >
+                    <span className="text-xs font-semibold">{meta.name}</span>
+                    <span className="mt-0.5 truncate text-[10px] opacity-75">
+                      {meta.tagline}
+                    </span>
+                  </button>
+                );
+              })}
+            </div>
           </div>
-          <Link
-            href="/organization"
-            className="text-[11px] font-medium text-[#57534E] transition hover:text-[#1B4D3E] hover:underline"
-          >
-            管理机构档案
-          </Link>
-        </div>
 
-        {/* Row 2: Main Topic Input + Platform Selector + Action */}
-        <div className="space-y-3 py-4">
-          <div className="flex flex-col gap-2.5 lg:flex-row lg:items-center">
-            <div className="flex flex-1 items-center gap-2 rounded border border-[#D5CFC3] bg-[#FCFBF8] px-3 py-2 transition focus-within:border-[#1B4D3E]">
-              <input
-                type="text"
+          {/* Step 2: Activity Archive + Topic Brief */}
+          <div className="space-y-3 border-t border-[#E2DDD3] pt-5">
+            <div className="flex items-baseline justify-between">
+              <span className="text-xs font-semibold text-[#181816]">
+                02 选题与关联档案
+              </span>
+              <Link
+                href="/organization"
+                className="text-[11px] font-medium text-[#1B4D3E] hover:underline"
+              >
+                管理档案
+              </Link>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <Building2 className="h-3.5 w-3.5 shrink-0 text-[#8C857B]" />
+              <select
+                value={selectedActivityId ?? ""}
+                onChange={(e) => {
+                  const nextId = e.target.value || null;
+                  setSelectedActivityId(nextId);
+                  const found = activities.find((a) => a.id === nextId);
+                  if (found) {
+                    setTopic(found.title);
+                    setContentType(found.category);
+                  }
+                }}
+                className="w-full rounded border border-[#D5CFC3] bg-[#FCFBF8] px-2.5 py-1.5 text-xs text-[#181816] outline-none transition focus:border-[#1B4D3E]"
+              >
+                <option value="">不关联（仅读取机构基础档案）</option>
+                {activities.map((act) => (
+                  <option key={act.id} value={act.id}>
+                    {act.title}（{act.date}）
+                  </option>
+                ))}
+              </select>
+            </div>
+
+            {selectedActivity && (
+              <p className="border-l-2 border-[#1B4D3E] bg-[#E9F0ED]/40 py-1.5 pl-2.5 pr-2 text-[11px] text-[#57534E]">
+                已载入：{selectedActivity.participantCount || selectedActivity.location}
+              </p>
+            )}
+
+            <div className="space-y-2">
+              <textarea
+                rows={3}
                 value={topic}
                 onChange={(e) => setTopic(e.target.value)}
-                placeholder={`输入${activePlatformMeta.name}创作主题...`}
-                className="w-full bg-transparent text-sm text-[#181816] outline-none placeholder:text-[#A8A29E]"
+                placeholder={`写下本次${activePlatformMeta.name}创作主题、现场故事或核心诉求...`}
+                className="w-full resize-none rounded border border-[#D5CFC3] bg-[#FCFBF8] p-3 text-sm leading-relaxed text-[#181816] outline-none transition placeholder:text-[#A8A29E] focus:border-[#1B4D3E]"
               />
-              <button
-                type="button"
-                onClick={handleAutoSelectTopic}
-                className="shrink-0 rounded border border-[#E2DDD3] bg-[#F6F4EF] px-2 py-0.5 text-[11px] font-medium text-[#57534E] transition hover:border-[#181816] hover:text-[#181816]"
-              >
-                自动匹配
-              </button>
-            </div>
-
-            <div className="flex flex-wrap items-center gap-2">
-              {/* Platform Segmented Control */}
-              <div className="flex items-center gap-0.5 rounded border border-[#E2DDD3] bg-[#EFECE4] p-0.5">
-                {(Object.keys(PLATFORMS) as PlatformId[]).map((pid) => {
-                  const meta = PLATFORMS[pid];
-                  const active = platform === pid;
-                  return (
+              <div className="flex flex-wrap items-center justify-between gap-2">
+                <div className="flex flex-wrap items-center gap-1.5">
+                  {QUICK_TOPICS.map((sample) => (
                     <button
-                      key={pid}
+                      key={sample.label}
                       type="button"
-                      onClick={() => setPlatform(pid)}
-                      className={`rounded-[3px] px-2.5 py-1 text-xs font-medium transition ${
-                        active
-                          ? "bg-[#FCFBF8] text-[#181816]"
-                          : "text-[#78716C] hover:text-[#181816]"
-                      }`}
+                      onClick={() => setTopic(sample.text)}
+                      className="rounded border border-[#E2DDD3] bg-[#FCFBF8] px-2 py-0.5 text-[11px] text-[#57534E] transition hover:border-[#1B4D3E] hover:text-[#1B4D3E]"
                     >
-                      {meta.name}
+                      {sample.label}
                     </button>
-                  );
-                })}
-              </div>
-
-              <button
-                type="button"
-                onClick={() => setOptionsExpanded((v) => !v)}
-                className={`inline-flex h-8 w-8 items-center justify-center rounded border text-xs font-medium transition ${
-                  optionsExpanded
-                    ? "border-[#181816] bg-[#181816] text-[#FCFBF8]"
-                    : "border-[#D5CFC3] bg-[#FCFBF8] text-[#57534E] hover:border-[#181816] hover:text-[#181816]"
-                }`}
-                title="高级参数"
-              >
-                <SlidersHorizontal className="h-3.5 w-3.5" />
-              </button>
-
-              <button
-                type="button"
-                onClick={() => void handleRunWorkflow()}
-                disabled={isRunning}
-                className="inline-flex h-8 items-center justify-center gap-1.5 rounded bg-[#1B4D3E] px-4 text-xs font-medium text-[#FCFBF8] transition hover:bg-[#143A2F] disabled:opacity-60"
-              >
-                {isRunning ? (
-                  <>
-                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                    <span>
-                      {stage === "processing-images"
-                        ? "处理配图"
-                        : stage === "researching-trends"
-                          ? `调研${activePlatformMeta.name}`
-                          : "撰稿中"}
-                    </span>
-                  </>
-                ) : (
-                  <>
-                    <Play className="h-3 w-3 fill-current" />
-                    <span>
-                      {images.length > 0 ? "一键生成图文" : "生成推流文案"}
-                    </span>
-                  </>
-                )}
-              </button>
-            </div>
-          </div>
-
-          {/* Quick Topic Presets + Platform Spec */}
-          <div className="flex flex-wrap items-center justify-between gap-2">
-            <div className="flex flex-wrap items-center gap-1.5">
-              <span className="text-[11px] text-[#8C857B]">快速主题：</span>
-              {QUICK_TOPICS.map((sample) => (
-                <button
-                  key={sample.label}
-                  type="button"
-                  onClick={() => setTopic(sample.text)}
-                  className="rounded border border-[#E2DDD3] bg-[#FCFBF8] px-2 py-0.5 text-[11px] text-[#57534E] transition hover:border-[#1B4D3E] hover:text-[#1B4D3E]"
-                >
-                  {sample.label}
-                </button>
-              ))}
-            </div>
-            <span className="text-[11px] text-[#8C857B]">
-              {activePlatformMeta.name} · {activePlatformMeta.tagline} · 建议{" "}
-              {activePlatformMeta.recommendedLength}
-            </span>
-          </div>
-
-          {/* Collapsible Advanced Options */}
-          <AnimatePresence initial={false}>
-            {optionsExpanded && (
-              <motion.div
-                initial={{ opacity: 0, height: 0 }}
-                animate={{ opacity: 1, height: "auto" }}
-                exit={{ opacity: 0, height: 0 }}
-                transition={{ duration: 0.14 }}
-                className="overflow-hidden"
-              >
-                <div className="grid grid-cols-2 gap-2.5 border-t border-[#E2DDD3] pt-3 sm:grid-cols-5">
-                  <select
-                    value={contentType}
-                    onChange={(e) =>
-                      setContentType(e.target.value as ContentTypeId)
-                    }
-                    className="rounded border border-[#D5CFC3] bg-[#FCFBF8] px-2.5 py-1.5 text-xs text-[#181816] outline-none focus:border-[#1B4D3E]"
-                  >
-                    {CONTENT_TYPES.map((ct) => (
-                      <option key={ct.id} value={ct.id}>
-                        {ct.label}
-                      </option>
-                    ))}
-                  </select>
-                  <select
-                    value={tone}
-                    onChange={(e) => setTone(e.target.value as ToneId)}
-                    className="rounded border border-[#D5CFC3] bg-[#FCFBF8] px-2.5 py-1.5 text-xs text-[#181816] outline-none focus:border-[#1B4D3E]"
-                  >
-                    {TONES.map((t) => (
-                      <option key={t.id} value={t.id}>
-                        {t.label}
-                      </option>
-                    ))}
-                  </select>
-                  <select
-                    value={wordCount}
-                    onChange={(e) =>
-                      setWordCount(e.target.value as WordCountId)
-                    }
-                    className="rounded border border-[#D5CFC3] bg-[#FCFBF8] px-2.5 py-1.5 text-xs text-[#181816] outline-none focus:border-[#1B4D3E]"
-                  >
-                    {WORD_COUNTS.map((wc) => (
-                      <option key={wc.id} value={wc.id}>
-                        {wc.label}
-                      </option>
-                    ))}
-                  </select>
-                  <input
-                    type="text"
-                    value={keywords}
-                    onChange={(e) => setKeywords(e.target.value)}
-                    placeholder="核心关键词"
-                    className="rounded border border-[#D5CFC3] bg-[#FCFBF8] px-2.5 py-1.5 text-xs text-[#181816] outline-none placeholder:text-[#A8A29E] focus:border-[#1B4D3E]"
-                  />
-                  <input
-                    type="text"
-                    value={targetAudience}
-                    onChange={(e) => setTargetAudience(e.target.value)}
-                    placeholder="目标受众"
-                    className="rounded border border-[#D5CFC3] bg-[#FCFBF8] px-2.5 py-1.5 text-xs text-[#181816] outline-none placeholder:text-[#A8A29E] focus:border-[#1B4D3E]"
-                  />
+                  ))}
                 </div>
-              </motion.div>
-            )}
-          </AnimatePresence>
-
-          {errorMsg && <p className="text-xs text-[#B42318]">{errorMsg}</p>}
-        </div>
-
-        {/* Row 3: Optional Attachable Image Strip */}
-        <div
-          onDragOver={(e) => {
-            e.preventDefault();
-            setIsDragging(true);
-          }}
-          onDragLeave={() => setIsDragging(false)}
-          onDrop={(e) => {
-            e.preventDefault();
-            setIsDragging(false);
-            handleFiles(e.dataTransfer.files);
-          }}
-          className={`transition ${
-            images.length === 0 ? "py-3" : "py-3.5"
-          } ${isDragging ? "bg-[#E9F0ED]/60 px-3 ring-1 ring-[#1B4D3E]" : ""}`}
-        >
-          <input
-            ref={fileInputRef}
-            type="file"
-            accept="image/*"
-            multiple
-            className="hidden"
-            onChange={(e) => {
-              handleFiles(e.target.files);
-              e.target.value = "";
-            }}
-          />
-
-          {images.length === 0 ? (
-            <div className="flex flex-wrap items-center justify-between gap-2">
-              <div className="flex items-center gap-2 text-xs text-[#57534E]">
-                <ImagePlus className="h-3.5 w-3.5 text-[#8C857B]" />
-                <span className="font-medium text-[#181816]">附加配图</span>
-                <span className="text-[#8C857B]">
-                  可选 · 支持拖拽上传，自动隐私打码与 2D 风格化
-                </span>
+                <button
+                  type="button"
+                  onClick={handleAutoSelectTopic}
+                  className="text-[11px] font-medium text-[#1B4D3E] hover:underline"
+                >
+                  智能匹配选题
+                </button>
               </div>
+            </div>
+          </div>
+
+          {/* Step 3: Optional Field Photos */}
+          <div
+            onDragOver={(e) => {
+              e.preventDefault();
+              setIsDragging(true);
+            }}
+            onDragLeave={() => setIsDragging(false)}
+            onDrop={(e) => {
+              e.preventDefault();
+              setIsDragging(false);
+              handleFiles(e.dataTransfer.files);
+            }}
+            className={`space-y-2.5 border-t border-[#E2DDD3] pt-5 transition ${
+              isDragging ? "bg-[#E9F0ED]/50 px-2 pb-2" : ""
+            }`}
+          >
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/*"
+              multiple
+              className="hidden"
+              onChange={(e) => {
+                handleFiles(e.target.files);
+                e.target.value = "";
+              }}
+            />
+
+            <div className="flex items-center justify-between">
+              <span className="text-xs font-semibold text-[#181816]">
+                03 现场配图（可选）
+              </span>
               <div className="flex items-center gap-2">
                 <button
                   type="button"
                   onClick={() => fileInputRef.current?.click()}
-                  className="rounded border border-[#D5CFC3] bg-[#FCFBF8] px-2.5 py-1 text-xs font-medium text-[#181816] transition hover:border-[#181816]"
+                  className="inline-flex items-center gap-1 text-[11px] font-medium text-[#1B4D3E] hover:underline"
                 >
-                  添加配图
+                  <ImagePlus className="h-3 w-3" />
+                  <span>上传</span>
                 </button>
+                <span className="text-[#CFC8BA]">·</span>
                 <button
                   type="button"
                   onClick={handleLoadSamples}
-                  className="inline-flex items-center gap-1 rounded border border-[#E2DDD3] bg-transparent px-2.5 py-1 text-xs font-medium text-[#57534E] transition hover:border-[#D5CFC3] hover:text-[#181816]"
+                  className="inline-flex items-center gap-1 text-[11px] text-[#78716C] hover:text-[#181816]"
                 >
-                  <FileImage className="h-3 w-3 text-[#8C857B]" />
-                  <span>载入示例图</span>
+                  <FileImage className="h-3 w-3" />
+                  <span>示例图</span>
                 </button>
               </div>
             </div>
-          ) : (
-            <div className="flex items-center gap-3 overflow-x-auto">
-              <button
-                type="button"
-                onClick={() => fileInputRef.current?.click()}
-                className="flex h-24 w-24 shrink-0 flex-col items-center justify-center gap-1.5 rounded border border-dashed border-[#CFC8BA] bg-[#FCFBF8] text-[#78716C] transition hover:border-[#1B4D3E] hover:text-[#1B4D3E]"
-              >
-                <ImagePlus className="h-4 w-4" />
-                <span className="text-[11px] font-medium">继续加图</span>
-              </button>
 
-              {images.map((item) => (
-                <div
-                  key={item.id}
-                  className="group relative flex h-24 shrink-0 items-center gap-2.5 rounded border border-[#E2DDD3] bg-[#FCFBF8] p-2 pr-3"
-                >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    src={item.processedUrl}
-                    alt={item.name}
-                    className="h-20 w-20 shrink-0 rounded border border-[#E2DDD3] object-cover"
-                  />
-
-                  <div className="flex w-36 flex-col justify-between self-stretch py-0.5">
-                    <div className="flex items-center justify-between gap-1">
+            {images.length === 0 ? (
+              <p className="text-[11px] leading-relaxed text-[#8C857B]">
+                支持拖拽图片至此区域，生成时自动执行隐私打码或二维风格化并图文混排。
+              </p>
+            ) : (
+              <div className="space-y-2">
+                {images.map((item) => (
+                  <div
+                    key={item.id}
+                    className="flex items-center gap-2.5 border-b border-[#E2DDD3] pb-2"
+                  >
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                      src={item.processedUrl}
+                      alt={item.name}
+                      className="h-12 w-12 shrink-0 rounded border border-[#E2DDD3] object-cover"
+                    />
+                    <div className="min-w-0 flex-1 space-y-1">
                       <input
                         type="text"
                         value={item.caption}
@@ -1012,455 +899,649 @@ export function ContentWorkflowWorkspace() {
                         placeholder="图注..."
                         className="w-full truncate bg-transparent text-xs font-medium text-[#181816] outline-none"
                       />
-                      <button
-                        type="button"
-                        onClick={() => removeImageItem(item.id)}
-                        className="rounded p-0.5 text-[#8C857B] transition hover:bg-[#FDF2F2] hover:text-[#B42318]"
-                        aria-label="删除"
-                      >
-                        <X className="h-3 w-3" />
-                      </button>
-                    </div>
-
-                    <div className="flex flex-wrap items-center gap-1">
-                      <button
-                        type="button"
-                        onClick={() =>
-                          updateImageItem(item.id, {
-                            enableRedact: !item.enableRedact,
-                          })
-                        }
-                        className={`rounded px-1.5 py-0.5 text-[10px] font-medium transition ${
-                          item.enableRedact
-                            ? "bg-[#181816] text-[#FCFBF8]"
-                            : "bg-[#EFECE4] text-[#78716C] hover:text-[#181816]"
-                        }`}
-                      >
-                        打码
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() =>
-                          updateImageItem(item.id, {
-                            enableStylize: !item.enableStylize,
-                          })
-                        }
-                        className={`rounded px-1.5 py-0.5 text-[10px] font-medium transition ${
-                          item.enableStylize
-                            ? "bg-[#1B4D3E] text-[#FCFBF8]"
-                            : "bg-[#EFECE4] text-[#78716C] hover:text-[#181816]"
-                        }`}
-                      >
-                        2D
-                      </button>
-                      {item.enableStylize && (
-                        <select
-                          value={item.stylePreset}
-                          onChange={(e) =>
+                      <div className="flex flex-wrap items-center gap-1">
+                        <button
+                          type="button"
+                          onClick={() =>
                             updateImageItem(item.id, {
-                              stylePreset: e.target.value as Style2DPreset,
+                              enableRedact: !item.enableRedact,
                             })
                           }
-                          className="rounded border border-[#E2DDD3] bg-[#F6F4EF] px-1 py-0.5 text-[10px] text-[#57534E] outline-none"
+                          className={`rounded px-1.5 py-0.5 text-[10px] font-medium transition ${
+                            item.enableRedact
+                              ? "bg-[#181816] text-[#FCFBF8]"
+                              : "bg-[#EFECE4] text-[#78716C]"
+                          }`}
                         >
-                          {STYLE_PRESETS.map((p) => (
-                            <option key={p.id} value={p.id}>
-                              {p.label}
-                            </option>
-                          ))}
-                        </select>
-                      )}
+                          打码
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            updateImageItem(item.id, {
+                              enableStylize: !item.enableStylize,
+                            })
+                          }
+                          className={`rounded px-1.5 py-0.5 text-[10px] font-medium transition ${
+                            item.enableStylize
+                              ? "bg-[#1B4D3E] text-[#FCFBF8]"
+                              : "bg-[#EFECE4] text-[#78716C]"
+                          }`}
+                        >
+                          2D
+                        </button>
+                        {item.enableStylize && (
+                          <select
+                            value={item.stylePreset}
+                            onChange={(e) =>
+                              updateImageItem(item.id, {
+                                stylePreset: e.target.value as Style2DPreset,
+                              })
+                            }
+                            className="rounded border border-[#E2DDD3] bg-[#F6F4EF] px-1 py-0.5 text-[10px] text-[#57534E] outline-none"
+                          >
+                            {STYLE_PRESETS.map((p) => (
+                              <option key={p.id} value={p.id}>
+                                {p.label}
+                              </option>
+                            ))}
+                          </select>
+                        )}
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => removeImageItem(item.id)}
+                      className="rounded p-1 text-[#8C857B] hover:text-[#B42318]"
+                      aria-label="删除"
+                    >
+                      <X className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
+                ))}
+                <button
+                  type="button"
+                  onClick={() => void processAllImages()}
+                  disabled={isRunning}
+                  className="text-[11px] font-medium text-[#1B4D3E] hover:underline disabled:opacity-40"
+                >
+                  立即预览配图处理效果 →
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Advanced Parameters Collapsible */}
+          <div className="border-t border-[#E2DDD3] pt-4">
+            <button
+              type="button"
+              onClick={() => setOptionsExpanded((v) => !v)}
+              className="flex w-full items-center justify-between text-xs font-medium text-[#57534E] hover:text-[#181816]"
+            >
+              <span className="inline-flex items-center gap-1.5">
+                <SlidersHorizontal className="h-3.5 w-3.5" />
+                <span>高级撰稿参数（场景 / 语气 / 字数 / 受众）</span>
+              </span>
+              <span className="font-mono text-[11px] text-[#8C857B]">
+                {optionsExpanded ? "收起" : "展开"}
+              </span>
+            </button>
+
+            <AnimatePresence initial={false}>
+              {optionsExpanded && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0 }}
+                  animate={{ opacity: 1, height: "auto" }}
+                  exit={{ opacity: 0, height: 0 }}
+                  transition={{ duration: 0.14 }}
+                  className="overflow-hidden"
+                >
+                  <div className="grid grid-cols-2 gap-2.5 pt-3.5">
+                    <select
+                      value={contentType}
+                      onChange={(e) =>
+                        setContentType(e.target.value as ContentTypeId)
+                      }
+                      className="rounded border border-[#D5CFC3] bg-[#FCFBF8] px-2.5 py-1.5 text-xs text-[#181816] outline-none focus:border-[#1B4D3E]"
+                    >
+                      {CONTENT_TYPES.map((ct) => (
+                        <option key={ct.id} value={ct.id}>
+                          {ct.label}
+                        </option>
+                      ))}
+                    </select>
+                    <select
+                      value={tone}
+                      onChange={(e) => setTone(e.target.value as ToneId)}
+                      className="rounded border border-[#D5CFC3] bg-[#FCFBF8] px-2.5 py-1.5 text-xs text-[#181816] outline-none focus:border-[#1B4D3E]"
+                    >
+                      {TONES.map((t) => (
+                        <option key={t.id} value={t.id}>
+                          {t.label}
+                        </option>
+                      ))}
+                    </select>
+                    <select
+                      value={wordCount}
+                      onChange={(e) =>
+                        setWordCount(e.target.value as WordCountId)
+                      }
+                      className="rounded border border-[#D5CFC3] bg-[#FCFBF8] px-2.5 py-1.5 text-xs text-[#181816] outline-none focus:border-[#1B4D3E]"
+                    >
+                      {WORD_COUNTS.map((wc) => (
+                        <option key={wc.id} value={wc.id}>
+                          {wc.label}
+                        </option>
+                      ))}
+                    </select>
+                    <input
+                      type="text"
+                      value={targetAudience}
+                      onChange={(e) => setTargetAudience(e.target.value)}
+                      placeholder="目标受众"
+                      className="rounded border border-[#D5CFC3] bg-[#FCFBF8] px-2.5 py-1.5 text-xs text-[#181816] outline-none placeholder:text-[#A8A29E] focus:border-[#1B4D3E]"
+                    />
+                    <input
+                      type="text"
+                      value={keywords}
+                      onChange={(e) => setKeywords(e.target.value)}
+                      placeholder="核心关键词（逗号分隔）"
+                      className="col-span-2 rounded border border-[#D5CFC3] bg-[#FCFBF8] px-2.5 py-1.5 text-xs text-[#181816] outline-none placeholder:text-[#A8A29E] focus:border-[#1B4D3E]"
+                    />
+                  </div>
+                </motion.div>
+              )}
+            </AnimatePresence>
+          </div>
+
+          {errorMsg && (
+            <p className="border-l-2 border-[#B42318] bg-[#FDF2F2] px-3 py-2 text-xs text-[#B42318]">
+              {errorMsg}
+            </p>
+          )}
+
+          {/* Primary Action Button */}
+          <button
+            type="button"
+            onClick={() => void handleRunWorkflow()}
+            disabled={isRunning}
+            className="flex h-10 w-full items-center justify-center gap-2 rounded bg-[#1B4D3E] px-4 text-xs font-medium text-[#FCFBF8] transition hover:bg-[#143A2F] disabled:opacity-60"
+          >
+            {isRunning ? (
+              <>
+                <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                <span>
+                  {stage === "processing-images"
+                    ? "正在处理配图..."
+                    : stage === "researching-trends"
+                      ? `正在调研${activePlatformMeta.name}风向...`
+                      : "正在撰写推流成稿..."}
+                </span>
+              </>
+            ) : (
+              <>
+                <Play className="h-3 w-3 fill-current" />
+                <span>
+                  {images.length > 0 ? "一键生成合规图文" : "生成推流文案"}
+                </span>
+              </>
+            )}
+          </button>
+        </section>
+
+        {/* RIGHT COLUMN: Editorial Proof Sheet & Manuscript Stage */}
+        <section className="lg:col-span-7 lg:pl-9">
+          <AnimatePresence mode="wait">
+            {!assembledDoc ? (
+              <motion.div
+                key="proof-sheet"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="border-t-2 border-[#181816] bg-[#FCFBF8] px-7 py-8 sm:px-10 sm:py-9"
+              >
+                <div className="flex items-center justify-between border-b border-[#E2DDD3] pb-4 text-[11px] text-[#8C857B]">
+                  <span className="font-medium text-[#181816]">
+                    {orgProfile.name} · {activePlatformMeta.name}样稿预览
+                  </span>
+                  <span className="font-mono">MANUSCRIPT PROOF</span>
+                </div>
+
+                <div className="mt-6 space-y-6">
+                  <div>
+                    <h2 className="font-editorial text-xl font-semibold text-[#181816]">
+                      {topic.trim() || "在左侧输入主题或选择活动档案"}
+                    </h2>
+                    <p className="mt-1.5 text-xs leading-relaxed text-[#78716C]">
+                      生成后将在此呈现面向「{activePlatformMeta.name}」的完整出版级成稿，支持直接编辑、隐私脱敏与多格式导出。
+                    </p>
+                  </div>
+
+                  <div className="divide-y divide-[#E2DDD3] border-y border-[#E2DDD3]">
+                    <div className="flex items-baseline gap-4 py-3.5">
+                      <span className="font-mono text-[11px] text-[#1B4D3E]">01</span>
+                      <div>
+                        <div className="text-xs font-medium text-[#181816]">
+                          黄金开头与多版备选标题
+                        </div>
+                        <div className="mt-0.5 text-[11px] text-[#8C857B]">
+                          结合{activePlatformMeta.name}传播规律提炼前 3 秒钩子与情绪切口
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-baseline gap-4 py-3.5">
+                      <span className="font-mono text-[11px] text-[#1B4D3E]">02</span>
+                      <div>
+                        <div className="text-xs font-medium text-[#181816]">
+                          基于真实档案的克制叙事
+                        </div>
+                        <div className="mt-0.5 text-[11px] text-[#8C857B]">
+                          自动读取机构使命、落款与活动数据，杜绝煽情与夸大表述
+                        </div>
+                      </div>
+                    </div>
+                    <div className="flex items-baseline gap-4 py-3.5">
+                      <span className="font-mono text-[11px] text-[#B85D3B]">03</span>
+                      <div>
+                        <div className="text-xs font-medium text-[#181816]">
+                          发布前隐私脱敏与事实核对
+                        </div>
+                        <div className="mt-0.5 text-[11px] text-[#8C857B]">
+                          自动标出姓名、号码、金额与人数，核对通过后解锁全文导出
+                        </div>
+                      </div>
                     </div>
                   </div>
                 </div>
-              ))}
-
-              <button
-                type="button"
-                onClick={() => void processAllImages()}
-                disabled={isRunning}
-                className="shrink-0 rounded bg-[#181816] px-3 py-2 text-[11px] font-medium text-[#FCFBF8] transition hover:bg-[#2F2E2A] disabled:opacity-40"
+              </motion.div>
+            ) : (
+              <motion.div
+                key="document"
+                initial={{ opacity: 0, y: 6 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.16, ease: [0.16, 1, 0.3, 1] }}
+                className="space-y-5"
               >
-                预览处理
-              </button>
-            </div>
-          )}
-        </div>
-      </section>
-
-      {/* Editorial Publication Canvas + Unified Hairline Inspector Rail */}
-      <AnimatePresence mode="wait">
-        {!assembledDoc ? (
-          <motion.div
-            key="empty"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="flex min-h-[280px] flex-col items-center justify-center border border-dashed border-[#D5CFC3] bg-[#FCFBF8]/60 px-6 py-14 text-center"
-          >
-            <div className="h-7 w-px bg-[#CFC8BA]" />
-            <p className="mt-4 font-editorial text-base font-medium text-[#57534E]">
-              成稿将在此呈现
-            </p>
-            <p className="mt-1.5 max-w-md text-xs leading-relaxed text-[#8C857B]">
-              关联上方活动档案或输入主题，点击「生成推流文案」即可启动趋势调研、撰文与合规审查流程
-            </p>
-          </motion.div>
-        ) : (
-          <motion.div
-            key="document"
-            initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.16, ease: [0.16, 1, 0.3, 1] }}
-            className="grid grid-cols-1 items-start gap-8 lg:grid-cols-12"
-          >
-            {/* Main Publication Column (8 cols) */}
-            <div className="space-y-4 lg:col-span-8">
-              {/* Document Toolbar */}
-              <div className="flex flex-wrap items-center justify-between gap-3">
-                <div className="flex items-center gap-0.5 rounded border border-[#E2DDD3] bg-[#EFECE4] p-0.5">
-                  <button
-                    type="button"
-                    onClick={() => setDocViewMode("preview")}
-                    className={`rounded-[3px] px-3 py-1 text-xs font-medium transition ${
-                      docViewMode === "preview"
-                        ? "bg-[#FCFBF8] text-[#181816]"
-                        : "text-[#78716C] hover:text-[#181816]"
-                    }`}
-                  >
-                    预览
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => setDocViewMode("edit")}
-                    className={`rounded-[3px] px-3 py-1 text-xs font-medium transition ${
-                      docViewMode === "edit"
-                        ? "bg-[#FCFBF8] text-[#181816]"
-                        : "text-[#78716C] hover:text-[#181816]"
-                    }`}
-                  >
-                    编辑
-                  </button>
-                  {candidateTitles.length > 1 && (
-                    <button
-                      type="button"
-                      onClick={() => setTitlesExpanded((v) => !v)}
-                      className={`rounded-[3px] px-3 py-1 text-xs font-medium transition ${
-                        titlesExpanded
-                          ? "bg-[#181816] text-[#FCFBF8]"
-                          : "text-[#78716C] hover:text-[#181816]"
-                      }`}
-                    >
-                      备选标题 ({candidateTitles.length})
-                    </button>
-                  )}
-                </div>
-
-                <div className="flex flex-wrap items-center gap-1.5">
-                  <button
-                    type="button"
-                    onClick={() => void handleExportDocx()}
-                    disabled={
-                      isExportingDocx ||
-                      Boolean(reviewReport && !reviewReport.isEligible)
-                    }
-                    title={
-                      reviewReport && !reviewReport.isEligible
-                        ? "完成右侧「发布前审查」获得发布资格后解锁导出"
-                        : "导出 DOCX"
-                    }
-                    className="inline-flex items-center gap-1 rounded border border-[#D5CFC3] bg-[#FCFBF8] px-2.5 py-1.5 text-xs font-medium text-[#57534E] transition hover:border-[#181816] hover:text-[#181816] disabled:cursor-not-allowed disabled:opacity-45"
-                  >
-                    {isExportingDocx && (
-                      <Loader2 className="h-3 w-3 animate-spin" />
-                    )}
-                    DOCX
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (reviewReport && !reviewReport.isEligible) return;
-                      exportDocumentAsPdf(assembledDoc);
-                    }}
-                    disabled={Boolean(reviewReport && !reviewReport.isEligible)}
-                    className="rounded border border-[#D5CFC3] bg-[#FCFBF8] px-2.5 py-1.5 text-xs font-medium text-[#57534E] transition hover:border-[#181816] hover:text-[#181816] disabled:cursor-not-allowed disabled:opacity-45"
-                  >
-                    PDF
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => {
-                      if (reviewReport && !reviewReport.isEligible) return;
-                      exportDocumentAsMarkdown(assembledDoc);
-                    }}
-                    disabled={Boolean(reviewReport && !reviewReport.isEligible)}
-                    className="rounded border border-[#D5CFC3] bg-[#FCFBF8] px-2.5 py-1.5 text-xs font-medium text-[#57534E] transition hover:border-[#181816] hover:text-[#181816] disabled:cursor-not-allowed disabled:opacity-45"
-                  >
-                    MD
-                  </button>
-                  <button
-                    type="button"
-                    onClick={handleCopyFullText}
-                    disabled={Boolean(reviewReport && !reviewReport.isEligible)}
-                    title={
-                      reviewReport && !reviewReport.isEligible
-                        ? "完成右侧「发布前审查」获得发布资格后解锁复制"
-                        : "已获发布资格，复制全文去外部平台发布"
-                    }
-                    className={`inline-flex items-center gap-1.5 rounded px-3 py-1.5 text-xs font-medium transition ${
-                      reviewReport?.isEligible
-                        ? "bg-[#1B4D3E] text-[#FCFBF8] hover:bg-[#143A2F]"
-                        : "cursor-not-allowed border border-[#E2DDD3] bg-[#EFECE4] text-[#8C857B]"
-                    }`}
-                  >
-                    {reviewReport?.isEligible ? (
-                      copiedKey === "full" ? (
-                        <Check className="h-3 w-3 text-[#86EFAC]" />
-                      ) : (
-                        <ShieldCheck className="h-3 w-3" />
-                      )
-                    ) : (
-                      <Lock className="h-3 w-3" />
-                    )}
-                    <span>
-                      {reviewReport?.isEligible
-                        ? copiedKey === "full"
-                          ? "已复制"
-                          : "已获资格 · 复制全文"
-                        : "审查通过后解锁"}
-                    </span>
-                  </button>
-                </div>
-              </div>
-
-              {/* Expandable Candidate Titles Strip */}
-              <AnimatePresence initial={false}>
-                {titlesExpanded && candidateTitles.length > 0 && (
-                  <motion.div
-                    initial={{ opacity: 0, height: 0 }}
-                    animate={{ opacity: 1, height: "auto" }}
-                    exit={{ opacity: 0, height: 0 }}
-                    className="flex flex-wrap gap-1.5 overflow-hidden py-1"
-                  >
-                    {candidateTitles.map((t, i) => {
-                      const active = assembledDoc.title === t;
+                {/* Right Stage Underline Tabs + Export Bar */}
+                <div className="flex flex-wrap items-center justify-between gap-3 border-b border-[#E2DDD3]">
+                  <div className="flex items-center gap-5">
+                    {(
+                      [
+                        { id: "manuscript", label: "成稿与编辑" },
+                        {
+                          id: "compliance",
+                          label: reviewReport?.isEligible
+                            ? "发布审查 ✓"
+                            : "发布审查与脱敏",
+                        },
+                        { id: "research", label: "调研与建议" },
+                      ] as const
+                    ).map((t) => {
+                      const active = rightTab === t.id;
                       return (
                         <button
-                          key={i}
+                          key={t.id}
                           type="button"
-                          onClick={() => handleTitleChange(t)}
-                          className={`rounded border px-2.5 py-1 text-xs transition ${
+                          onClick={() => setRightTab(t.id)}
+                          className={`relative pb-3 text-xs font-medium transition ${
                             active
-                              ? "border-[#1B4D3E] bg-[#E9F0ED] font-medium text-[#1B4D3E]"
-                              : "border-[#E2DDD3] bg-[#FCFBF8] text-[#57534E] hover:border-[#181816] hover:text-[#181816]"
+                              ? "text-[#1B4D3E]"
+                              : "text-[#78716C] hover:text-[#181816]"
                           }`}
                         >
-                          {t}
+                          {t.label}
+                          {active && (
+                            <span className="absolute inset-x-0 -bottom-px h-[2px] bg-[#1B4D3E]" />
+                          )}
                         </button>
                       );
                     })}
-                  </motion.div>
-                )}
-              </AnimatePresence>
-
-              {/* Warm Ivory Editorial Publication Sheet */}
-              <div className="border-t-2 border-[#181816] bg-[#FCFBF8] px-7 py-8 sm:px-10 sm:py-10">
-                {docViewMode === "edit" ? (
-                  <div className="space-y-5">
-                    <input
-                      type="text"
-                      value={assembledDoc.title}
-                      onChange={(e) => handleTitleChange(e.target.value)}
-                      className="w-full border-b border-[#E2DDD3] pb-3 font-editorial text-2xl font-semibold text-[#181816] outline-none focus:border-[#1B4D3E]"
-                    />
-                    <textarea
-                      rows={16}
-                      value={assembledDoc.body}
-                      onChange={(e) => handleBodyChange(e.target.value)}
-                      className="w-full resize-y bg-transparent text-[15px] leading-8 text-[#292524] outline-none"
-                    />
                   </div>
-                ) : (
-                  <article className="space-y-6">
-                    <header className="space-y-3 border-b border-[#E2DDD3] pb-5">
-                      <div className="flex items-center gap-2.5 text-[11px] text-[#8C857B]">
-                        <span className="rounded bg-[#181816] px-2 py-0.5 font-medium text-[#FCFBF8]">
-                          {assembledDoc.platformName}
-                        </span>
-                        <span className="font-mono tabular-nums">
-                          {assembledDoc.body.length} 字
-                        </span>
-                        <span className="font-mono tabular-nums">
-                          {new Date(assembledDoc.createdAt).toLocaleString(
-                            "zh-CN"
-                          )}
-                        </span>
-                      </div>
-                      <h2 className="font-editorial text-2xl font-semibold leading-snug text-[#181816] sm:text-[28px]">
-                        {assembledDoc.title}
-                      </h2>
-                    </header>
 
-                    {assembledDoc.hook && (
-                      <div className="border-l-2 border-[#1B4D3E] bg-[#F6F4EF] py-3 pl-4 pr-3.5">
-                        <div className="mb-1 flex items-center justify-between">
-                          <span className="text-[11px] font-semibold text-[#1B4D3E]">
-                            {assembledDoc.platform === "douyin"
-                              ? "前 3 秒钩子"
-                              : "黄金开头"}
-                          </span>
-                          <button
-                            type="button"
-                            onClick={() =>
-                              void handleCopyText(assembledDoc.hook!, "hook")
-                            }
-                            className="text-[11px] text-[#8C857B] transition hover:text-[#181816]"
-                          >
-                            {copiedKey === "hook" ? "已复制" : "复制"}
-                          </button>
+                  <div className="flex flex-wrap items-center gap-1.5 pb-2">
+                    <button
+                      type="button"
+                      onClick={() => void handleExportDocx()}
+                      disabled={
+                        isExportingDocx ||
+                        Boolean(reviewReport && !reviewReport.isEligible)
+                      }
+                      className="inline-flex items-center gap-1 rounded border border-[#D5CFC3] bg-[#FCFBF8] px-2 py-1 text-[11px] font-medium text-[#57534E] transition hover:border-[#181816] hover:text-[#181816] disabled:cursor-not-allowed disabled:opacity-45"
+                    >
+                      {isExportingDocx && (
+                        <Loader2 className="h-3 w-3 animate-spin" />
+                      )}
+                      DOCX
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (reviewReport && !reviewReport.isEligible) return;
+                        exportDocumentAsPdf(assembledDoc);
+                      }}
+                      disabled={Boolean(reviewReport && !reviewReport.isEligible)}
+                      className="rounded border border-[#D5CFC3] bg-[#FCFBF8] px-2 py-1 text-[11px] font-medium text-[#57534E] transition hover:border-[#181816] hover:text-[#181816] disabled:cursor-not-allowed disabled:opacity-45"
+                    >
+                      PDF
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (reviewReport && !reviewReport.isEligible) return;
+                        exportDocumentAsMarkdown(assembledDoc);
+                      }}
+                      disabled={Boolean(reviewReport && !reviewReport.isEligible)}
+                      className="rounded border border-[#D5CFC3] bg-[#FCFBF8] px-2 py-1 text-[11px] font-medium text-[#57534E] transition hover:border-[#181816] hover:text-[#181816] disabled:cursor-not-allowed disabled:opacity-45"
+                    >
+                      MD
+                    </button>
+                    <button
+                      type="button"
+                      onClick={handleCopyFullText}
+                      disabled={Boolean(reviewReport && !reviewReport.isEligible)}
+                      className={`inline-flex items-center gap-1 rounded px-2.5 py-1 text-[11px] font-medium transition ${
+                        reviewReport?.isEligible
+                          ? "bg-[#1B4D3E] text-[#FCFBF8] hover:bg-[#143A2F]"
+                          : "cursor-not-allowed border border-[#E2DDD3] bg-[#EFECE4] text-[#8C857B]"
+                      }`}
+                    >
+                      {reviewReport?.isEligible ? (
+                        copiedKey === "full" ? (
+                          <Check className="h-3 w-3 text-[#86EFAC]" />
+                        ) : (
+                          <ShieldCheck className="h-3 w-3" />
+                        )
+                      ) : (
+                        <Lock className="h-3 w-3" />
+                      )}
+                      <span>
+                        {reviewReport?.isEligible
+                          ? copiedKey === "full"
+                            ? "已复制"
+                            : "复制全文"
+                          : "审查后解锁"}
+                      </span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Tab 1: Manuscript */}
+                {rightTab === "manuscript" && (
+                  <div className="space-y-4">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <div className="flex items-center gap-0.5 rounded border border-[#E2DDD3] bg-[#EFECE4] p-0.5">
+                        <button
+                          type="button"
+                          onClick={() => setDocViewMode("preview")}
+                          className={`rounded-[3px] px-2.5 py-0.5 text-xs font-medium transition ${
+                            docViewMode === "preview"
+                              ? "bg-[#FCFBF8] text-[#181816]"
+                              : "text-[#78716C]"
+                          }`}
+                        >
+                          预览
+                        </button>
+                        <button
+                          type="button"
+                          onClick={() => setDocViewMode("edit")}
+                          className={`rounded-[3px] px-2.5 py-0.5 text-xs font-medium transition ${
+                            docViewMode === "edit"
+                              ? "bg-[#FCFBF8] text-[#181816]"
+                              : "text-[#78716C]"
+                          }`}
+                        >
+                          编辑
+                        </button>
+                      </div>
+
+                      {candidateTitles.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => setTitlesExpanded((v) => !v)}
+                          className="text-xs font-medium text-[#1B4D3E] hover:underline"
+                        >
+                          {titlesExpanded
+                            ? "收起备选标题"
+                            : `切换备选标题 (${candidateTitles.length})`}
+                        </button>
+                      )}
+                    </div>
+
+                    <AnimatePresence initial={false}>
+                      {titlesExpanded && candidateTitles.length > 0 && (
+                        <motion.div
+                          initial={{ opacity: 0, height: 0 }}
+                          animate={{ opacity: 1, height: "auto" }}
+                          exit={{ opacity: 0, height: 0 }}
+                          className="flex flex-wrap gap-1.5 overflow-hidden"
+                        >
+                          {candidateTitles.map((t, i) => {
+                            const active = assembledDoc.title === t;
+                            return (
+                              <button
+                                key={i}
+                                type="button"
+                                onClick={() => handleTitleChange(t)}
+                                className={`rounded border px-2.5 py-1 text-xs transition ${
+                                  active
+                                    ? "border-[#1B4D3E] bg-[#E9F0ED] font-medium text-[#1B4D3E]"
+                                    : "border-[#E2DDD3] bg-[#FCFBF8] text-[#57534E] hover:border-[#181816]"
+                                }`}
+                              >
+                                {t}
+                              </button>
+                            );
+                          })}
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+
+                    <div className="border-t-2 border-[#181816] bg-[#FCFBF8] px-7 py-8 sm:px-9">
+                      {docViewMode === "edit" ? (
+                        <div className="space-y-5">
+                          <input
+                            type="text"
+                            value={assembledDoc.title}
+                            onChange={(e) => handleTitleChange(e.target.value)}
+                            className="w-full border-b border-[#E2DDD3] pb-3 font-editorial text-2xl font-semibold text-[#181816] outline-none focus:border-[#1B4D3E]"
+                          />
+                          <textarea
+                            rows={16}
+                            value={assembledDoc.body}
+                            onChange={(e) => handleBodyChange(e.target.value)}
+                            className="w-full resize-y bg-transparent text-[15px] leading-8 text-[#292524] outline-none"
+                          />
                         </div>
-                        <p className="text-[15px] font-medium leading-relaxed text-[#181816]">
-                          {assembledDoc.hook}
+                      ) : (
+                        <article className="space-y-6">
+                          <header className="space-y-3 border-b border-[#E2DDD3] pb-5">
+                            <div className="flex items-center gap-2.5 text-[11px] text-[#8C857B]">
+                              <span className="rounded bg-[#181816] px-2 py-0.5 font-medium text-[#FCFBF8]">
+                                {assembledDoc.platformName}
+                              </span>
+                              <span className="font-mono tabular-nums">
+                                {assembledDoc.body.length} 字
+                              </span>
+                              <span className="font-mono tabular-nums">
+                                {new Date(
+                                  assembledDoc.createdAt
+                                ).toLocaleString("zh-CN")}
+                              </span>
+                            </div>
+                            <h2 className="font-editorial text-2xl font-semibold leading-snug text-[#181816]">
+                              {assembledDoc.title}
+                            </h2>
+                          </header>
+
+                          {assembledDoc.hook && (
+                            <div className="border-l-2 border-[#1B4D3E] bg-[#F6F4EF] py-3 pl-4 pr-3.5">
+                              <div className="mb-1 flex items-center justify-between">
+                                <span className="text-[11px] font-semibold text-[#1B4D3E]">
+                                  {assembledDoc.platform === "douyin"
+                                    ? "前 3 秒钩子"
+                                    : "黄金开头"}
+                                </span>
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    void handleCopyText(
+                                      assembledDoc.hook!,
+                                      "hook"
+                                    )
+                                  }
+                                  className="text-[11px] text-[#8C857B] hover:text-[#181816]"
+                                >
+                                  {copiedKey === "hook" ? "已复制" : "复制"}
+                                </button>
+                              </div>
+                              <p className="text-[15px] font-medium leading-relaxed text-[#181816]">
+                                {assembledDoc.hook}
+                              </p>
+                            </div>
+                          )}
+
+                          <div className="space-y-5">
+                            {documentBlocks.map((block, idx) =>
+                              block.type === "paragraph" ? (
+                                <p
+                                  key={idx}
+                                  className="whitespace-pre-wrap text-[15px] leading-8 text-[#292524]"
+                                >
+                                  {block.text}
+                                </p>
+                              ) : (
+                                <figure key={block.image.id} className="my-6">
+                                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                                  <img
+                                    src={block.image.dataUrl}
+                                    alt={block.image.caption || block.image.name}
+                                    className="mx-auto max-h-96 rounded border border-[#E2DDD3] object-contain"
+                                  />
+                                  {block.image.caption && (
+                                    <figcaption className="mt-2 text-center text-xs text-[#8C857B]">
+                                      {block.image.caption}
+                                    </figcaption>
+                                  )}
+                                </figure>
+                              )
+                            )}
+                          </div>
+
+                          {assembledDoc.tags.length > 0 && (
+                            <footer className="flex flex-wrap items-center gap-2 border-t border-[#E2DDD3] pt-5">
+                              {assembledDoc.tags.map((tag) => (
+                                <span
+                                  key={tag}
+                                  className="rounded bg-[#E9F0ED] px-2 py-0.5 text-xs font-medium text-[#1B4D3E]"
+                                >
+                                  #{tag.replace(/^#/, "")}
+                                </span>
+                              ))}
+                            </footer>
+                          )}
+                        </article>
+                      )}
+                    </div>
+                  </div>
+                )}
+
+                {/* Tab 2: Compliance & Redaction */}
+                {rightTab === "compliance" && (
+                  <RedactionAndReviewPanel
+                    title={assembledDoc.title}
+                    hook={assembledDoc.hook ?? ""}
+                    body={assembledDoc.body}
+                    onApplyTextChange={({
+                      title: nextTitle,
+                      hook: nextHook,
+                      body: nextBody,
+                    }) => {
+                      if (currentResult) {
+                        const nextTitles =
+                          currentResult.titles.length > 0
+                            ? [nextTitle, ...currentResult.titles.slice(1)]
+                            : [nextTitle];
+                        updateCurrentResultPatch({
+                          titles: nextTitles,
+                          hook: nextHook,
+                          body: nextBody,
+                        });
+                      }
+                    }}
+                    activity={linkedResultActivity}
+                    orgRedlines={orgProfile.complianceRedlines}
+                    unredactedImageCount={unredactedImageCount}
+                    redactionRecords={currentResult?.redactionRecords ?? []}
+                    onChangeRedactionRecords={updateCurrentRedactionRecords}
+                    reviewState={currentResult?.reviewState}
+                    onChangeReviewState={updateCurrentReviewState}
+                  />
+                )}
+
+                {/* Tab 3: Platform Research & Tips */}
+                {rightTab === "research" && (
+                  <div className="divide-y divide-[#E2DDD3]">
+                    {matchedTrendInsights && (
+                      <div className="pb-6">
+                        <div className="mb-2 flex items-center justify-between gap-2">
+                          <span className="font-editorial text-base font-semibold text-[#181816]">
+                            {docPlatformMeta.name}调研参考
+                          </span>
+                          <span className="rounded bg-[#E9F0ED] px-2 py-0.5 text-[11px] font-medium text-[#1B4D3E]">
+                            {matchedTrendInsights.sourceLabel}
+                          </span>
+                        </div>
+                        <p className="mb-3 text-xs leading-relaxed text-[#57534E]">
+                          {matchedTrendInsights.summary}
+                        </p>
+                        <div className="flex flex-wrap gap-1.5">
+                          {matchedTrendInsights.hotKeywords.map((kw) => (
+                            <span
+                              key={kw}
+                              className="rounded border border-[#E2DDD3] bg-[#FCFBF8] px-2 py-0.5 text-[11px] text-[#57534E]"
+                            >
+                              {kw}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+
+                    {currentResult?.cta && (
+                      <div className="py-6">
+                        <span className="mb-1.5 block font-editorial text-base font-semibold text-[#181816]">
+                          互动引导
+                        </span>
+                        <p className="text-xs leading-relaxed text-[#57534E]">
+                          {currentResult.cta}
                         </p>
                       </div>
                     )}
 
-                    <div className="space-y-5">
-                      {documentBlocks.map((block, idx) =>
-                        block.type === "paragraph" ? (
-                          <p
-                            key={idx}
-                            className="whitespace-pre-wrap text-[15px] leading-8 text-[#292524]"
-                          >
-                            {block.text}
-                          </p>
-                        ) : (
-                          <figure key={block.image.id} className="my-6">
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img
-                              src={block.image.dataUrl}
-                              alt={block.image.caption || block.image.name}
-                              className="mx-auto max-h-96 rounded border border-[#E2DDD3] object-contain"
-                            />
-                            {block.image.caption && (
-                              <figcaption className="mt-2 text-center text-xs text-[#8C857B]">
-                                {block.image.caption}
-                              </figcaption>
-                            )}
-                          </figure>
-                        )
-                      )}
-                    </div>
-
-                    {assembledDoc.tags.length > 0 && (
-                      <footer className="flex flex-wrap items-center gap-2 border-t border-[#E2DDD3] pt-5">
-                        {assembledDoc.tags.map((tag) => (
-                          <span
-                            key={tag}
-                            className="rounded bg-[#E9F0ED] px-2 py-0.5 text-xs font-medium text-[#1B4D3E]"
-                          >
-                            #{tag.replace(/^#/, "")}
-                          </span>
-                        ))}
-                      </footer>
+                    {assembledDoc.algorithmTips.length > 0 && (
+                      <div className="py-6">
+                        <span className="mb-2 block font-editorial text-base font-semibold text-[#181816]">
+                          {docPlatformMeta.name}发布建议
+                        </span>
+                        <ul className="space-y-2">
+                          {assembledDoc.algorithmTips.map((tip, i) => (
+                            <li
+                              key={i}
+                              className="text-xs leading-relaxed text-[#57534E]"
+                            >
+                              — {tip}
+                            </li>
+                          ))}
+                        </ul>
+                      </div>
                     )}
-                  </article>
+                  </div>
                 )}
-              </div>
-            </div>
-
-            {/* Right 4 Cols: Unified Hairline Inspector Rail (Zero Stacked Cards) */}
-            <aside className="divide-y divide-[#E2DDD3] border-t border-[#E2DDD3] pt-6 lg:col-span-4 lg:border-l lg:border-t-0 lg:pl-7 lg:pt-11">
-              <div className="pb-6">
-                <RedactionAndReviewPanel
-                  title={assembledDoc.title}
-                  hook={assembledDoc.hook ?? ""}
-                  body={assembledDoc.body}
-                  onApplyTextChange={({
-                    title: nextTitle,
-                    hook: nextHook,
-                    body: nextBody,
-                  }) => {
-                    if (currentResult) {
-                      const nextTitles =
-                        currentResult.titles.length > 0
-                          ? [nextTitle, ...currentResult.titles.slice(1)]
-                          : [nextTitle];
-                      updateCurrentResultPatch({
-                        titles: nextTitles,
-                        hook: nextHook,
-                        body: nextBody,
-                      });
-                    }
-                  }}
-                  activity={linkedResultActivity}
-                  orgRedlines={orgProfile.complianceRedlines}
-                  unredactedImageCount={unredactedImageCount}
-                  redactionRecords={currentResult?.redactionRecords ?? []}
-                  onChangeRedactionRecords={updateCurrentRedactionRecords}
-                  reviewState={currentResult?.reviewState}
-                  onChangeReviewState={updateCurrentReviewState}
-                />
-              </div>
-
-              {matchedTrendInsights && (
-                <div className="py-5">
-                  <div className="mb-2 flex items-center justify-between gap-2">
-                    <span className="text-xs font-semibold text-[#181816]">
-                      {docPlatformMeta.name}调研参考
-                    </span>
-                    <span className="rounded bg-[#E9F0ED] px-1.5 py-0.5 text-[10px] font-medium text-[#1B4D3E]">
-                      {matchedTrendInsights.sourceLabel}
-                    </span>
-                  </div>
-                  <p className="mb-3 text-xs leading-relaxed text-[#57534E]">
-                    {matchedTrendInsights.summary}
-                  </p>
-                  <div className="flex flex-wrap gap-1.5">
-                    {matchedTrendInsights.hotKeywords.map((kw) => (
-                      <span
-                        key={kw}
-                        className="rounded border border-[#E2DDD3] bg-[#FCFBF8] px-2 py-0.5 text-[11px] text-[#57534E]"
-                      >
-                        {kw}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              )}
-
-              {currentResult?.cta && (
-                <div className="py-5">
-                  <span className="mb-1.5 block text-xs font-semibold text-[#181816]">
-                    互动引导
-                  </span>
-                  <p className="text-xs leading-relaxed text-[#57534E]">
-                    {currentResult.cta}
-                  </p>
-                </div>
-              )}
-
-              {assembledDoc.algorithmTips.length > 0 && (
-                <div className="py-5">
-                  <span className="mb-2 block text-xs font-semibold text-[#181816]">
-                    {docPlatformMeta.name}发布建议
-                  </span>
-                  <ul className="space-y-1.5">
-                    {assembledDoc.algorithmTips.map((tip, i) => (
-                      <li
-                        key={i}
-                        className="text-xs leading-relaxed text-[#57534E]"
-                      >
-                        — {tip}
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-              )}
-            </aside>
-          </motion.div>
-        )}
-      </AnimatePresence>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </section>
+      </div>
     </div>
   );
 }
