@@ -28,6 +28,7 @@ import {
 } from "@/lib/platforms";
 import { buildActivityContextPayload } from "@/lib/organization";
 import { evaluatePublishReview } from "@/lib/publish-review";
+import { isAllowedRasterImageType } from "@/lib/url-safety";
 import type { DouyinTrendInsights } from "@/lib/skills/types";
 import { processWorkflowImage } from "@/lib/workflow-image-processor";
 import {
@@ -296,7 +297,7 @@ export function ContentWorkflowWorkspace() {
   const handleFiles = (fileList: FileList | null) => {
     if (!fileList) return;
     Array.from(fileList).forEach((file) => {
-      if (!file.type.startsWith("image/")) return;
+      if (!isAllowedRasterImageType(file.type)) return;
       const reader = new FileReader();
       reader.onload = () => {
         const dataUrl = reader.result as string;

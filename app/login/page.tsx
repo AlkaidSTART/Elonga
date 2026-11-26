@@ -13,13 +13,14 @@ export const metadata: Metadata = {
 
 function LoginCardFallback() {
   return (
-    <div className="w-full max-w-[360px] space-y-5">
-      <div className="h-6 w-28 animate-pulse rounded bg-[#E5E0D5]" />
-      <div className="h-4 w-48 animate-pulse rounded bg-[#EFECE4]" />
-      <div className="space-y-4 pt-4">
-        <div className="h-10 animate-pulse rounded bg-[#EFECE4]" />
-        <div className="h-10 animate-pulse rounded bg-[#EFECE4]" />
-        <div className="h-10 animate-pulse rounded bg-[#E5E0D5]" />
+    <div className="w-full max-w-[390px] space-y-5">
+      <div className="h-8 w-36 animate-pulse rounded-xl bg-[#EFECE4]" />
+      <div className="h-7 w-40 animate-pulse rounded-lg bg-[#E5E0D5]" />
+      <div className="h-4 w-56 animate-pulse rounded bg-[#EFECE4]" />
+      <div className="space-y-4 pt-3">
+        <div className="h-11 animate-pulse rounded-xl bg-[#EFECE4]" />
+        <div className="h-11 animate-pulse rounded-xl bg-[#EFECE4]" />
+        <div className="h-11 animate-pulse rounded-xl bg-[#E5E0D5]" />
       </div>
     </div>
   );
@@ -45,7 +46,7 @@ export default function LoginPage() {
 
       {/* Right Flush Warm-Paper Sign-In Surface (Zero Floating Card) */}
       <main className="flex flex-col justify-center px-6 py-12 sm:px-12 lg:col-span-6 lg:px-16 xl:px-24">
-        <div className="mx-auto w-full max-w-[360px]">
+        <div className="mx-auto w-full max-w-[390px]">
           <Suspense fallback={<LoginCardFallback />}>
             <LoginCard />
           </Suspense>

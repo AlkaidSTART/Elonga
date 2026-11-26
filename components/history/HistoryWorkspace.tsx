@@ -20,6 +20,7 @@ import {
   PLATFORMS,
   type CopywritingResult,
 } from "@/lib/platforms";
+import { sanitizeExternalUrl } from "@/lib/url-safety";
 import { useWorkbenchStore } from "@/store/useWorkbenchStore";
 
 type FilterMode = "all" | "eligible" | "published" | "archived" | "viral";
@@ -65,6 +66,7 @@ export function HistoryWorkspace() {
 
   const [backfillTarget, setBackfillTarget] =
     useState<CopywritingResult | null>(null);
+  const [backfillError, setBackfillError] = useState<string | null>(null);
   const [backfillForm, setBackfillForm] = useState<BackfillFormState>({
     publishedUrl: "",
     publishedDate: "",
@@ -117,6 +119,7 @@ export function HistoryWorkspace() {
     ).slice(0, 10);
 
     setBackfillTarget(item);
+    setBackfillError(null);
     setBackfillForm({
       publishedUrl: existing?.publishedUrl ?? "",
       publishedDate: defaultDate,
@@ -144,12 +147,19 @@ export function HistoryWorkspace() {
 
   const handleSaveBackfill = () => {
     if (!backfillTarget) return;
+    const rawUrl = backfillForm.publishedUrl.trim();
+    const safePublishedUrl = rawUrl ? sanitizeExternalUrl(rawUrl) : undefined;
+    if (rawUrl && !safePublishedUrl) {
+      setBackfillError("请输入合法的 http:// 或 https:// 链接");
+      return;
+    }
+
     const publishedIso = backfillForm.publishedDate
       ? new Date(`${backfillForm.publishedDate}T12:00:00`).toISOString()
       : new Date().toISOString();
 
     updatePublishArchive(backfillTarget.id, {
-      publishedUrl: backfillForm.publishedUrl.trim() || undefined,
+      publishedUrl: safePublishedUrl ?? undefined,
       publishedAt: publishedIso,
       metrics: {
         views: parseOptionalInt(backfillForm.views),
@@ -162,6 +172,7 @@ export function HistoryWorkspace() {
       archivedAt: backfillForm.archived ? new Date().toISOString() : undefined,
       notes: backfillForm.notes.trim() || undefined,
     });
+    setBackfillError(null);
     setBackfillTarget(null);
   };
 
@@ -352,17 +363,23 @@ export function HistoryWorkspace() {
                               转化：{archive.metrics.conversions}
                             </span>
                           )}
-                          {archive?.publishedUrl && (
-                            <a
-                              href={archive.publishedUrl}
-                              target="_blank"
-                              rel="noopener noreferrer"
-                              className="inline-flex items-center gap-1 font-medium text-[#1B4D3E] hover:underline"
-                            >
-                              <ExternalLink className="h-3 w-3" />
-                              <span>查看原帖</span>
-                            </a>
-                          )}
+                          {(() => {
+                            const safePublishedUrl = sanitizeExternalUrl(
+                              archive?.publishedUrl
+                            );
+                            if (!safePublishedUrl) return null;
+                            return (
+                              <a
+                                href={safePublishedUrl}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="inline-flex items-center gap-1 font-medium text-[#1B4D3E] hover:underline"
+                              >
+                                <ExternalLink className="h-3 w-3" />
+                                <span>查看原帖</span>
+                              </a>
+                            );
+                          })()}
                         </div>
                       )}
                     </div>
@@ -545,15 +562,19 @@ export function HistoryWorkspace() {
                   <input
                     type="url"
                     value={backfillForm.publishedUrl}
-                    onChange={(e) =>
+                    onChange={(e) => {
+                      setBackfillError(null);
                       setBackfillForm((prev) => ({
                         ...prev,
                         publishedUrl: e.target.value,
-                      }))
-                    }
+                      }));
+                    }}
                     placeholder="https://..."
                     className="w-full rounded-md border border-[#E4E7EC] px-3 py-2 text-xs text-[#0F172A] outline-none focus:border-[#1D4ED8]"
                   />
+                  {backfillError && (
+                    <p className="text-[11px] text-[#B42318]">{backfillError}</p>
+                  )}
                 </label>
 
                 <label className="space-y-1">

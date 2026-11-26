@@ -3,6 +3,7 @@
 import { useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import { FileImage, ImagePlus, RefreshCw } from "lucide-react";
+import { isAllowedRasterImageType } from "@/lib/url-safety";
 import { useImageStudioStore } from "@/store/useImageStudioStore";
 import { MosaicEditor } from "./MosaicEditor";
 import { Stylize2DPanel } from "./Stylize2DPanel";
@@ -102,7 +103,7 @@ export function ImageStudioWorkspace() {
   const [isDragging, setIsDragging] = useState(false);
 
   const loadFile = (file: File) => {
-    if (!file.type.startsWith("image/")) return;
+    if (!isAllowedRasterImageType(file.type)) return;
     const reader = new FileReader();
     reader.onload = () => {
       const dataUrl = reader.result as string;

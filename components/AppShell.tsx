@@ -12,6 +12,7 @@ import {
   resolveWorkspaceRoute,
 } from "@/components/layout/workspace-routes";
 import type { AuthUser } from "@/lib/auth/jwt";
+import { sanitizeImageSrc } from "@/lib/url-safety";
 import {
   PROFILE_UPDATED_EVENT,
   getAvatarAccentMeta,
@@ -58,7 +59,7 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
   const userInitial = currentUser?.name?.slice(0, 1) || "E";
   const userExtras = currentUser?.id ? profilesByUserId[currentUser.id] : undefined;
   const avatarAccent = getAvatarAccentMeta(userExtras?.avatarAccent);
-  const avatarDataUrl = userExtras?.avatarDataUrl ?? null;
+  const avatarDataUrl = sanitizeImageSrc(userExtras?.avatarDataUrl);
 
   return (
     <MotionConfig reducedMotion="user">

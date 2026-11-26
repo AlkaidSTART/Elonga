@@ -26,6 +26,7 @@ import {
   UserRound,
 } from "lucide-react";
 import { PLATFORMS, TONES, type PlatformId, type ToneId } from "@/lib/platforms";
+import { isAllowedRasterImageType, sanitizeImageSrc } from "@/lib/url-safety";
 import { useOrganizationStore } from "@/store/useOrganizationStore";
 import {
   AVATAR_ACCENTS,
@@ -157,7 +158,7 @@ export function ProfileWorkspace() {
             setWechat(extras.wechat);
             setLocation(extras.location);
             setBio(extras.bio);
-            setAvatarDataUrl(extras.avatarDataUrl);
+            setAvatarDataUrl(sanitizeImageSrc(extras.avatarDataUrl));
             setAvatarAccent(extras.avatarAccent);
             setSignature(extras.signature || `责编：${data.user.name}`);
             setPreferredPlatforms(extras.preferredPlatforms);
@@ -193,8 +194,8 @@ export function ProfileWorkspace() {
   const handleAvatarUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    if (!file.type.startsWith("image/")) {
-      setBasicMessage({ type: "error", text: "请选择图片格式文件（PNG/JPG/WebP）" });
+    if (!isAllowedRasterImageType(file.type)) {
+      setBasicMessage({ type: "error", text: "请选择图片格式文件（PNG/JPG/WebP/GIF）" });
       return;
     }
     if (file.size > 2 * 1024 * 1024) {

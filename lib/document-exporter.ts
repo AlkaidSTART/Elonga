@@ -9,6 +9,7 @@ import {
 } from "docx";
 import type { PlatformId } from "@/lib/platforms";
 import type { DouyinTrendInsights } from "@/lib/skills/types";
+import { sanitizeImageSrc } from "@/lib/url-safety";
 
 export interface DocumentImageItem {
   id: string;
@@ -314,7 +315,8 @@ function escapeHtml(str: string): string {
     .replace(/&/g, "&amp;")
     .replace(/</g, "&lt;")
     .replace(/>/g, "&gt;")
-    .replace(/"/g, "&quot;");
+    .replace(/"/g, "&quot;")
+    .replace(/'/g, "&#39;");
 }
 
 /**
@@ -329,13 +331,18 @@ export function exportDocumentAsPdf(doc: AssembledDocument) {
       if (block.type === "paragraph") {
         return `<p class="paragraph">${escapeHtml(block.text)}</p>`;
       }
+      const safeSrc = sanitizeImageSrc(block.image.dataUrl);
+      if (!safeSrc) {
+        return "";
+      }
       const caption = block.image.caption
         ? `<figcaption>${escapeHtml(block.image.caption)}</figcaption>`
         : "";
-      return `<figure><img src="${block.image.dataUrl}" alt="${escapeHtml(
+      return `<figure><img src="${escapeHtml(safeSrc)}" alt="${escapeHtml(
         block.image.caption || block.image.name
       )}" />${caption}</figure>`;
     })
+    .filter(Boolean)
     .join("\n");
 
   const tagsHtml =
@@ -427,6 +434,8 @@ export function exportDocumentAsPdf(doc: AssembledDocument) {
 </html>`;
 
   const iframe = document.createElement("iframe");
+  // Disallow scripts inside the print iframe while keeping same-origin document write & print
+  iframe.setAttribute("sandbox", "allow-same-origin allow-modals");
   iframe.style.position = "fixed";
   iframe.style.right = "0";
   iframe.style.bottom = "0";

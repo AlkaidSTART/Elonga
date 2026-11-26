@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { sanitizeExternalUrl } from "@/lib/url-safety";
 import type { Style2DPreset } from "@/store/useImageStudioStore";
 
 const STYLE_PROMPTS: Record<Style2DPreset, string> = {
@@ -103,8 +104,15 @@ export async function POST(req: Request) {
       });
     }
     if (first?.url) {
+      const safeUrl = sanitizeExternalUrl(String(first.url));
+      if (!safeUrl) {
+        return NextResponse.json(
+          { error: "图像大模型返回的图片链接不安全" },
+          { status: 502 }
+        );
+      }
       return NextResponse.json({
-        imageUrl: first.url,
+        imageUrl: safeUrl,
         mode: "ai",
       });
     }
