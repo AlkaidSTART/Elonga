@@ -1,4 +1,4 @@
-import { AlignmentType, Document, HeadingLevel, ImageRun, Packer, Paragraph, TextRun } from "docx";
+import type { Paragraph } from "docx";
 import type { PlatformId } from "@/lib/platforms";
 import type { DouyinTrendInsights } from "@/lib/skills/types";
 import { sanitizeImageSrc } from "@/lib/url-safety";
@@ -168,6 +168,8 @@ async function imageUrlToPngBytes(
  * Export assembled document as Word (.docx).
  */
 export async function exportDocumentAsDocx(doc: AssembledDocument) {
+  const { AlignmentType, Document, HeadingLevel, ImageRun, Packer, Paragraph, TextRun } =
+    await import("docx");
   const blocks = buildDocumentBlocks(doc);
   const children: Paragraph[] = [];
 

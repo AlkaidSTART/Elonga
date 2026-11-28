@@ -1,6 +1,7 @@
 "use client";
 
 import type { ComponentType } from "react";
+import dynamic from "next/dynamic";
 import {
   Building2,
   FileBarChart2,
@@ -12,14 +13,52 @@ import {
   UserRound,
   type LucideIcon,
 } from "lucide-react";
-import { HistoryWorkspace } from "@/components/history/HistoryWorkspace";
-import { ImageStudioWorkspace } from "@/components/image-studio/ImageStudioWorkspace";
-import { OrganizationWorkspace } from "@/components/organization/OrganizationWorkspace";
+import { WorkspaceViewFallback } from "@/components/layout/WorkspaceViewFallback";
 import { OverviewWorkspace } from "@/components/overview/OverviewWorkspace";
-import { ProfileWorkspace } from "@/components/profile/ProfileWorkspace";
-import { ReportsWorkspace } from "@/components/reports/ReportsWorkspace";
-import { SettingsWorkspace } from "@/components/settings/SettingsWorkspace";
-import { ContentWorkflowWorkspace } from "@/components/workflow/ContentWorkflowWorkspace";
+
+const ReportsWorkspace = dynamic(
+  () => import("@/components/reports/ReportsWorkspace").then((mod) => mod.ReportsWorkspace),
+  { loading: WorkspaceViewFallback },
+);
+
+const ContentWorkflowWorkspace = dynamic(
+  () =>
+    import("@/components/workflow/ContentWorkflowWorkspace").then(
+      (mod) => mod.ContentWorkflowWorkspace,
+    ),
+  { loading: WorkspaceViewFallback },
+);
+
+const ImageStudioWorkspace = dynamic(
+  () =>
+    import("@/components/image-studio/ImageStudioWorkspace").then(
+      (mod) => mod.ImageStudioWorkspace,
+    ),
+  { loading: WorkspaceViewFallback },
+);
+
+const OrganizationWorkspace = dynamic(
+  () =>
+    import("@/components/organization/OrganizationWorkspace").then(
+      (mod) => mod.OrganizationWorkspace,
+    ),
+  { loading: WorkspaceViewFallback },
+);
+
+const HistoryWorkspace = dynamic(
+  () => import("@/components/history/HistoryWorkspace").then((mod) => mod.HistoryWorkspace),
+  { loading: WorkspaceViewFallback },
+);
+
+const SettingsWorkspace = dynamic(
+  () => import("@/components/settings/SettingsWorkspace").then((mod) => mod.SettingsWorkspace),
+  { loading: WorkspaceViewFallback },
+);
+
+const ProfileWorkspace = dynamic(
+  () => import("@/components/profile/ProfileWorkspace").then((mod) => mod.ProfileWorkspace),
+  { loading: WorkspaceViewFallback },
+);
 
 export type WorkspaceNavGroupLabel = "总览" | "创作" | "资产" | "系统";
 
