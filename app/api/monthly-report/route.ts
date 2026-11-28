@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { callTextModel } from "@/lib/ai/model-client";
 import {
   generateLocalMonthlyReport,
   type MonthlyReportFocus,
@@ -93,29 +94,26 @@ ${JSON.stringify(
 
 请生成结构完整、有洞察、可直接导出的月报。`;
 
-    const response = await fetch(`${baseUrl}/chat/completions`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
+    let rawContent = "";
+    try {
+      const result = await callTextModel({
+        apiKey,
+        baseUrl,
+        port: modelConfig?.port,
+        endpointPath: modelConfig?.endpointPath,
+        apiFormat: modelConfig?.apiFormat,
         model,
+        systemPrompt,
+        userPrompt,
         temperature: 0.6,
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt },
-        ],
-      }),
-    });
-
-    if (!response.ok) {
+        timeoutMs: 60000,
+      });
+      rawContent = result.text;
+    } catch {
       const local = generateLocalMonthlyReport({ orgProfile, snapshot, focus });
       return NextResponse.json({ ...local, mode: "local" as const });
     }
 
-    const data = await response.json();
-    const rawContent: string = data?.choices?.[0]?.message?.content ?? "";
     const jsonMatch = rawContent.match(/\{[\s\S]*\}/);
     if (!jsonMatch) {
       const local = generateLocalMonthlyReport({ orgProfile, snapshot, focus });

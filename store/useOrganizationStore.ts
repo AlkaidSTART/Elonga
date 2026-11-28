@@ -6,6 +6,7 @@ import {
   type ActivityArchive,
   type OrganizationProfile,
 } from "@/lib/organization";
+import { indexedDBStorage } from "@/lib/storage/indexeddb-storage";
 
 interface OrganizationState {
   profile: OrganizationProfile;
@@ -68,7 +69,7 @@ export const useOrganizationStore = create<OrganizationState>()(
     }),
     {
       name: "elonga-organization-storage",
-      storage: createJSONStorage(() => localStorage),
+      storage: createJSONStorage(() => indexedDBStorage),
     },
   ),
 );

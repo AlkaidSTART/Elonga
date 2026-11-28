@@ -10,24 +10,36 @@ import type {
 } from "@/lib/platforms";
 import type { TextRedactionRecord } from "@/lib/text-redaction";
 import type { PublishReviewState } from "@/lib/publish-review";
+import { isTextApiFormat, type TextApiFormat } from "@/lib/ai/model-client";
+import { indexedDBStorage } from "@/lib/storage/indexeddb-storage";
 
 export type WorkbenchTab = "copywriting" | "image-studio";
 
 export interface ModelConfig {
   textApiKey: string;
   textBaseUrl: string;
+  textPort: string;
+  textEndpointPath: string;
+  textApiFormat: TextApiFormat;
   textModel: string;
   imageApiKey: string;
   imageBaseUrl: string;
+  imagePort: string;
+  imageEndpointPath: string;
   imageModel: string;
 }
 
 const DEFAULT_MODEL_CONFIG: ModelConfig = {
   textApiKey: "",
   textBaseUrl: "https://api.deepseek.com/v1",
+  textPort: "",
+  textEndpointPath: "",
+  textApiFormat: "openai-chat",
   textModel: "deepseek-chat",
   imageApiKey: "",
   imageBaseUrl: "https://ark.cn-beijing.volces.com/api/v3",
+  imagePort: "",
+  imageEndpointPath: "",
   imageModel: "doubao-seedream-3-0-t2i-250415",
 };
 
@@ -261,7 +273,7 @@ export const useWorkbenchStore = create<WorkbenchState>()(
     }),
     {
       name: "jianyue-workbench-storage",
-      storage: createJSONStorage(() => localStorage),
+      storage: createJSONStorage(() => indexedDBStorage),
       partialize: (state) => ({
         modelConfig: state.modelConfig,
         history: state.history,
@@ -308,12 +320,19 @@ export const useWorkbenchStore = create<WorkbenchState>()(
             textApiKey: oldConfig?.textApiKey ?? oldConfig?.apiKey ?? "",
             textBaseUrl:
               oldConfig?.textBaseUrl ?? legacyBaseUrl ?? DEFAULT_MODEL_CONFIG.textBaseUrl,
+            textPort: oldConfig?.textPort ?? "",
+            textEndpointPath: oldConfig?.textEndpointPath ?? "",
+            textApiFormat: isTextApiFormat(oldConfig?.textApiFormat)
+              ? oldConfig.textApiFormat
+              : DEFAULT_MODEL_CONFIG.textApiFormat,
             textModel:
               oldConfig?.textModel && oldConfig.textModel !== "gpt-4o-mini"
                 ? oldConfig.textModel
                 : DEFAULT_MODEL_CONFIG.textModel,
             imageApiKey: oldConfig?.imageApiKey ?? "",
             imageBaseUrl: oldConfig?.imageBaseUrl ?? DEFAULT_MODEL_CONFIG.imageBaseUrl,
+            imagePort: oldConfig?.imagePort ?? "",
+            imageEndpointPath: oldConfig?.imageEndpointPath ?? "",
             imageModel:
               oldConfig?.imageModel && oldConfig.imageModel !== "gpt-image-1"
                 ? oldConfig.imageModel

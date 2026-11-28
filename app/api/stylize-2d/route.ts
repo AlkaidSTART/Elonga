@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { DEFAULT_IMAGE_ENDPOINT_PATH, resolveModelEndpointUrl } from "@/lib/ai/model-client";
 import { sanitizeExternalUrl } from "@/lib/url-safety";
 import type { Style2DPreset } from "@/store/useImageStudioStore";
 
@@ -25,6 +26,8 @@ interface StylizeRequest {
   modelConfig?: {
     apiKey?: string;
     baseUrl?: string;
+    port?: string;
+    endpointPath?: string;
     imageModel?: string;
   };
 }
@@ -77,7 +80,14 @@ export async function POST(req: Request) {
     formData.append("prompt", finalPrompt);
     formData.append("size", "1024x1024");
 
-    const response = await fetch(`${baseUrl}/images/edits`, {
+    const endpointUrl = resolveModelEndpointUrl({
+      baseUrl,
+      port: modelConfig?.port,
+      endpointPath: modelConfig?.endpointPath,
+      defaultPath: DEFAULT_IMAGE_ENDPOINT_PATH,
+    });
+
+    const response = await fetch(endpointUrl, {
       method: "POST",
       headers: {
         Authorization: `Bearer ${apiKey}`,

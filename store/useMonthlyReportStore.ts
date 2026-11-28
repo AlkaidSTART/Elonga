@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { persist, createJSONStorage } from "zustand/middleware";
 import type { SavedMonthlyReport } from "@/lib/monthly-report";
+import { indexedDBStorage } from "@/lib/storage/indexeddb-storage";
 
 interface MonthlyReportState {
   reports: SavedMonthlyReport[];
@@ -33,7 +34,7 @@ export const useMonthlyReportStore = create<MonthlyReportState>()(
     }),
     {
       name: "elonga-monthly-reports-storage",
-      storage: createJSONStorage(() => localStorage),
+      storage: createJSONStorage(() => indexedDBStorage),
     },
   ),
 );

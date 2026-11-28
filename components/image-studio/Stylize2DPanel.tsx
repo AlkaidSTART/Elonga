@@ -50,6 +50,8 @@ export function Stylize2DPanel() {
           modelConfig: {
             apiKey: modelConfig.imageApiKey,
             baseUrl: modelConfig.imageBaseUrl,
+            port: modelConfig.imagePort,
+            endpointPath: modelConfig.imageEndpointPath,
             imageModel: modelConfig.imageModel,
           },
         }),

@@ -175,6 +175,9 @@ export function MosaicEditor() {
                 modelConfig: {
                   apiKey: modelConfig.textApiKey,
                   baseUrl: modelConfig.textBaseUrl,
+                  port: modelConfig.textPort,
+                  endpointPath: modelConfig.textEndpointPath,
+                  apiFormat: modelConfig.textApiFormat,
                   model: modelConfig.textModel,
                 },
               }),
@@ -218,6 +221,9 @@ export function MosaicEditor() {
     [
       modelConfig.textApiKey,
       modelConfig.textBaseUrl,
+      modelConfig.textPort,
+      modelConfig.textEndpointPath,
+      modelConfig.textApiFormat,
       modelConfig.textModel,
       originalImage,
       replaceAutoActions,
