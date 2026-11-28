@@ -16,6 +16,7 @@ import {
 } from "lucide-react";
 import { BrandLogo } from "@/components/BrandLogo";
 import { getSafeRedirectPath, performHardAuthNavigation } from "@/lib/auth/client-navigation";
+import { clearWorkspaceBootPending, markWorkspaceBootPending } from "@/lib/auth/workspace-boot";
 
 const DEMO_ACCOUNTS = [
   {
@@ -38,10 +39,15 @@ export function LoginCard() {
   const [remember, setRemember] = useState(true);
   const [showPassword, setShowPassword] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [enteringWorkspace, setEnteringWorkspace] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const resetSubmitting = () => setSubmitting(false);
+    const resetSubmitting = () => {
+      setSubmitting(false);
+      setEnteringWorkspace(false);
+      clearWorkspaceBootPending();
+    };
     window.addEventListener("pageshow", resetSubmitting);
     return () => {
       window.removeEventListener("pageshow", resetSubmitting);
@@ -86,6 +92,8 @@ export function LoginCard() {
       }
 
       const redirectTarget = getSafeRedirectPath(searchParams.get("redirect"));
+      markWorkspaceBootPending();
+      setEnteringWorkspace(true);
       performHardAuthNavigation(redirectTarget);
     } catch {
       setError("网络请求异常，请检查服务是否正常运行");
@@ -299,6 +307,39 @@ export function LoginCard() {
           })}
         </div>
       </div>
+      {/* Full-screen Warm Editorial Studio Transition Overlay (First-Login -> Workspace) */}
+      <AnimatePresence>
+        {enteringWorkspace && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
+            role="status"
+            aria-live="polite"
+            aria-label="正在加载工作台"
+            className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#F6F4EF] px-6 text-center text-[#181816]"
+          >
+            <div className="flex h-12 w-12 items-center justify-center rounded-xl border border-[#E2DDD3] bg-[#FCFBF8]">
+              <BrandLogo size={26} />
+            </div>
+
+            <div className="mt-[18px] flex items-center gap-2">
+              <span className="font-editorial text-[19px] font-semibold tracking-tight text-[#181816]">
+                Elonga
+              </span>
+              <span className="h-1 w-1 rounded-full bg-[#B85D3B]" />
+              <span className="text-xs tracking-[0.06em] text-[#8C857B]">简悦工坊</span>
+            </div>
+
+            <div className="relative mt-5 h-[2px] w-[184px] overflow-hidden rounded-full bg-[#E2DDD3]">
+              <div className="elonga-login-boot-fill absolute inset-y-0 left-0 w-[42%] rounded-full bg-[#1B4D3E]" />
+            </div>
+
+            <p className="mt-3 text-xs tracking-[0.02em] text-[#78716C]">正在加载工作台资源…</p>
+          </motion.div>
+        )}
+      </AnimatePresence>
     </motion.div>
   );
 }

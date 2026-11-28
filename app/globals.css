@@ -74,3 +74,23 @@ body {
 ::-webkit-scrollbar-thumb:hover {
   background: #b5aea0;
 }
+
+@keyframes elonga-login-boot-slide {
+  0% {
+    transform: translateX(-100%);
+  }
+  100% {
+    transform: translateX(340%);
+  }
+}
+
+.elonga-login-boot-fill {
+  animation: elonga-login-boot-slide 1.25s cubic-bezier(0.22, 1, 0.36, 1) infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .elonga-login-boot-fill {
+    width: 65%;
+    animation: none;
+  }
+}
