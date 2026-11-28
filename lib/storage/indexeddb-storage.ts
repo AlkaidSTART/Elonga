@@ -4,20 +4,24 @@ export const IDB_DATABASE_NAME = "elonga-local-db";
 export const IDB_DATABASE_VERSION = 1;
 export const IDB_STORE_NAME = "kv";
 
-export interface StorageLike {
-  getItem(key: string): string | null;
-  setItem(key: string, value: string): void;
-  removeItem(key: string): void;
-}
+export const LEGACY_LOCAL_STORAGE_KEYS = [
+  "jianyue-workbench-storage",
+  "elonga-organization-storage",
+  "elonga-monthly-reports-storage",
+  "elonga-personal-profile-storage",
+  "elonga-analytics-chat-storage",
+] as const;
+
+export type LegacyStorageRemover = Pick<Storage, "removeItem">;
 
 export interface IndexedDBStorageOptions {
   dbName?: string;
   storeName?: string;
   indexedDBFactory?: IDBFactory | null;
-  fallbackStorage?: StorageLike | null;
+  legacyStorage?: LegacyStorageRemover | null;
 }
 
-export type LocalStorageBackend = "indexeddb" | "localstorage" | "memory";
+export type LocalStorageBackend = "indexeddb" | "memory";
 
 function getGlobalIndexedDB(): IDBFactory | null {
   if (typeof window === "undefined") return null;
@@ -28,12 +32,28 @@ function getGlobalIndexedDB(): IDBFactory | null {
   }
 }
 
-function getGlobalLocalStorage(): StorageLike | null {
+function getGlobalLegacyLocalStorage(): LegacyStorageRemover | null {
   if (typeof window === "undefined") return null;
   try {
     return window.localStorage ?? null;
   } catch {
     return null;
+  }
+}
+
+export function clearLegacyLocalStorageData(
+  keys: readonly string[] = LEGACY_LOCAL_STORAGE_KEYS,
+  storage?: LegacyStorageRemover | null,
+): void {
+  const target = storage !== undefined ? storage : getGlobalLegacyLocalStorage();
+  if (!target) return;
+
+  for (const key of keys) {
+    try {
+      target.removeItem(key);
+    } catch {
+      // Ignore storage access errors in restricted or privacy browser modes
+    }
   }
 }
 
@@ -94,19 +114,40 @@ function idbDelete(db: IDBDatabase, storeName: string, key: string): Promise<voi
 }
 
 /**
- * Create a Zustand-compatible async StateStorage backed by browser IndexedDB.
- * - Automatically migrates existing keys from localStorage on first read.
- * - Falls back gracefully to localStorage (or no-op on SSR) when IndexedDB is unavailable.
+ * Create a Zustand-compatible async StateStorage backed exclusively by browser IndexedDB.
+ * - Proactively purges legacy localStorage keys once without reading or migrating them.
+ * - Falls back to in-memory storage only when IndexedDB is unavailable (e.g. SSR).
  */
 export function createIndexedDBStateStorage(options: IndexedDBStorageOptions = {}): StateStorage {
   const dbName = options.dbName ?? IDB_DATABASE_NAME;
   const storeName = options.storeName ?? IDB_STORE_NAME;
+  const memoryFallback = new Map<string, string>();
   let dbPromise: Promise<IDBDatabase> | null = null;
+  let hasPurgedKnownLegacyKeys = false;
+  const purgedKeySet = new Set<string>();
 
   const resolveFactory = () =>
     options.indexedDBFactory !== undefined ? options.indexedDBFactory : getGlobalIndexedDB();
-  const resolveFallback = () =>
-    options.fallbackStorage !== undefined ? options.fallbackStorage : getGlobalLocalStorage();
+  const resolveLegacyStorage = () =>
+    options.legacyStorage !== undefined ? options.legacyStorage : getGlobalLegacyLocalStorage();
+
+  const purgeLegacyOnce = (key?: string): void => {
+    const legacyStorage = resolveLegacyStorage();
+    if (!legacyStorage) return;
+
+    if (!hasPurgedKnownLegacyKeys) {
+      hasPurgedKnownLegacyKeys = true;
+      clearLegacyLocalStorageData(LEGACY_LOCAL_STORAGE_KEYS, legacyStorage);
+      for (const knownKey of LEGACY_LOCAL_STORAGE_KEYS) {
+        purgedKeySet.add(knownKey);
+      }
+    }
+
+    if (key && !purgedKeySet.has(key)) {
+      purgedKeySet.add(key);
+      clearLegacyLocalStorageData([key], legacyStorage);
+    }
+  };
 
   const getDb = (): Promise<IDBDatabase> | null => {
     const factory = resolveFactory();
@@ -122,42 +163,23 @@ export function createIndexedDBStateStorage(options: IndexedDBStorageOptions = {
 
   return {
     async getItem(name: string): Promise<string | null> {
-      const fallback = resolveFallback();
+      purgeLegacyOnce(name);
       const pendingDb = getDb();
 
       if (pendingDb) {
         try {
           const db = await pendingDb;
-          const stored = await idbGet(db, storeName, name);
-          if (stored !== null) {
-            return stored;
-          }
-
-          // One-time transparent migration from legacy localStorage data
-          const legacy = fallback?.getItem(name) ?? null;
-          if (legacy !== null) {
-            try {
-              await idbSet(db, storeName, name, legacy);
-            } catch {
-              // Ignore migration write error and still return legacy data
-            }
-            return legacy;
-          }
-          return null;
+          return await idbGet(db, storeName, name);
         } catch {
-          // Fall through to localStorage fallback
+          // Fall through to in-memory fallback when IndexedDB fails at runtime
         }
       }
 
-      try {
-        return fallback?.getItem(name) ?? null;
-      } catch {
-        return null;
-      }
+      return memoryFallback.get(name) ?? null;
     },
 
     async setItem(name: string, value: string): Promise<void> {
-      const fallback = resolveFallback();
+      purgeLegacyOnce(name);
       const pendingDb = getDb();
 
       if (pendingDb) {
@@ -166,19 +188,15 @@ export function createIndexedDBStateStorage(options: IndexedDBStorageOptions = {
           await idbSet(db, storeName, name, value);
           return;
         } catch {
-          // Fall through to localStorage fallback
+          // Fall through to in-memory fallback when IndexedDB fails at runtime
         }
       }
 
-      try {
-        fallback?.setItem(name, value);
-      } catch {
-        // Ignore quota or privacy-mode storage errors
-      }
+      memoryFallback.set(name, value);
     },
 
     async removeItem(name: string): Promise<void> {
-      const fallback = resolveFallback();
+      purgeLegacyOnce(name);
       const pendingDb = getDb();
 
       if (pendingDb) {
@@ -190,19 +208,13 @@ export function createIndexedDBStateStorage(options: IndexedDBStorageOptions = {
         }
       }
 
-      try {
-        fallback?.removeItem(name);
-      } catch {
-        // Ignore fallback delete error
-      }
+      memoryFallback.delete(name);
     },
   };
 }
 
 export function detectLocalStorageBackend(): LocalStorageBackend {
-  if (getGlobalIndexedDB()) return "indexeddb";
-  if (getGlobalLocalStorage()) return "localstorage";
-  return "memory";
+  return getGlobalIndexedDB() ? "indexeddb" : "memory";
 }
 
 export const indexedDBStorage: StateStorage = createIndexedDBStateStorage();

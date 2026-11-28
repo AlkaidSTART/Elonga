@@ -46,7 +46,7 @@ Elonga 是一款面向公益机构与内容团队的一体化新媒体创作与�
 | ------------------ | ---------------------------------------------------------- |
 | 应用框架           | Next.js `16.4.6`（App Router、Standalone 输出、Turbopack） |
 | 前端基础           | React `19.3.0`、TypeScript `5`、Tailwind CSS `4.3.3`       |
-| 状态管理           | Zustand `5.1.0`（支持浏览器 `localStorage` 持久化）        |
+| 状态管理           | Zustand `5.1.0`（支持浏览器 `IndexedDB` 持久化）           |
 | 动效与图标         | Framer Motion `14.14.0`、Lucide React `1.77.0`             |
 | 图表 / 文档 / 图像 | ECharts `6.1.0`、`docx` `9.16.0`、StackBlur Canvas `3.0.1` |
 | 运行环境与包管理   | Node.js `22+`、`pnpm@11.17.0`                              |
@@ -194,5 +194,5 @@ pnpm lint     # 运行 ESLint 代码检查
 
 ## 存储与架构说明
 
-- **前端状态持久化**：当前版本中，创作记录、机构资料、活动台账、月报与模型配置通过 Zustand 持久化存储于浏览器 `localStorage`；登录用户信息与密码修改保存在服务端进程内存中（重启后恢复为环境变量默认值）。
+- **前端状态持久化**：当前版本中，创作记录、流量分析会话、机构资料、活动台账、月报、个人资料与模型配置均通过 Zustand 持久化存储于浏览器 `IndexedDB`（数据库 `elonga-local-db`），已移除旧版 `localStorage` 存储与迁移逻辑；登录用户信息与密码修改保存在服务端进程内存中（重启后恢复为环境变量默认值）。
 - **数据库预置**：Docker Compose 已预置 MySQL 8.0 服务及基础表结构（见 [`docker/mysql/init.sql`](./docker/mysql/init.sql)，包含 `organizations`、`users`、`publish_records`、`monthly_reports` 表），便于后续平滑接入服务端持久化存储。

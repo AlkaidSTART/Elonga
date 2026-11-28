@@ -575,19 +575,15 @@ export function SettingsWorkspace() {
           <div className="flex flex-col justify-center gap-2 lg:col-span-8">
             <div className="flex flex-wrap items-center gap-2">
               <span className="rounded border border-[#1B4D3E]/25 bg-[#E9F0ED] px-2 py-0.5 text-[11px] font-medium text-[#1B4D3E]">
-                {storageBackend === "indexeddb"
-                  ? "IndexedDB 已启用"
-                  : storageBackend === "localstorage"
-                    ? "localStorage 降级模式"
-                    : "仅内存模式"}
+                {storageBackend === "indexeddb" ? "IndexedDB 已启用" : "仅内存模式"}
               </span>
               <span className="rounded bg-[#EFECE4] px-2 py-0.5 font-mono text-[11px] text-[#57534E]">
                 {IDB_DATABASE_NAME}
               </span>
             </div>
             <p className="text-xs leading-relaxed text-[#78716C]">
-              已自动托管文案历史、模型配置、月度汇报、机构活动档案与个人资料，并无缝兼容旧版
-              localStorage 数据迁移。
+              已全面迁移至浏览器 IndexedDB，自动托管文案历史、流量分析会话、模型配置、月度汇报、
+              机构活动档案与个人资料，不再使用旧版 localStorage 存储。
             </p>
           </div>
         </section>
