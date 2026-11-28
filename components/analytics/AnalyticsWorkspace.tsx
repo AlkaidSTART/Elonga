@@ -25,6 +25,7 @@ import {
 import { PLATFORMS, type PlatformId } from "@/lib/platforms";
 import { sanitizeExternalUrl } from "@/lib/url-safety";
 import { useWorkbenchStore } from "@/store/useWorkbenchStore";
+import { TrafficAiAssistant } from "./TrafficAiAssistant";
 
 type InputMode = "file" | "paste";
 type PlatformFilter = "all" | PlatformId;
@@ -642,6 +643,12 @@ export function AnalyticsWorkspace() {
           </div>
         )}
       </section>
+
+      {/* AI Traffic Insight Component (reuses configured text LLM) */}
+      <TrafficAiAssistant
+        records={filteredRecords}
+        scopeLabel={platformFilter === "all" ? "全部平台" : PLATFORMS[platformFilter].name}
+      />
 
       {/* Synced Works Traffic Ledger */}
       <section className="space-y-4">
