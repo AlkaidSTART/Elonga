@@ -10,7 +10,7 @@ describe("scanSensitiveEntities", () => {
   it("detects names, phone numbers, addresses, ID cards, and schools", () => {
     const sample = [
       "受助学生张小明，学校：阳光小学三年级，",
-      "家住幸福社区12号楼302室，",
+      "住址：幸福社区12号楼302室，",
       "联系电话13812345678，",
       "身份证号110101201001011234。",
     ].join("");
