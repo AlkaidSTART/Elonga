@@ -202,3 +202,21 @@ export function generateLocalMonthlyReport(params: {
     body: sections.join("\n"),
   };
 }
+
+export function resolveActiveMonthlyReport(
+  reports: SavedMonthlyReport[],
+  activeReportId: string | null,
+  selectedMonth: string,
+): SavedMonthlyReport | null {
+  if (activeReportId) {
+    const found = reports.find((r) => r.id === activeReportId);
+    if (found) return found;
+  }
+  return reports.find((r) => r.month === selectedMonth) ?? reports[0] ?? null;
+}
+
+export function formatReportPlainText(
+  report: Pick<SavedMonthlyReport, "title" | "summary" | "body">,
+): string {
+  return `${report.title}\n\n【核心摘要】\n${report.summary}\n\n${report.body}`;
+}
