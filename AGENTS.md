@@ -1,42 +1,43 @@
-## 项目约束（Elonga）
+## Project Constraints (Elonga)
 
-在仓库内进行任何开发与修改时，必须严格遵守以下技术栈选型与开发约束：
+When developing or making any changes in this repository, you must strictly follow the technology stack and development constraints below:
 
-### 0. 技术栈约束（严禁随意替换或引入无关框架）
-- **核心框架**：`Next.js 16`（App Router）+ `React 19` + `TypeScript 5`（`strict: true`）
-- **样式与交互**：`Tailwind CSS v4` + `framer-motion`（动效）+ `lucide-react`（图标）
-- **状态管理**：`zustand`
-- **图表与业务库**：`echarts`（图表）、`docx`（Word 导出）、`stackblur-canvas`（画布模糊处理）
-- **包管理与工程工具**：统一使用 `pnpm`（严禁混用 `npm` / `yarn` 生成其他 lock 文件），代码检查使用 `ESLint 9`（`eslint-config-next`）
-- **选型原则**：必须严格沿用当前仓库已有技术栈与依赖，**禁止**擅自更换核心框架、状态管理方案、样式方案或引入功能重叠的第三方库；确需新增依赖时，必须先向用户说明原因并获得确认。
+### 0. Tech Stack Constraints (No Arbitrary Replacements or Unrelated Frameworks)
 
-### 1. 重构原则（最小重构）
+- **Core Framework**: `Next.js 16` (App Router) + `React 19` + `TypeScript 5` (`strict: true`)
+- **Styling & Interaction**: `Tailwind CSS v4` + `framer-motion` (animations) + `lucide-react` (icons)
+- **State Management**: `zustand`
+- **Charts & Domain Libraries**: `echarts` (charts), `docx` (Word export), `stackblur-canvas` (canvas blur processing)
+- **Package Manager & Tooling**: Use `pnpm` exclusively (never mix `npm` or `yarn` or generate other lockfiles); use `ESLint 9` (`eslint-config-next`) for linting
+- **Selection Principle**: Strictly adhere to the existing tech stack and dependencies in this repository. Do **not** swap out core frameworks, state management, or styling solutions, or introduce overlapping third-party libraries. If a new dependency is genuinely needed, explain the reason to the user and get confirmation first.
 
-- **禁止大规模重构**：不得提出或执行大范围架构重写、跨模块大改或无关代码清理。
-- **遵循最小重构原则**：所有改动应聚焦当前任务目标，尽量缩小变更范围（Minimal Diff），保持现有目录结构、公共接口与无关逻辑稳定。
+### 1. Refactoring Principle (Minimal Refactoring)
 
-### 2. 团队协作与提 PR
+- **No Large-Scale Refactoring**: Do not propose or perform sweeping architectural rewrites, broad cross-module overhauls, or unrelated code cleanups.
+- **Follow Minimal Diff**: Keep all changes focused on the current task goal, minimize the scope of changes (Minimal Diff), and preserve the existing directory structure, public interfaces, and unrelated logic.
 
-- 凡涉及工作区改动、提交代码、推送分支或发起 Pull Request，**必须加载并遵循仓库内技能** `.agents/skills/team-pr-workflow/SKILL.md`（`team-pr-workflow`）。
-- 严禁直接向 `main` 分支提交或推送；统一按技能流程同步最新 `main` -> 新建独立分支 -> 校验通过 -> 提交并推送 -> 发起 PR。
+### 2. Team Collaboration & Pull Requests
 
-### 3. UI 视觉规范
+- Whenever a task involves modifying the workspace, committing code, pushing a branch, or opening a Pull Request, you **must load and follow the repository skill** `.agents/skills/team-pr-workflow/SKILL.md` (`team-pr-workflow`).
+- Never commit or push directly to the `main` branch. Always follow the skill workflow: sync latest `main` -> create a dedicated branch -> pass all checks -> commit and push -> open a PR.
 
-- 凡涉及页面新建、组件重构、样式调整、弹窗/表单/图表设计等 UI 改动，**必须先加载并严格遵循仓库内 UI 风格文档** `.agents/skills/elonga-ui-style/SKILL.md`（`elonga-ui-style`）及组件配方 `.agents/skills/elonga-ui-style/references/component-recipes.md`。
-- 保持 Elonga「Warm Editorial Studio（暖纸编辑工坊）」的色值、字体、1px 分割线与交互细节一致，不得随意引入脱离规范的卡片阴影或第三方配色。
+### 3. UI Visual Guidelines
 
-### 4. 测试与代码规范（提交前门禁）
+- Whenever a task involves UI changes—such as creating new pages, refactoring components, adjusting styles, or designing modals/forms/charts—you **must first load and strictly follow the repository UI style guide** `.agents/skills/elonga-ui-style/SKILL.md` (`elonga-ui-style`) and component recipes `.agents/skills/elonga-ui-style/references/component-recipes.md`.
+- Maintain consistency with Elonga's "Warm Editorial Studio" palette, typography, 1px dividers, and interaction details. Do not introduce off-spec card shadows or third-party color schemes.
 
-- **补充对应测试**：每次完成功能开发或 Bug 修复后，必须为本次改动补充对应的测试文件并运行通过。
-- **检查语法与代码风格**：
-  - 遵循仓库现有代码风格与 `eslint.config.mjs`、`tsconfig.json`（`strict: true`）约束：**2 空格缩进**、双引号、保留分号、保持与周边文件格式一致。
-  - 执行 `pnpm lint`、`pnpm build` 及对应的测试命令，检查语法、类型与构建状态。
-- **全部通过方可提交**：仅在测试、语法检查、代码风格检查与构建**全部通过**后，才允许执行提交并发起 PR。
+### 4. Testing & Code Style (Pre-Commit Gate)
 
-### 5. 新功能准入原则（拒绝纯 Vibe Coding，以可落地交付为准）
+- **Add Corresponding Tests**: After completing any feature or bug fix, you must add corresponding test files for the changes and ensure they pass.
+- **Check Syntax & Code Style**:
+  - Follow the repository's code style and the constraints in `eslint.config.mjs` and `tsconfig.json` (`strict: true`): **2-space indentation**, double quotes, semicolons, and formatting consistent with surrounding files.
+  - Run `pnpm lint`, `pnpm build`, and the corresponding test commands (`pnpm test`) to verify syntax, types, and build status.
+- **Pass Everything Before Committing**: Only commit and open a PR after all tests, syntax checks, style checks, and builds **pass completely**.
 
-- **先问清再动手**：每次提出或准备新增功能前，必须先与用户明确并确认以下三点：
-  1. **解决什么问题**：具体面向什么业务痛点或用户场景，是否有真实需求支撑；
-  2. **能否实际落地**：现有技术栈、数据来源、依赖服务与权限条件是否具备可行性，是否存在未解决的阻塞项；
-  3. **能否正常交付**：验收标准、边界条件与完整闭环是否清晰，确保最终产出是可运行、可验证、可交付的完整能力。
-- **严禁盲目 Vibe Coding**：禁止未经需求澄清和可行性评估就直接堆砌华而不实的代码、Mock 假实现或无法闭环的半成品功能，一切以**能够实际落地并稳定交付**为最高准则。
+### 5. New Feature Admission Principle (No Pure Vibe Coding; Ship Deliverable Capabilities)
+
+- **Clarify Before Building**: Before proposing or starting any new feature, you must confirm the following three points with the user:
+  1. **What problem it solves**: Which specific business pain point or user scenario it addresses, and whether it is backed by a real need.
+  2. **Whether it is feasible**: Whether the current tech stack, data sources, dependent services, and permissions can support it, and whether any blockers remain.
+  3. **Whether it can be delivered cleanly**: Whether the acceptance criteria, edge cases, and end-to-end loop are clear so the final output is runnable, verifiable, and deliverable.
+- **No Blind Vibe Coding**: Do not pile up flashy code, fake mock implementations, or half-baked features without requirements clarification and feasibility assessment. **Practical feasibility and reliable delivery** are the highest priorities.
