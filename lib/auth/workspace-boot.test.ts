@@ -1,7 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
   WORKSPACE_BOOT_FAILSAFE_MS,
-  WORKSPACE_BOOT_OVERLAY_ID,
+  WORKSPACE_BOOT_HTML_ATTR,
   WORKSPACE_BOOT_STORAGE_KEY,
   WORKSPACE_BOOT_TTL_MS,
   buildWorkspaceBootRevealScript,
@@ -86,12 +86,12 @@ describe("workspace-boot first-login transition helpers", () => {
     expect(() => clearWorkspaceBootPending(throwingStorage)).not.toThrow();
   });
 
-  it("generates an inline reveal script referencing the storage key, overlay id, and failsafe", () => {
+  it("generates an inline reveal script toggling the html root attribute with failsafe", () => {
     const script = buildWorkspaceBootRevealScript();
     expect(script).toContain(WORKSPACE_BOOT_STORAGE_KEY);
-    expect(script).toContain(WORKSPACE_BOOT_OVERLAY_ID);
+    expect(script).toContain(WORKSPACE_BOOT_HTML_ATTR);
     expect(script).toContain(String(WORKSPACE_BOOT_TTL_MS));
     expect(script).toContain(String(WORKSPACE_BOOT_FAILSAFE_MS));
-    expect(script).toContain('setAttribute("data-boot-state","active")');
+    expect(script).toContain('root.setAttribute(attr,"active")');
   });
 });
