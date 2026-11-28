@@ -11,7 +11,6 @@ import {
   Database,
   FileSpreadsheet,
   Loader2,
-  MessageSquare,
   PanelLeft,
   Plus,
   SlidersHorizontal,
@@ -267,28 +266,29 @@ export function AnalyticsWorkspace() {
     }
   };
 
-  const renderSessionList = () => (
+  const renderSessionRail = () => (
     <div className="flex h-full flex-col">
-      <div className="border-b border-[#E2DDD3] p-3">
+      {/* Flush New Session Action (no boxy card) */}
+      <div className="flex h-14 shrink-0 items-center justify-between px-4">
+        <span className="text-[11px] font-medium tracking-[0.12em] text-[#8C857B]">
+          会话（{sessions.length}）
+        </span>
         <button
           type="button"
           onClick={handleNewSession}
-          className="flex w-full items-center justify-center gap-1.5 rounded bg-[#1B4D3E] px-3 py-2 text-xs font-medium text-[#FCFBF8] transition hover:bg-[#143A2F]"
+          className="inline-flex items-center gap-1 rounded px-2 py-1 text-xs font-medium text-[#1B4D3E] transition hover:bg-[#E9F0ED]"
         >
           <Plus className="h-3.5 w-3.5" />
-          <span>新建分析会话</span>
+          <span>新建会话</span>
         </button>
       </div>
 
-      <div className="flex-1 overflow-y-auto p-2">
-        <p className="px-2 pb-1.5 pt-1 text-[10px] font-medium tracking-[0.12em] text-[#8C857B]">
-          会话列表（{sessions.length}）
-        </p>
-
+      {/* Seamless Session List */}
+      <div className="flex-1 overflow-y-auto px-2 pb-4">
         {sessions.length === 0 ? (
-          <div className="px-2 py-6 text-center text-xs text-[#8C857B]">
-            暂无会话，发送问题或点击上方按钮新建
-          </div>
+          <p className="px-3 py-8 text-xs leading-relaxed text-[#8C857B]">
+            暂无历史会话，直接在右侧输入问题即可自动开启。
+          </p>
         ) : (
           <div className="space-y-0.5">
             {sessions.map((session) => {
@@ -310,23 +310,21 @@ export function AnalyticsWorkspace() {
                       setMobileSidebarOpen(false);
                     }
                   }}
-                  className={`group relative flex cursor-pointer items-start justify-between gap-2 rounded px-2.5 py-2 transition ${
+                  className={`group relative flex cursor-pointer items-start justify-between gap-2 rounded-md px-3 py-2 transition ${
                     isActive
-                      ? "bg-[#FCFBF8] text-[#181816]"
-                      : "text-[#57534E] hover:bg-[#E5E0D5]/70 hover:text-[#181816]"
+                      ? "bg-[#EFECE4]/90 text-[#181816]"
+                      : "text-[#57534E] hover:bg-[#EFECE4]/50 hover:text-[#181816]"
                   }`}
                 >
                   {isActive && (
-                    <span className="absolute bottom-1.5 left-0 top-1.5 w-[2.5px] rounded-r bg-[#1B4D3E]" />
+                    <span className="absolute bottom-2 left-0 top-2 w-[2px] rounded-r bg-[#1B4D3E]" />
                   )}
 
-                  <div className="min-w-0 flex-1 pl-1">
+                  <div className="min-w-0 flex-1">
                     <p className="truncate text-xs font-medium">{session.title}</p>
-                    <div className="mt-1 flex items-center gap-1.5 font-mono text-[10px] text-[#8C857B] tabular-nums">
-                      <span>{getScopeLabel(session.platformScope)}</span>
-                      <span>·</span>
-                      <span>{session.messages.length} 条</span>
-                    </div>
+                    <p className="mt-0.5 font-mono text-[10px] text-[#8C857B] tabular-nums">
+                      {getScopeLabel(session.platformScope)} · {session.messages.length} 条
+                    </p>
                   </div>
 
                   <button
@@ -347,12 +345,12 @@ export function AnalyticsWorkspace() {
         )}
       </div>
 
-      {/* Sidebar Footer: Model Config Quick Link */}
-      <div className="border-t border-[#E2DDD3] p-3">
+      {/* Flush Model Status Footer */}
+      <div className="shrink-0 border-t border-[#E2DDD3] px-4 py-3">
         <button
           type="button"
           onClick={() => router.push("/settings")}
-          className="flex w-full items-center justify-between gap-2 rounded border border-[#D5CFC3] bg-[#FCFBF8] px-2.5 py-2 text-left transition hover:border-[#181816]"
+          className="flex w-full items-center justify-between gap-2 rounded py-1 text-left transition hover:text-[#1B4D3E]"
         >
           <div className="min-w-0">
             <div className="flex items-center gap-1.5">
@@ -365,7 +363,7 @@ export function AnalyticsWorkspace() {
                 {modelConfig.textModel || "deepseek-chat"}
               </span>
             </div>
-            <p className="mt-0.5 truncate text-[10px] text-[#78716C]">
+            <p className="mt-0.5 truncate text-[10px] text-[#8C857B]">
               {formatMeta.shortLabel} · {hasApiKey ? "云端模型就绪" : "本地降级模式"}
             </p>
           </div>
@@ -376,309 +374,302 @@ export function AnalyticsWorkspace() {
   );
 
   return (
-    <div className="space-y-4">
-      {/* Compact Workspace Frame (Codex-style Split) */}
-      <div className="relative flex h-[calc(100vh-8.25rem)] min-h-[580px] overflow-hidden rounded-lg border border-[#E2DDD3] bg-[#FCFBF8]">
-        {/* Desktop Sessions Sidebar */}
-        <aside className="hidden w-60 shrink-0 border-r border-[#E2DDD3] bg-[#EFECE4]/60 md:block">
-          {renderSessionList()}
-        </aside>
+    <div className="relative flex h-[calc(100vh-3.5rem)] min-h-[560px] w-full bg-[#F6F4EF] lg:h-screen">
+      {/* Flush Desktop Session Rail (hairline divider only, zero outer box) */}
+      <aside className="hidden w-60 shrink-0 border-r border-[#E2DDD3] md:block">
+        {renderSessionRail()}
+      </aside>
 
-        {/* Mobile Sessions Overlay */}
-        {mobileSidebarOpen && (
-          <div className="fixed inset-0 z-40 flex md:hidden">
-            <div
-              className="fixed inset-0 bg-[#181816]/35"
-              onClick={() => setMobileSidebarOpen(false)}
-              aria-hidden="true"
-            />
-            <aside className="relative z-10 h-full w-64 border-r border-[#E2DDD3] bg-[#EFECE4]">
-              {renderSessionList()}
-            </aside>
+      {/* Mobile Sessions Drawer */}
+      {mobileSidebarOpen && (
+        <div className="fixed inset-0 z-40 flex md:hidden">
+          <div
+            className="fixed inset-0 bg-[#181816]/35"
+            onClick={() => setMobileSidebarOpen(false)}
+            aria-hidden="true"
+          />
+          <aside className="relative z-10 h-full w-64 border-r border-[#E2DDD3] bg-[#F6F4EF]">
+            {renderSessionRail()}
+          </aside>
+        </div>
+      )}
+
+      {/* Main Seamless Conversation Canvas */}
+      <div className="flex min-w-0 flex-1 flex-col">
+        {/* Flush Top Header */}
+        <header className="flex h-14 shrink-0 items-center justify-between gap-3 border-b border-[#E2DDD3] px-5 sm:px-8">
+          <div className="flex min-w-0 items-center gap-2.5">
+            <button
+              type="button"
+              onClick={() => setMobileSidebarOpen(true)}
+              aria-label="打开会话列表"
+              className="rounded p-1.5 text-[#57534E] hover:bg-[#EFECE4] md:hidden"
+            >
+              <PanelLeft className="h-4 w-4" />
+            </button>
+
+            <h1 className="truncate font-editorial text-base font-semibold text-[#181816]">
+              {activeSession?.title ?? "流量分析"}
+            </h1>
+
+            <span className="text-[#CFC8BA]">/</span>
+
+            <select
+              aria-label="分析平台范围"
+              value={platformScope}
+              onChange={(e) => handleScopeChange(e.target.value as AnalyticsPlatformScope)}
+              className="cursor-pointer bg-transparent py-1 text-xs font-medium text-[#57534E] outline-none transition hover:text-[#181816] focus:text-[#1B4D3E]"
+            >
+              <option value="all">全部平台</option>
+              {PLATFORM_IDS.map((pid) => (
+                <option key={pid} value={pid}>
+                  {PLATFORMS[pid].name}
+                </option>
+              ))}
+            </select>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => setLedgerOpen(true)}
+              className="inline-flex items-center gap-1.5 rounded px-2 py-1 text-xs font-medium text-[#57534E] transition hover:bg-[#EFECE4] hover:text-[#181816]"
+            >
+              <Database className="h-3.5 w-3.5" />
+              <span className="font-mono tabular-nums">台账 {syncedRecords.length}</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setImportModalOpen(true)}
+              className="inline-flex items-center gap-1.5 rounded px-2.5 py-1 text-xs font-medium text-[#1B4D3E] transition hover:bg-[#E9F0ED]"
+            >
+              <FileSpreadsheet className="h-3.5 w-3.5" />
+              <span>导入报表</span>
+            </button>
+          </div>
+        </header>
+
+        {/* Sync Feedback Strip */}
+        {syncNotice && (
+          <div className="flex shrink-0 items-center justify-between gap-3 border-b border-[#1B4D3E]/20 bg-[#E9F0ED]/80 px-5 py-2 text-xs text-[#1B4D3E] sm:px-8">
+            <span>{syncNotice}</span>
+            <button
+              type="button"
+              onClick={() => setSyncNotice(null)}
+              aria-label="关闭提示"
+              className="rounded p-0.5 text-[#1B4D3E]/70 hover:text-[#1B4D3E]"
+            >
+              <X className="h-3.5 w-3.5" />
+            </button>
           </div>
         )}
 
-        {/* Main Conversation Pane */}
-        <div className="flex min-w-0 flex-1 flex-col bg-[#F6F4EF]/45">
-          {/* Top Bar */}
-          <header className="flex shrink-0 flex-wrap items-center justify-between gap-2 border-b border-[#E2DDD3] bg-[#FCFBF8] px-4 py-2.5">
-            <div className="flex min-w-0 items-center gap-2.5">
-              <button
-                type="button"
-                onClick={() => setMobileSidebarOpen(true)}
-                aria-label="打开会话列表"
-                className="rounded p-1.5 text-[#57534E] hover:bg-[#EFECE4] md:hidden"
-              >
-                <PanelLeft className="h-4 w-4" />
-              </button>
+        {/* Messages Viewport */}
+        <div className="flex-1 overflow-y-auto px-5 py-8 sm:px-10">
+          {!activeSession || activeSession.messages.length === 0 ? (
+            <div className="mx-auto flex max-w-3xl flex-col justify-center py-8">
+              <div className="flex items-center gap-2 text-xs font-medium text-[#1B4D3E]">
+                <Sparkles className="h-3.5 w-3.5" />
+                <span>流量分析 · {getScopeLabel(platformScope)}</span>
+              </div>
 
-              <h1 className="truncate font-editorial text-base font-semibold text-[#181816]">
-                {activeSession?.title ?? "流量分析"}
-              </h1>
+              <h2 className="mt-3 font-editorial text-3xl font-semibold tracking-tight text-[#181816]">
+                想从哪一组作品数据开始复盘？
+              </h2>
+              <p className="mt-2 text-xs leading-relaxed text-[#78716C]">
+                直接提问或点选下方分析方向，系统会自动注入当前已同步的作品播放与互动数据作为模型上下文。
+              </p>
 
-              <select
-                aria-label="分析平台范围"
-                value={platformScope}
-                onChange={(e) => handleScopeChange(e.target.value as AnalyticsPlatformScope)}
-                className="rounded border border-[#D5CFC3] bg-[#FCFBF8] px-2 py-1 text-[11px] font-medium text-[#57534E] outline-none transition focus:border-[#1B4D3E]"
-              >
-                <option value="all">全部平台</option>
-                {PLATFORM_IDS.map((pid) => (
-                  <option key={pid} value={pid}>
-                    {PLATFORMS[pid].name}
-                  </option>
+              {/* Flush Hairline KPI Row */}
+              <div className="mt-8 grid grid-cols-2 gap-y-4 border-y border-[#E2DDD3] py-4 sm:grid-cols-4 sm:divide-x sm:divide-[#E2DDD3]">
+                <div className="sm:pr-5">
+                  <p className="text-[11px] text-[#78716C]">已同步作品</p>
+                  <p className="mt-1 font-editorial text-2xl font-semibold text-[#181816] tabular-nums">
+                    {totals.count.toLocaleString("zh-CN")}
+                  </p>
+                </div>
+                <div className="sm:px-5">
+                  <p className="text-[11px] text-[#78716C]">累计播放 / 阅读</p>
+                  <p className="mt-1 font-editorial text-2xl font-semibold text-[#1B4D3E] tabular-nums">
+                    {totals.views.toLocaleString("zh-CN")}
+                  </p>
+                </div>
+                <div className="sm:px-5">
+                  <p className="text-[11px] text-[#78716C]">累计互动</p>
+                  <p className="mt-1 font-editorial text-2xl font-semibold text-[#181816] tabular-nums">
+                    {totals.interactions.toLocaleString("zh-CN")}
+                  </p>
+                </div>
+                <div className="sm:pl-5">
+                  <p className="text-[11px] text-[#78716C]">综合互动率</p>
+                  <p className="mt-1 font-editorial text-2xl font-semibold text-[#B85D3B] tabular-nums">
+                    {totals.rate}
+                  </p>
+                </div>
+              </div>
+
+              {/* Flush Prompt Suggestions (hairline list, no floating cards) */}
+              <div className="mt-6 grid grid-cols-1 divide-y divide-[#E2DDD3] border-b border-[#E2DDD3] sm:grid-cols-2 sm:gap-x-8">
+                {QUICK_PROMPTS.map((item) => (
+                  <button
+                    key={item.title}
+                    type="button"
+                    disabled={isSending}
+                    onClick={() => void sendMessage(item.prompt)}
+                    className="group py-3.5 text-left transition hover:text-[#1B4D3E]"
+                  >
+                    <p className="font-editorial text-sm font-semibold text-[#181816] group-hover:text-[#1B4D3E]">
+                      {item.title}
+                    </p>
+                    <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-[#78716C]">
+                      {item.prompt}
+                    </p>
+                  </button>
                 ))}
-              </select>
-            </div>
+              </div>
 
-            <div className="flex items-center gap-2">
-              <button
-                type="button"
-                onClick={() => setLedgerOpen(true)}
-                className="inline-flex items-center gap-1.5 rounded border border-[#D5CFC3] bg-[#FCFBF8] px-2.5 py-1.5 text-xs font-medium text-[#57534E] transition hover:border-[#181816] hover:text-[#181816]"
-              >
-                <Database className="h-3.5 w-3.5" />
-                <span className="font-mono tabular-nums">台账 ({syncedRecords.length})</span>
-              </button>
-
-              <button
-                type="button"
-                onClick={() => setImportModalOpen(true)}
-                className="inline-flex items-center gap-1.5 rounded border border-[#1B4D3E]/35 bg-[#E9F0ED] px-3 py-1.5 text-xs font-medium text-[#1B4D3E] transition hover:bg-[#1B4D3E] hover:text-[#FCFBF8]"
-              >
-                <FileSpreadsheet className="h-3.5 w-3.5" />
-                <span>导入报表</span>
-              </button>
-            </div>
-          </header>
-
-          {/* Sync Feedback Banner */}
-          {syncNotice && (
-            <div className="flex shrink-0 items-center justify-between gap-3 border-b border-[#1B4D3E]/20 bg-[#E9F0ED] px-4 py-2 text-xs text-[#1B4D3E]">
-              <span>{syncNotice}</span>
-              <button
-                type="button"
-                onClick={() => setSyncNotice(null)}
-                aria-label="关闭提示"
-                className="rounded p-0.5 text-[#1B4D3E]/70 hover:text-[#1B4D3E]"
-              >
-                <X className="h-3.5 w-3.5" />
-              </button>
-            </div>
-          )}
-
-          {/* Messages Viewport */}
-          <div className="flex-1 overflow-y-auto px-4 py-6 sm:px-8">
-            {!activeSession || activeSession.messages.length === 0 ? (
-              <div className="mx-auto flex max-w-2xl flex-col items-center justify-center py-8 text-center">
-                <span className="inline-flex items-center gap-1.5 rounded bg-[#E9F0ED] px-2.5 py-1 text-[11px] font-medium text-[#1B4D3E]">
-                  <Sparkles className="h-3 w-3" />
-                  <span>流量分析工作台 · {getScopeLabel(platformScope)}</span>
-                </span>
-
-                <h2 className="mt-4 font-editorial text-2xl font-semibold tracking-tight text-[#181816]">
-                  想从哪一组作品数据开始复盘？
-                </h2>
-                <p className="mt-1.5 text-xs text-[#78716C]">
-                  支持多会话独立追问，自动注入当前已同步的作品播放与互动指标作为分析上下文
-                </p>
-
-                {/* Inline Compact KPI Strip */}
-                <div className="mt-6 grid w-full grid-cols-2 divide-x divide-[#E2DDD3] border-y border-[#E2DDD3] py-3.5 sm:grid-cols-4">
-                  <div className="px-2">
-                    <p className="text-[11px] text-[#78716C]">已同步作品</p>
-                    <p className="mt-1 font-mono text-base font-semibold text-[#181816] tabular-nums">
-                      {totals.count.toLocaleString("zh-CN")}
-                    </p>
-                  </div>
-                  <div className="px-2">
-                    <p className="text-[11px] text-[#78716C]">累计播放/阅读</p>
-                    <p className="mt-1 font-mono text-base font-semibold text-[#1B4D3E] tabular-nums">
-                      {totals.views.toLocaleString("zh-CN")}
-                    </p>
-                  </div>
-                  <div className="px-2">
-                    <p className="text-[11px] text-[#78716C]">累计互动</p>
-                    <p className="mt-1 font-mono text-base font-semibold text-[#181816] tabular-nums">
-                      {totals.interactions.toLocaleString("zh-CN")}
-                    </p>
-                  </div>
-                  <div className="px-2">
-                    <p className="text-[11px] text-[#78716C]">综合互动率</p>
-                    <p className="mt-1 font-mono text-base font-semibold text-[#B85D3B] tabular-nums">
-                      {totals.rate}
-                    </p>
-                  </div>
-                </div>
-
-                {/* Quick Prompt Grid */}
-                <div className="mt-6 grid w-full grid-cols-1 gap-2.5 text-left sm:grid-cols-2">
-                  {QUICK_PROMPTS.map((item) => (
-                    <button
-                      key={item.title}
-                      type="button"
-                      disabled={isSending}
-                      onClick={() => void sendMessage(item.prompt)}
-                      className="group rounded border border-[#E2DDD3] bg-[#FCFBF8] p-3.5 transition hover:border-[#1B4D3E]"
-                    >
-                      <div className="flex items-center justify-between gap-2">
-                        <span className="font-editorial text-sm font-semibold text-[#181816] group-hover:text-[#1B4D3E]">
-                          {item.title}
-                        </span>
-                        <MessageSquare className="h-3.5 w-3.5 text-[#8C857B] group-hover:text-[#1B4D3E]" />
-                      </div>
-                      <p className="mt-1 line-clamp-2 text-[11px] leading-relaxed text-[#78716C]">
-                        {item.prompt}
-                      </p>
-                    </button>
-                  ))}
-                </div>
-
-                {syncedRecords.length === 0 && (
+              {syncedRecords.length === 0 && (
+                <div className="mt-5">
                   <button
                     type="button"
                     onClick={() => setImportModalOpen(true)}
-                    className="mt-5 inline-flex items-center gap-1.5 text-xs font-medium text-[#1B4D3E] hover:underline"
+                    className="inline-flex items-center gap-1.5 text-xs font-medium text-[#1B4D3E] hover:underline"
                   >
                     <FileSpreadsheet className="h-3.5 w-3.5" />
-                    <span>尚未同步作品数据？点击导入创作者后台 CSV 报表</span>
+                    <span>尚未同步作品数据？点此导入创作者后台 CSV 报表</span>
                   </button>
-                )}
-              </div>
-            ) : (
-              <div className="mx-auto max-w-3xl space-y-5">
-                {activeSession.messages.map((msg) => {
-                  const isUser = msg.role === "user";
-                  return (
-                    <div
-                      key={msg.id}
-                      className={isUser ? "flex justify-end" : "flex justify-start"}
-                    >
-                      {isUser ? (
-                        <div className="max-w-[85%] rounded-lg border border-[#1B4D3E]/20 bg-[#E9F0ED] px-4 py-2.5 text-xs leading-relaxed text-[#181816]">
-                          <p className="whitespace-pre-wrap">{msg.content}</p>
-                        </div>
-                      ) : (
-                        <div className="w-full rounded-lg border border-[#E2DDD3] bg-[#FCFBF8] p-4">
-                          <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#E2DDD3] pb-2.5">
-                            <div className="flex flex-wrap items-center gap-2">
-                              <span
-                                className={`rounded px-1.5 py-0.5 text-[10px] font-medium ${
-                                  msg.mode === "ai"
-                                    ? "border border-[#1B4D3E]/25 bg-[#E9F0ED] text-[#1B4D3E]"
-                                    : "bg-[#FBF3EC] text-[#9A4A22]"
-                                }`}
-                              >
-                                {msg.mode === "ai"
-                                  ? `云端模型 · ${msg.model ?? modelConfig.textModel}`
-                                  : "本地分析降级"}
-                              </span>
-                              {msg.latencyMs !== undefined && (
-                                <span className="font-mono text-[10px] text-[#8C857B] tabular-nums">
-                                  {(msg.latencyMs / 1000).toFixed(2)}s
-                                </span>
-                              )}
-                              <span className="font-mono text-[10px] text-[#8C857B] tabular-nums">
-                                {formatShortTime(msg.createdAt)}
-                              </span>
-                            </div>
-
-                            <button
-                              type="button"
-                              onClick={() => void handleCopyMessage(msg.id, msg.content)}
-                              className="inline-flex items-center gap-1 rounded px-2 py-0.5 text-[11px] text-[#78716C] transition hover:bg-[#EFECE4] hover:text-[#181816]"
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="mx-auto max-w-3xl space-y-7">
+              {activeSession.messages.map((msg) => {
+                const isUser = msg.role === "user";
+                return (
+                  <div key={msg.id} className={isUser ? "flex justify-end" : "block"}>
+                    {isUser ? (
+                      <div className="max-w-[82%] rounded-lg bg-[#E9F0ED] px-4 py-2.5 text-xs leading-relaxed text-[#181816]">
+                        <p className="whitespace-pre-wrap">{msg.content}</p>
+                      </div>
+                    ) : (
+                      <article className="space-y-2.5 border-l-2 border-[#E2DDD3] pl-4">
+                        <div className="flex flex-wrap items-center justify-between gap-2">
+                          <div className="flex flex-wrap items-center gap-2 text-[11px]">
+                            <span
+                              className={
+                                msg.mode === "ai"
+                                  ? "font-mono font-medium text-[#1B4D3E]"
+                                  : "font-medium text-[#9A4A22]"
+                              }
                             >
-                              {copiedMsgId === msg.id ? (
-                                <>
-                                  <Check className="h-3 w-3 text-[#1B4D3E]" />
-                                  <span className="text-[#1B4D3E]">已复制</span>
-                                </>
-                              ) : (
-                                <>
-                                  <Copy className="h-3 w-3" />
-                                  <span>复制</span>
-                                </>
-                              )}
-                            </button>
+                              {msg.mode === "ai"
+                                ? msg.model ?? modelConfig.textModel
+                                : "本地分析降级"}
+                            </span>
+                            {msg.latencyMs !== undefined && (
+                              <span className="font-mono text-[#8C857B] tabular-nums">
+                                · {(msg.latencyMs / 1000).toFixed(2)}s
+                              </span>
+                            )}
+                            <span className="font-mono text-[#8C857B] tabular-nums">
+                              · {formatShortTime(msg.createdAt)}
+                            </span>
                           </div>
 
-                          {msg.fallbackReason && (
-                            <p className="mt-2.5 border-l-2 border-[#B85D3B] bg-[#FBF3EC] px-2.5 py-1 text-[11px] text-[#9A4A22]">
-                              {msg.fallbackReason}
-                            </p>
-                          )}
-
-                          <div className="mt-3 whitespace-pre-wrap text-xs leading-relaxed text-[#181816]">
-                            {msg.content}
-                          </div>
+                          <button
+                            type="button"
+                            onClick={() => void handleCopyMessage(msg.id, msg.content)}
+                            className="inline-flex items-center gap-1 rounded px-1.5 py-0.5 text-[11px] text-[#8C857B] transition hover:bg-[#EFECE4] hover:text-[#181816]"
+                          >
+                            {copiedMsgId === msg.id ? (
+                              <>
+                                <Check className="h-3 w-3 text-[#1B4D3E]" />
+                                <span className="text-[#1B4D3E]">已复制</span>
+                              </>
+                            ) : (
+                              <>
+                                <Copy className="h-3 w-3" />
+                                <span>复制</span>
+                              </>
+                            )}
+                          </button>
                         </div>
-                      )}
-                    </div>
-                  );
-                })}
 
-                {isSending && (
-                  <div className="flex items-center gap-2 rounded-lg border border-[#E2DDD3] bg-[#FCFBF8] px-4 py-3 text-xs text-[#57534E]">
-                    <Loader2 className="h-3.5 w-3.5 animate-spin text-[#1B4D3E]" />
-                    <span>正在调用 {modelConfig.textModel || "deepseek-chat"} 分析数据...</span>
+                        {msg.fallbackReason && (
+                          <p className="text-[11px] text-[#9A4A22]">{msg.fallbackReason}</p>
+                        )}
+
+                        <div className="whitespace-pre-wrap text-[13px] leading-7 text-[#181816]">
+                          {msg.content}
+                        </div>
+                      </article>
+                    )}
                   </div>
-                )}
+                );
+              })}
 
-                <div ref={messagesEndRef} />
-              </div>
-            )}
-          </div>
+              {isSending && (
+                <div className="flex items-center gap-2 pl-4 text-xs text-[#78716C]">
+                  <Loader2 className="h-3.5 w-3.5 animate-spin text-[#1B4D3E]" />
+                  <span>正在调用 {modelConfig.textModel || "deepseek-chat"} 分析数据...</span>
+                </div>
+              )}
 
-          {/* Error Banner */}
-          {error && (
-            <div className="mx-4 mb-2 flex items-center gap-2 border-l-2 border-[#B42318] bg-[#FDF2F2] px-3 py-1.5 text-xs text-[#B42318] sm:mx-8">
-              <AlertCircle className="h-3.5 w-3.5 shrink-0" />
-              <span>{error}</span>
+              <div ref={messagesEndRef} />
             </div>
           )}
+        </div>
 
-          {/* Codex-style Bottom Composer */}
-          <div className="shrink-0 border-t border-[#E2DDD3] bg-[#FCFBF8] px-4 py-3 sm:px-8">
-            <div className="mx-auto max-w-3xl rounded-lg border border-[#D5CFC3] bg-[#FCFBF8] transition focus-within:border-[#1B4D3E]">
-              <textarea
-                rows={2}
-                value={input}
-                onChange={(e) => setInput(e.target.value)}
-                onKeyDown={handleKeyDown}
-                placeholder="输入分析问题（Enter 发送，Shift + Enter 换行）..."
-                className="w-full resize-none bg-transparent px-3.5 pt-2.5 text-xs leading-relaxed text-[#181816] outline-none placeholder:text-[#A8A29E]"
-              />
-              <div className="flex items-center justify-between gap-2 px-2.5 pb-2 pt-1">
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setImportModalOpen(true)}
-                    title="导入创作者后台 CSV 报表"
-                    className="inline-flex items-center gap-1 rounded px-2 py-1 text-[11px] font-medium text-[#57534E] transition hover:bg-[#EFECE4] hover:text-[#181816]"
-                  >
-                    <FileSpreadsheet className="h-3.5 w-3.5 text-[#1B4D3E]" />
-                    <span>导入 CSV</span>
-                  </button>
-                  <span className="hidden font-mono text-[10px] text-[#8C857B] tabular-nums sm:inline">
-                    上下文：{getScopeLabel(platformScope)} · {scopedRecords.length} 篇
-                  </span>
-                </div>
+        {/* Error Banner */}
+        {error && (
+          <div className="mx-auto mb-2 flex w-full max-w-3xl items-center gap-2 border-l-2 border-[#B42318] bg-[#FDF2F2] px-3.5 py-1.5 text-xs text-[#B42318]">
+            <AlertCircle className="h-3.5 w-3.5 shrink-0" />
+            <span>{error}</span>
+          </div>
+        )}
 
+        {/* Seamless Composer (blends directly into #F6F4EF warm paper, no boxed footer bar) */}
+        <div className="shrink-0 px-5 pb-5 pt-2 sm:px-10">
+          <div className="mx-auto max-w-3xl border-t border-[#D5CFC3] pt-3 transition-colors focus-within:border-[#1B4D3E]">
+            <textarea
+              rows={2}
+              value={input}
+              onChange={(e) => setInput(e.target.value)}
+              onKeyDown={handleKeyDown}
+              placeholder="向模型提问，例如：对比抖音与今日头条的互动率，或追问某篇作品的优化方向（Enter 发送）..."
+              className="w-full resize-none bg-transparent text-sm leading-relaxed text-[#181816] outline-none placeholder:text-[#A8A29E]"
+            />
+
+            <div className="mt-2 flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3 text-[11px] text-[#78716C]">
                 <button
                   type="button"
-                  disabled={!input.trim() || isSending}
-                  onClick={() => void sendMessage()}
-                  aria-label="发送消息"
-                  className="inline-flex items-center gap-1 rounded bg-[#1B4D3E] px-3 py-1.5 text-xs font-medium text-[#FCFBF8] transition hover:bg-[#143A2F] disabled:opacity-45"
+                  onClick={() => setImportModalOpen(true)}
+                  className="inline-flex items-center gap-1 rounded px-1.5 py-1 font-medium text-[#57534E] transition hover:bg-[#EFECE4] hover:text-[#181816]"
                 >
-                  {isSending ? (
-                    <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                  ) : (
-                    <ArrowUp className="h-3.5 w-3.5" />
-                  )}
-                  <span>发送</span>
+                  <FileSpreadsheet className="h-3.5 w-3.5 text-[#1B4D3E]" />
+                  <span>导入报表</span>
                 </button>
+                <span className="hidden font-mono text-[#8C857B] tabular-nums sm:inline">
+                  {getScopeLabel(platformScope)} · {scopedRecords.length} 篇数据已接入
+                </span>
               </div>
+
+              <button
+                type="button"
+                disabled={!input.trim() || isSending}
+                onClick={() => void sendMessage()}
+                aria-label="发送消息"
+                className="inline-flex items-center gap-1 rounded bg-[#1B4D3E] px-3.5 py-1.5 text-xs font-medium text-[#FCFBF8] transition hover:bg-[#143A2F] disabled:opacity-40"
+              >
+                {isSending ? (
+                  <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                ) : (
+                  <ArrowUp className="h-3.5 w-3.5" />
+                )}
+                <span>发送</span>
+              </button>
             </div>
           </div>
         </div>
