@@ -941,7 +941,7 @@ export function ContentWorkflowWorkspace() {
                     aria-haspopup="listbox"
                     aria-expanded={platformMenuOpen}
                     onClick={() => setPlatformMenuOpen((v) => !v)}
-                    className="inline-flex items-center gap-1.5 rounded border border-[#1B4D3E]/25 bg-[#E9F0ED] px-2.5 py-1.5 text-xs font-medium text-[#1B4D3E] transition hover:border-[#1B4D3E]"
+                    className="inline-flex items-center gap-1.5 rounded border border-[#1B4D3E]/25 bg-[#E9F0ED] px-2.5 py-1.5 text-xs font-medium text-[#1B4D3E] outline-none transition hover:border-[#1B4D3E] focus-visible:border-[#1B4D3E]"
                   >
                     <span className="h-1.5 w-1.5 rounded-full bg-[#1B4D3E]" />
                     <span>{activePlatformMeta.name}</span>
@@ -957,17 +957,13 @@ export function ContentWorkflowWorkspace() {
                       <motion.div
                         role="listbox"
                         aria-label="选择传播渠道"
-                        initial={{ opacity: 0, y: 6 }}
+                        initial={{ opacity: 0, y: -4 }}
                         animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0, y: 6 }}
+                        exit={{ opacity: 0, y: -4 }}
                         transition={{ duration: 0.14, ease: [0.16, 1, 0.3, 1] }}
-                        className="absolute bottom-full left-0 z-30 mb-2 w-72 rounded-md border border-[#E2DDD3] bg-[#FCFBF8] p-1.5 shadow-[0_14px_34px_-16px_rgba(24,24,22,0.22)]"
+                        className="absolute top-full left-0 z-30 mt-1.5 w-56 rounded-md border border-[#E2DDD3] bg-[#FCFBF8] p-1 shadow-[0_12px_28px_-14px_rgba(24,24,22,0.22)]"
                       >
-                        <div className="flex items-center justify-between border-b border-[#E2DDD3] px-2.5 py-1.5 text-[10px] text-[#8C857B]">
-                          <span className="font-medium tracking-wider uppercase">传播渠道</span>
-                          <span>建议 {activePlatformMeta.recommendedLength}</span>
-                        </div>
-                        <div className="mt-1 space-y-0.5">
+                        <div className="space-y-0.5">
                           {platformOptions.map((meta) => {
                             const active = platform === meta.id;
                             return (
@@ -980,14 +976,14 @@ export function ContentWorkflowWorkspace() {
                                   setPlatform(meta.id);
                                   setPlatformMenuOpen(false);
                                 }}
-                                className={`flex w-full items-center justify-between gap-2 rounded px-2.5 py-2 text-left transition ${
+                                className={`flex w-full items-center justify-between gap-2 rounded px-2.5 py-1.5 text-left transition ${
                                   active
                                     ? "bg-[#E9F0ED] text-[#1B4D3E]"
                                     : "text-[#181816] hover:bg-[#EFECE4]/70"
                                 }`}
                               >
                                 <div className="min-w-0">
-                                  <div className="text-xs font-semibold">{meta.name}</div>
+                                  <div className="text-xs font-medium">{meta.name}</div>
                                   <div className="truncate text-[10px] text-[#78716C]">
                                     {meta.tagline}
                                   </div>
@@ -997,23 +993,10 @@ export function ContentWorkflowWorkspace() {
                             );
                           })}
                         </div>
-                        <div className="mt-1.5 border-t border-[#E2DDD3] px-2.5 pt-2 pb-1">
-                          <div className="flex items-center justify-between gap-2">
-                            <span className="text-[11px] font-semibold text-[#1B4D3E]">
-                              已挂载：{activePlatformSkill.name}
-                            </span>
-                            <span className="font-mono text-[10px] tabular-nums text-[#8C857B]">
-                              {activePlatformSkill.id}
-                            </span>
-                          </div>
-                          <ul className="mt-1 space-y-1 text-[11px] leading-relaxed text-[#57534E]">
-                            {activePlatformSkill.quickHighlights.map((tip) => (
-                              <li key={tip} className="flex items-start gap-1.5">
-                                <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-[#1B4D3E]/60" />
-                                <span>{tip}</span>
-                              </li>
-                            ))}
-                          </ul>
+                        <div className="mt-1 border-t border-[#E2DDD3] px-2.5 pt-1.5 pb-1 text-[10px] text-[#78716C]">
+                          <span className="font-medium text-[#1B4D3E]">
+                            已挂载：{activePlatformSkill.name}
+                          </span>
                         </div>
                       </motion.div>
                     )}
