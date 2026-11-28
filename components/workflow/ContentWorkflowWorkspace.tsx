@@ -33,6 +33,7 @@ import { buildActivityContextPayload } from "@/lib/organization";
 import { evaluatePublishReview } from "@/lib/publish-review";
 import { isAllowedRasterImageType } from "@/lib/url-safety";
 import type { DouyinTrendInsights } from "@/lib/skills/types";
+import { getPlatformWritingSkill } from "@/lib/skills/platform-writing-skills";
 import { processWorkflowImage } from "@/lib/workflow-image-processor";
 import {
   getPlatformOptionList,
@@ -636,6 +637,7 @@ export function ContentWorkflowWorkspace() {
     stage === "assembling";
 
   const activePlatformMeta = getPlatformTriggerMeta(platform);
+  const activePlatformSkill = getPlatformWritingSkill(platform);
   const platformOptions = useMemo(() => getPlatformOptionList(), []);
   const layoutState = resolveWorkflowLayoutState({
     hasDocument: Boolean(assembledDoc),
@@ -994,6 +996,24 @@ export function ContentWorkflowWorkspace() {
                               </button>
                             );
                           })}
+                        </div>
+                        <div className="mt-1.5 border-t border-[#E2DDD3] px-2.5 pt-2 pb-1">
+                          <div className="flex items-center justify-between gap-2">
+                            <span className="text-[11px] font-semibold text-[#1B4D3E]">
+                              已挂载：{activePlatformSkill.name}
+                            </span>
+                            <span className="font-mono text-[10px] tabular-nums text-[#8C857B]">
+                              {activePlatformSkill.id}
+                            </span>
+                          </div>
+                          <ul className="mt-1 space-y-1 text-[11px] leading-relaxed text-[#57534E]">
+                            {activePlatformSkill.quickHighlights.map((tip) => (
+                              <li key={tip} className="flex items-start gap-1.5">
+                                <span className="mt-1.5 h-1 w-1 shrink-0 rounded-full bg-[#1B4D3E]/60" />
+                                <span>{tip}</span>
+                              </li>
+                            ))}
+                          </ul>
                         </div>
                       </motion.div>
                     )}
