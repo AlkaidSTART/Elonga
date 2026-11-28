@@ -12,11 +12,11 @@ import {
   ImagePlus,
   Loader2,
   Lock,
-  PanelRightClose,
   PanelRightOpen,
   Play,
   ShieldCheck,
   SlidersHorizontal,
+  Trash2,
   X,
 } from "lucide-react";
 import {
@@ -36,6 +36,8 @@ import type { DouyinTrendInsights } from "@/lib/skills/types";
 import { getPlatformWritingSkill } from "@/lib/skills/platform-writing-skills";
 import { processWorkflowImage } from "@/lib/workflow-image-processor";
 import {
+  buildPublishableBody,
+  buildPublishableFullText,
   getPlatformOptionList,
   getPlatformTriggerMeta,
   getWorkflowOptionsSummary,
@@ -212,16 +214,19 @@ function buildDocFromResult(
   images: WorkflowImageItem[],
 ): AssembledDocument {
   const platformMeta = PLATFORMS[result.platform] ?? PLATFORMS.douyin;
+  const fullBody = buildPublishableBody({
+    hook: result.hook,
+    body: result.body,
+    cta: result.cta,
+  });
   return {
     title: result.titles[0] || result.topic,
     platform: result.platform,
     platformName: platformMeta.name,
     topic: result.topic,
-    body: result.body,
+    body: fullBody,
     tags: result.tags,
-    hook: result.hook,
-    algorithmTips: result.tips?.length ? result.tips : platformMeta.algorithmTips,
-    trendInsights: result.trendInsights,
+    algorithmTips: [],
     images: images.map((img) => ({
       id: img.id,
       name: img.name,
@@ -259,6 +264,7 @@ export function ContentWorkflowWorkspace() {
     updateCurrentRedactionRecords,
     updateCurrentReviewState,
     addToHistory,
+    removeFromHistory,
   } = useWorkbenchStore();
 
   const { profile: orgProfile, activities } = useOrganizationStore();
@@ -289,7 +295,7 @@ export function ContentWorkflowWorkspace() {
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [optionsExpanded, setOptionsExpanded] = useState(false);
   const [titlesExpanded, setTitlesExpanded] = useState(false);
-  const [rightTab, setRightTab] = useState<"manuscript" | "compliance" | "research">("manuscript");
+  const [rightTab, setRightTab] = useState<"manuscript" | "compliance">("manuscript");
 
   useEffect(() => {
     if (!platformMenuOpen) return;
@@ -566,8 +572,20 @@ export function ContentWorkflowWorkspace() {
 
   const handleBodyChange = (nextBody: string) => {
     if (currentResult) {
-      updateCurrentResultPatch({ body: nextBody });
+      updateCurrentResultPatch({ body: nextBody, hook: "", cta: "" });
     }
+  };
+
+  const handleDeleteManuscript = () => {
+    if (currentResult?.id) {
+      removeFromHistory(currentResult.id);
+    }
+    setCurrentResult(null);
+    setIsPreviewOpen(false);
+    setStage("idle");
+    setTitlesExpanded(false);
+    setDocViewMode("preview");
+    setRightTab("manuscript");
   };
 
   const unredactedImageCount = useMemo(
@@ -616,17 +634,11 @@ export function ContentWorkflowWorkspace() {
 
   const handleCopyFullText = () => {
     if (!assembledDoc || (reviewReport && !reviewReport.isEligible)) return;
-    const text = [
-      assembledDoc.title,
-      assembledDoc.hook ? `\n${assembledDoc.hook}` : "",
-      assembledDoc.body ? `\n${assembledDoc.body}` : "",
-      currentResult?.cta ? `\n${currentResult.cta}` : "",
-      assembledDoc.tags.length > 0
-        ? `\n${assembledDoc.tags.map((t) => `#${t.replace(/^#/, "")}`).join(" ")}`
-        : "",
-    ]
-      .filter(Boolean)
-      .join("\n");
+    const text = buildPublishableFullText({
+      title: assembledDoc.title,
+      body: assembledDoc.body,
+      tags: assembledDoc.tags,
+    });
     void handleCopyText(text, "full");
   };
 
@@ -680,16 +692,6 @@ export function ContentWorkflowWorkspace() {
   const activeStepIdx = pipelineSteps.findIndex((s) => s.id === stage);
   const documentBlocks = assembledDoc ? buildDocumentBlocks(assembledDoc) : [];
 
-  const docPlatformMeta = assembledDoc
-    ? getPlatformTriggerMeta(assembledDoc.platform)
-    : activePlatformMeta;
-  const matchedTrendInsights =
-    assembledDoc?.trendInsights &&
-    (!assembledDoc.trendInsights.platform ||
-      assembledDoc.trendInsights.platform === assembledDoc.platform)
-      ? assembledDoc.trendInsights
-      : undefined;
-
   return (
     <div className="space-y-8">
       {/* Top Page Header */}
@@ -730,27 +732,14 @@ export function ContentWorkflowWorkspace() {
             </ol>
           )}
 
-          {!isRunning && layoutState.showPreviewTrigger && (
+          {!isRunning && layoutState.showPreviewTrigger && !layoutState.showPreviewPanel && (
             <button
               type="button"
-              onClick={() => setIsPreviewOpen((v) => !v)}
-              className={
-                layoutState.showPreviewPanel
-                  ? "inline-flex items-center gap-1.5 rounded border border-[#D5CFC3] bg-[#FCFBF8] px-3.5 py-2 text-xs font-medium text-[#181816] transition hover:border-[#181816]"
-                  : "inline-flex items-center gap-1.5 rounded bg-[#1B4D3E] px-4 py-2 text-xs font-medium text-[#FCFBF8] transition hover:bg-[#143A2F]"
-              }
+              onClick={() => setIsPreviewOpen(true)}
+              className="inline-flex items-center gap-1.5 rounded bg-[#1B4D3E] px-4 py-2 text-xs font-medium text-[#FCFBF8] transition hover:bg-[#143A2F]"
             >
-              {layoutState.showPreviewPanel ? (
-                <>
-                  <PanelRightClose className="h-3.5 w-3.5" />
-                  <span>收起预览</span>
-                </>
-              ) : (
-                <>
-                  <Eye className="h-3.5 w-3.5" />
-                  <span>预览样稿</span>
-                </>
-              )}
+              <Eye className="h-3.5 w-3.5" />
+              <span>预览样稿</span>
             </button>
           )}
         </div>
@@ -1243,14 +1232,24 @@ export function ContentWorkflowWorkspace() {
                   </p>
                 </div>
 
-                <button
-                  type="button"
-                  onClick={() => setIsPreviewOpen(true)}
-                  className="inline-flex shrink-0 items-center justify-center gap-1.5 rounded bg-[#1B4D3E] px-4 py-2 text-xs font-medium text-[#FCFBF8] transition hover:bg-[#143A2F]"
-                >
-                  <PanelRightOpen className="h-3.5 w-3.5" />
-                  <span>预览样稿</span>
-                </button>
+                <div className="flex shrink-0 items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={handleDeleteManuscript}
+                    className="inline-flex items-center justify-center gap-1.5 rounded border border-[#D5CFC3] bg-[#FCFBF8] px-3 py-2 text-xs font-medium text-[#57534E] transition hover:border-[#B42318] hover:text-[#B42318]"
+                  >
+                    <Trash2 className="h-3.5 w-3.5" />
+                    <span>删除样稿</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setIsPreviewOpen(true)}
+                    className="inline-flex items-center justify-center gap-1.5 rounded bg-[#1B4D3E] px-4 py-2 text-xs font-medium text-[#FCFBF8] transition hover:bg-[#143A2F]"
+                  >
+                    <PanelRightOpen className="h-3.5 w-3.5" />
+                    <span>预览样稿</span>
+                  </button>
+                </div>
               </motion.div>
             )}
           </AnimatePresence>
@@ -1272,12 +1271,11 @@ export function ContentWorkflowWorkspace() {
                 <div className="flex items-center gap-5">
                   {(
                     [
-                      { id: "manuscript", label: "成稿与编辑" },
+                      { id: "manuscript", label: "完整文案" },
                       {
                         id: "compliance",
                         label: reviewReport?.isEligible ? "发布审查 ✓" : "发布审查与脱敏",
                       },
-                      { id: "research", label: "调研与建议" },
                     ] as const
                   ).map((t) => {
                     const active = rightTab === t.id;
@@ -1360,10 +1358,18 @@ export function ContentWorkflowWorkspace() {
                         : "审查后解锁"}
                     </span>
                   </button>
+                  <button
+                    type="button"
+                    onClick={handleDeleteManuscript}
+                    className="inline-flex items-center gap-1 rounded border border-[#D5CFC3] bg-[#FCFBF8] px-2 py-1 text-[11px] font-medium text-[#57534E] transition hover:border-[#B42318] hover:text-[#B42318]"
+                  >
+                    <Trash2 className="h-3 w-3" />
+                    <span>删除样稿</span>
+                  </button>
                 </div>
               </div>
 
-              {/* Tab 1: Manuscript */}
+              {/* Tab 1: Complete Publishable Copy */}
               {rightTab === "manuscript" && (
                 <div className="space-y-4">
                   <div className="flex flex-wrap items-center justify-between gap-2">
@@ -1469,26 +1475,6 @@ export function ContentWorkflowWorkspace() {
                           </h2>
                         </header>
 
-                        {assembledDoc.hook && (
-                          <div className="border-l-2 border-[#1B4D3E] bg-[#F6F4EF] py-3 pl-4 pr-3.5">
-                            <div className="mb-1 flex items-center justify-between">
-                              <span className="text-[11px] font-semibold text-[#1B4D3E]">
-                                {assembledDoc.platform === "douyin" ? "前 3 秒钩子" : "黄金开头"}
-                              </span>
-                              <button
-                                type="button"
-                                onClick={() => void handleCopyText(assembledDoc.hook!, "hook")}
-                                className="text-[11px] text-[#8C857B] hover:text-[#181816]"
-                              >
-                                {copiedKey === "hook" ? "已复制" : "复制"}
-                              </button>
-                            </div>
-                            <p className="text-[15px] font-medium leading-relaxed text-[#181816]">
-                              {assembledDoc.hook}
-                            </p>
-                          </div>
-                        )}
-
                         <div className="space-y-5">
                           {documentBlocks.map((block, idx) =>
                             block.type === "paragraph" ? (
@@ -1538,9 +1524,9 @@ export function ContentWorkflowWorkspace() {
               {rightTab === "compliance" && (
                 <RedactionAndReviewPanel
                   title={assembledDoc.title}
-                  hook={assembledDoc.hook ?? ""}
+                  hook=""
                   body={assembledDoc.body}
-                  onApplyTextChange={({ title: nextTitle, hook: nextHook, body: nextBody }) => {
+                  onApplyTextChange={({ title: nextTitle, body: nextBody }) => {
                     if (currentResult) {
                       const nextTitles =
                         currentResult.titles.length > 0
@@ -1548,8 +1534,9 @@ export function ContentWorkflowWorkspace() {
                           : [nextTitle];
                       updateCurrentResultPatch({
                         titles: nextTitles,
-                        hook: nextHook,
+                        hook: "",
                         body: nextBody,
+                        cta: "",
                       });
                     }
                   }}
@@ -1561,63 +1548,6 @@ export function ContentWorkflowWorkspace() {
                   reviewState={currentResult?.reviewState}
                   onChangeReviewState={updateCurrentReviewState}
                 />
-              )}
-
-              {/* Tab 3: Platform Research & Tips */}
-              {rightTab === "research" && (
-                <div className="divide-y divide-[#E2DDD3]">
-                  {matchedTrendInsights && (
-                    <div className="pb-6">
-                      <div className="mb-2 flex items-center justify-between gap-2">
-                        <span className="font-editorial text-base font-semibold text-[#181816]">
-                          {docPlatformMeta.name}调研参考
-                        </span>
-                        <span className="rounded bg-[#E9F0ED] px-2 py-0.5 text-[11px] font-medium text-[#1B4D3E]">
-                          {matchedTrendInsights.sourceLabel}
-                        </span>
-                      </div>
-                      <p className="mb-3 text-xs leading-relaxed text-[#57534E]">
-                        {matchedTrendInsights.summary}
-                      </p>
-                      <div className="flex flex-wrap gap-1.5">
-                        {matchedTrendInsights.hotKeywords.map((kw) => (
-                          <span
-                            key={kw}
-                            className="rounded border border-[#E2DDD3] bg-[#FCFBF8] px-2 py-0.5 text-[11px] text-[#57534E]"
-                          >
-                            {kw}
-                          </span>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-
-                  {currentResult?.cta && (
-                    <div className="py-6">
-                      <span className="mb-1.5 block font-editorial text-base font-semibold text-[#181816]">
-                        互动引导
-                      </span>
-                      <p className="text-xs leading-relaxed text-[#57534E]">
-                        {currentResult.cta}
-                      </p>
-                    </div>
-                  )}
-
-                  {assembledDoc.algorithmTips.length > 0 && (
-                    <div className="py-6">
-                      <span className="mb-2 block font-editorial text-base font-semibold text-[#181816]">
-                        {docPlatformMeta.name}发布建议
-                      </span>
-                      <ul className="space-y-2">
-                        {assembledDoc.algorithmTips.map((tip, i) => (
-                          <li key={i} className="text-xs leading-relaxed text-[#57534E]">
-                            — {tip}
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
-                  )}
-                </div>
               )}
             </motion.section>
           )}
