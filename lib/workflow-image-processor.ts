@@ -56,6 +56,9 @@ async function runAutoRedact(
         modelConfig: {
           apiKey: modelConfig.textApiKey,
           baseUrl: modelConfig.textBaseUrl,
+          port: modelConfig.textPort,
+          endpointPath: modelConfig.textEndpointPath,
+          apiFormat: modelConfig.textApiFormat,
           model: modelConfig.textModel,
         },
       }),
@@ -123,6 +126,8 @@ async function runStylize2D(
         modelConfig: {
           apiKey: modelConfig.imageApiKey,
           baseUrl: modelConfig.imageBaseUrl,
+          port: modelConfig.imagePort,
+          endpointPath: modelConfig.imageEndpointPath,
           imageModel: modelConfig.imageModel,
         },
       }),

@@ -1,3 +1,4 @@
+import { callTextModel } from "@/lib/ai/model-client";
 import { PLATFORMS, type PlatformId } from "@/lib/platforms";
 import type {
   DouyinTrendInsights,
@@ -231,29 +232,18 @@ ${hotContext}
 请输出适合公益机构工作流直接借鉴的【${platformMeta.name}】爆款文案调研结果（samples 返回 2 条即可）。`;
 
   try {
-    const controller = new AbortController();
-    const timer = setTimeout(() => controller.abort(), 15000);
-    const res = await fetch(`${baseUrl}/chat/completions`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        model,
-        temperature: 0.6,
-        messages: [
-          { role: "system", content: systemPrompt },
-          { role: "user", content: userPrompt },
-        ],
-      }),
-      signal: controller.signal,
+    const { text: raw } = await callTextModel({
+      apiKey,
+      baseUrl,
+      port: modelConfig?.port,
+      endpointPath: modelConfig?.endpointPath,
+      apiFormat: modelConfig?.apiFormat,
+      model,
+      systemPrompt,
+      userPrompt,
+      temperature: 0.6,
+      timeoutMs: 15000,
     });
-    clearTimeout(timer);
-
-    if (!res.ok) return null;
-    const data = await res.json();
-    const raw: string = data?.choices?.[0]?.message?.content ?? "";
     const jsonMatch = raw.match(/\{[\s\S]*\}/);
     if (!jsonMatch) return null;
 

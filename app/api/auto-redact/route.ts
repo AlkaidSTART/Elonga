@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { callTextModel, type TextApiFormat } from "@/lib/ai/model-client";
 import type { AutoRedactCategory, DetectedRegion } from "@/lib/auto-redact";
 
 interface AutoRedactRequest {
@@ -9,6 +10,9 @@ interface AutoRedactRequest {
   modelConfig?: {
     apiKey?: string;
     baseUrl?: string;
+    port?: string;
+    endpointPath?: string;
+    apiFormat?: TextApiFormat;
     model?: string;
   };
 }
@@ -59,36 +63,18 @@ Return ONLY a valid JSON array of objects with normalized coordinates in [0, 100
 [{"category":"text"|"face"|"qrcode","label":"short Chinese label","x":number,"y":number,"w":number,"h":number}]
 If nothing is found, return [].`;
 
-    const response = await fetch(`${baseUrl}/chat/completions`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        Authorization: `Bearer ${apiKey}`,
-      },
-      body: JSON.stringify({
-        model,
-        temperature: 0,
-        messages: [
-          {
-            role: "user",
-            content: [
-              { type: "text", text: prompt },
-              {
-                type: "image_url",
-                image_url: { url: imageBase64 },
-              },
-            ],
-          },
-        ],
-      }),
+    const { text: rawText } = await callTextModel({
+      apiKey,
+      baseUrl,
+      port: modelConfig?.port,
+      endpointPath: modelConfig?.endpointPath,
+      apiFormat: modelConfig?.apiFormat,
+      model,
+      userPrompt: prompt,
+      imageBase64,
+      temperature: 0,
+      timeoutMs: 30000,
     });
-
-    if (!response.ok) {
-      return NextResponse.json({ fallback: true, mode: "local" });
-    }
-
-    const data = await response.json();
-    const rawText: string = data?.choices?.[0]?.message?.content ?? "";
     const jsonMatch = rawText.match(/\[[\s\S]*\]/);
     if (!jsonMatch) {
       return NextResponse.json({ fallback: true, mode: "local" });

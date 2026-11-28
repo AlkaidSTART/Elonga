@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { createJSONStorage, persist } from "zustand/middleware";
 import type { PlatformId, ToneId } from "@/lib/platforms";
+import { indexedDBStorage } from "@/lib/storage/indexeddb-storage";
 
 export const PROFILE_UPDATED_EVENT = "elonga:profile-updated";
 
@@ -125,7 +126,7 @@ export const useProfileStore = create<ProfileState>()(
     }),
     {
       name: "elonga-personal-profile-storage",
-      storage: createJSONStorage(() => localStorage),
+      storage: createJSONStorage(() => indexedDBStorage),
     },
   ),
 );

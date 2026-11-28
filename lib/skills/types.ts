@@ -6,10 +6,14 @@ import type {
   WordCountId,
 } from "@/lib/platforms";
 import type { ActivityContextPayload } from "@/lib/organization";
+import type { TextApiFormat } from "@/lib/ai/model-client";
 
 export interface ModelConfigPayload {
   apiKey?: string;
   baseUrl?: string;
+  port?: string;
+  endpointPath?: string;
+  apiFormat?: TextApiFormat;
   textModel?: string;
 }
 

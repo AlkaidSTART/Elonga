@@ -433,6 +433,9 @@ export function ContentWorkflowWorkspace() {
     const requestModelConfig = {
       apiKey: modelConfig.textApiKey,
       baseUrl: modelConfig.textBaseUrl,
+      port: modelConfig.textPort,
+      endpointPath: modelConfig.textEndpointPath,
+      apiFormat: modelConfig.textApiFormat,
       textModel: modelConfig.textModel,
     };
 

@@ -1,3 +1,4 @@
+import { callTextModel } from "@/lib/ai/model-client";
 import { generateLocalCopywriting } from "@/lib/copywriting-engine";
 import { formatActivityContextForPrompt } from "@/lib/organization";
 import {
@@ -110,29 +111,19 @@ ${formatTrendPromptSection(input)}
 
 请直接产出可直接用于公益机构发布与推流的完整文案。`;
 
-      const response = await fetch(`${baseUrl}/chat/completions`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${apiKey}`,
-        },
-        body: JSON.stringify({
-          model,
-          temperature: 0.75,
-          messages: [
-            { role: "system", content: systemPrompt },
-            { role: "user", content: userPrompt },
-          ],
-        }),
+      const { text: rawContent } = await callTextModel({
+        apiKey,
+        baseUrl,
+        port: input.modelConfig?.port,
+        endpointPath: input.modelConfig?.endpointPath,
+        apiFormat: input.modelConfig?.apiFormat,
+        model,
+        systemPrompt,
+        userPrompt,
+        temperature: 0.75,
+        timeoutMs: 60000,
       });
 
-      if (!response.ok) {
-        const errText = await response.text();
-        throw new Error(`大模型接口调用失败 (${response.status}): ${errText.slice(0, 200)}`);
-      }
-
-      const data = await response.json();
-      const rawContent: string = data?.choices?.[0]?.message?.content ?? "";
       const jsonMatch = rawContent.match(/\{[\s\S]*\}/);
       if (!jsonMatch) {
         throw new Error("模型返回格式异常，未能解析出结构化文案");
