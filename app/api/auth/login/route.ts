@@ -32,10 +32,17 @@ export async function POST(request: Request) {
     const maxAge = remember ? EXTENDED_SESSION_MAX_AGE : DEFAULT_SESSION_MAX_AGE;
     const token = await signSessionJwt(user, maxAge);
 
-    const response = NextResponse.json({
-      ok: true,
-      user,
-    });
+    const response = NextResponse.json(
+      {
+        ok: true,
+        user,
+      },
+      {
+        headers: {
+          "Cache-Control": "no-store",
+        },
+      },
+    );
 
     response.cookies.set(AUTH_COOKIE_NAME, token, getAuthCookieOptions(maxAge));
     return response;
