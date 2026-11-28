@@ -2,14 +2,7 @@
 
 import { useMemo, useState, useSyncExternalStore } from "react";
 import Link from "next/link";
-import {
-  Check,
-  Copy,
-  Download,
-  FileBarChart2,
-  Loader2,
-  Trash2,
-} from "lucide-react";
+import { Check, Copy, Download, FileBarChart2, Loader2, Trash2 } from "lucide-react";
 import {
   exportDocumentAsDocx,
   exportDocumentAsMarkdown,
@@ -42,12 +35,10 @@ export function ReportsWorkspace() {
   const defaultMonth = useSyncExternalStore(
     emptySubscribe,
     getClientCurrentMonth,
-    getServerCurrentMonth
+    getServerCurrentMonth,
   );
 
-  const [selectedMonthOverride, setSelectedMonthOverride] = useState<
-    string | null
-  >(null);
+  const [selectedMonthOverride, setSelectedMonthOverride] = useState<string | null>(null);
   const selectedMonth = selectedMonthOverride ?? defaultMonth;
 
   const [focus, setFocus] = useState<MonthlyReportFocus>("internal");
@@ -60,12 +51,11 @@ export function ReportsWorkspace() {
 
   const { history, modelConfig } = useWorkbenchStore();
   const { profile: orgProfile, activities } = useOrganizationStore();
-  const { reports, saveReport, updateReportContent, deleteReport } =
-    useMonthlyReportStore();
+  const { reports, saveReport, updateReportContent, deleteReport } = useMonthlyReportStore();
 
   const snapshot = useMemo(
     () => buildMonthlySnapshot(selectedMonth, history, activities),
-    [selectedMonth, history, activities]
+    [selectedMonth, history, activities],
   );
 
   const activeReport = useMemo<SavedMonthlyReport | null>(() => {
@@ -77,18 +67,11 @@ export function ReportsWorkspace() {
   }, [activeReportId, reports, selectedMonth]);
 
   const maxChannelCount = useMemo(
-    () =>
-      Math.max(
-        1,
-        ...snapshot.platformBreakdown.map(
-          (p) => p.publishedCount + p.archivedCount
-        )
-      ),
-    [snapshot.platformBreakdown]
+    () => Math.max(1, ...snapshot.platformBreakdown.map((p) => p.publishedCount + p.archivedCount)),
+    [snapshot.platformBreakdown],
   );
 
-  const totalInteractions =
-    snapshot.totalLikes + snapshot.totalComments + snapshot.totalShares;
+  const totalInteractions = snapshot.totalLikes + snapshot.totalComments + snapshot.totalShares;
 
   const handleGenerateReport = async () => {
     setErrorMsg(null);
@@ -139,8 +122,7 @@ export function ReportsWorkspace() {
   const buildExportDoc = (report: SavedMonthlyReport): AssembledDocument => ({
     title: report.title,
     platform: "wechat",
-    platformName:
-      report.focus === "donor" ? "对外公益进展月报" : "内部运营复盘月报",
+    platformName: report.focus === "donor" ? "对外公益进展月报" : "内部运营复盘月报",
     topic: `${report.month} 月度运营报告`,
     hook: report.summary,
     body: report.body,
@@ -258,9 +240,7 @@ export function ReportsWorkspace() {
               <h2 className="font-editorial text-sm font-semibold text-[#181816]">
                 {selectedMonth} 数据台账
               </h2>
-              <span className="font-mono text-[10px] text-[#8C857B]">
-                LIVE SNAPSHOT
-              </span>
+              <span className="font-mono text-[10px] text-[#8C857B]">LIVE SNAPSHOT</span>
             </div>
 
             <dl className="divide-y divide-[#E2DDD3] border-y border-[#E2DDD3] text-xs">
@@ -326,30 +306,22 @@ export function ReportsWorkspace() {
 
           {/* 2. Compact Channel Bars */}
           <div className="space-y-2.5">
-            <h3 className="font-editorial text-sm font-semibold text-[#181816]">
-              渠道分布
-            </h3>
+            <h3 className="font-editorial text-sm font-semibold text-[#181816]">渠道分布</h3>
             <div className="space-y-2.5">
               {snapshot.platformBreakdown.map((ch) => {
                 const total = ch.publishedCount + ch.archivedCount;
                 const width =
-                  total > 0
-                    ? Math.max(8, Math.round((total / maxChannelCount) * 100))
-                    : 0;
+                  total > 0 ? Math.max(8, Math.round((total / maxChannelCount) * 100)) : 0;
                 return (
                   <div key={ch.platform} className="space-y-1">
                     <div className="flex items-baseline justify-between text-[11px]">
                       <span className="text-[#57534E]">{ch.platformName}</span>
                       <span className="font-mono text-[#8C857B] tabular-nums">
-                        发 {ch.publishedCount} · 档 {ch.archivedCount} · 爆{" "}
-                        {ch.viralCount}
+                        发 {ch.publishedCount} · 档 {ch.archivedCount} · 爆 {ch.viralCount}
                       </span>
                     </div>
                     <div className="h-1.5 w-full overflow-hidden rounded-xs bg-[#EFECE4]">
-                      <div
-                        className="h-full bg-[#1B4D3E]"
-                        style={{ width: `${width}%` }}
-                      />
+                      <div className="h-full bg-[#1B4D3E]" style={{ width: `${width}%` }} />
                     </div>
                   </div>
                 );
@@ -374,9 +346,7 @@ export function ReportsWorkspace() {
                     <div
                       key={rep.id}
                       className={`flex items-start justify-between gap-2 py-2.5 transition ${
-                        isSelected
-                          ? "bg-[#E9F0ED]/60 px-2"
-                          : "px-0.5 hover:bg-[#FCFBF8]/70"
+                        isSelected ? "bg-[#E9F0ED]/60 px-2" : "px-0.5 hover:bg-[#FCFBF8]/70"
                       }`}
                     >
                       <button
@@ -420,12 +390,9 @@ export function ReportsWorkspace() {
           {!activeReport ? (
             <div className="border-t-2 border-[#181816] bg-[#FCFBF8] px-7 py-9 sm:px-10 sm:py-10">
               <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#E2DDD3] pb-4 text-[11px] text-[#8C857B]">
-                <span className="font-medium text-[#181816]">
-                  {orgProfile.name} · 月度公报样稿
-                </span>
+                <span className="font-medium text-[#181816]">{orgProfile.name} · 月度公报样稿</span>
                 <span className="font-mono">
-                  {selectedMonth} ·{" "}
-                  {focus === "donor" ? "DONOR EDITION" : "INTERNAL REVIEW"}
+                  {selectedMonth} · {focus === "donor" ? "DONOR EDITION" : "INTERNAL REVIEW"}
                 </span>
               </div>
 
@@ -437,13 +404,9 @@ export function ReportsWorkspace() {
                   </h2>
                   <p className="mt-2 text-xs leading-relaxed text-[#57534E]">
                     尚未正式编印本期月报。点击下方按钮后，系统将自动汇集本月已建档的{" "}
-                    <strong className="text-[#181816]">
-                      {snapshot.activitiesCount}
-                    </strong>{" "}
+                    <strong className="text-[#181816]">{snapshot.activitiesCount}</strong>{" "}
                     项公益活动与已发布的{" "}
-                    <strong className="text-[#181816]">
-                      {snapshot.publishedCount}
-                    </strong>{" "}
+                    <strong className="text-[#181816]">{snapshot.publishedCount}</strong>{" "}
                     篇内容记录，生成可直接编辑、打印与导出 Word / PDF / Markdown 的正式月度报告。
                   </p>
                 </div>
@@ -456,12 +419,8 @@ export function ReportsWorkspace() {
                     <ul className="space-y-1.5 text-xs text-[#57534E]">
                       {activities.slice(0, 4).map((act) => (
                         <li key={act.id} className="flex items-baseline gap-2.5">
-                          <span className="font-mono text-[11px] text-[#8C857B]">
-                            {act.date}
-                          </span>
-                          <span className="font-medium text-[#181816]">
-                            {act.title}
-                          </span>
+                          <span className="font-mono text-[11px] text-[#8C857B]">{act.date}</span>
+                          <span className="font-medium text-[#181816]">{act.title}</span>
                         </li>
                       ))}
                     </ul>
@@ -495,9 +454,7 @@ export function ReportsWorkspace() {
                       type="button"
                       onClick={() => setViewMode("preview")}
                       className={`rounded-[3px] px-2.5 py-1 text-xs font-medium ${
-                        viewMode === "preview"
-                          ? "bg-[#FCFBF8] text-[#181816]"
-                          : "text-[#78716C]"
+                        viewMode === "preview" ? "bg-[#FCFBF8] text-[#181816]" : "text-[#78716C]"
                       }`}
                     >
                       预览
@@ -506,9 +463,7 @@ export function ReportsWorkspace() {
                       type="button"
                       onClick={() => setViewMode("edit")}
                       className={`rounded-[3px] px-2.5 py-1 text-xs font-medium ${
-                        viewMode === "edit"
-                          ? "bg-[#FCFBF8] text-[#181816]"
-                          : "text-[#78716C]"
+                        viewMode === "edit" ? "bg-[#FCFBF8] text-[#181816]" : "text-[#78716C]"
                       }`}
                     >
                       编辑
@@ -531,18 +486,14 @@ export function ReportsWorkspace() {
                   </button>
                   <button
                     type="button"
-                    onClick={() =>
-                      exportDocumentAsPdf(buildExportDoc(activeReport))
-                    }
+                    onClick={() => exportDocumentAsPdf(buildExportDoc(activeReport))}
                     className="rounded border border-[#D5CFC3] bg-[#FCFBF8] px-2.5 py-1 text-xs font-medium text-[#57534E] hover:border-[#181816] hover:text-[#181816]"
                   >
                     PDF
                   </button>
                   <button
                     type="button"
-                    onClick={() =>
-                      exportDocumentAsMarkdown(buildExportDoc(activeReport))
-                    }
+                    onClick={() => exportDocumentAsMarkdown(buildExportDoc(activeReport))}
                     className="rounded border border-[#D5CFC3] bg-[#FCFBF8] px-2.5 py-1 text-xs font-medium text-[#57534E] hover:border-[#181816] hover:text-[#181816]"
                   >
                     MD
@@ -610,9 +561,7 @@ export function ReportsWorkspace() {
 
                   {activeReport.summary && (
                     <div className="border-l-2 border-[#1B4D3E] bg-[#F6F4EF] p-4 text-xs leading-relaxed text-[#57534E]">
-                      <span className="mb-1 block font-semibold text-[#181816]">
-                        核心摘要
-                      </span>
+                      <span className="mb-1 block font-semibold text-[#181816]">核心摘要</span>
                       {activeReport.summary}
                     </div>
                   )}

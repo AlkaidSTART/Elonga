@@ -15,11 +15,7 @@ import {
   Trash2,
   X,
 } from "lucide-react";
-import {
-  PLATFORM_CREATOR_URLS,
-  PLATFORMS,
-  type CopywritingResult,
-} from "@/lib/platforms";
+import { PLATFORM_CREATOR_URLS, PLATFORMS, type CopywritingResult } from "@/lib/platforms";
 import { sanitizeExternalUrl } from "@/lib/url-safety";
 import { useWorkbenchStore } from "@/store/useWorkbenchStore";
 
@@ -64,8 +60,7 @@ export function HistoryWorkspace() {
   const [filterMode, setFilterMode] = useState<FilterMode>("all");
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
-  const [backfillTarget, setBackfillTarget] =
-    useState<CopywritingResult | null>(null);
+  const [backfillTarget, setBackfillTarget] = useState<CopywritingResult | null>(null);
   const [backfillError, setBackfillError] = useState<string | null>(null);
   const [backfillForm, setBackfillForm] = useState<BackfillFormState>({
     publishedUrl: "",
@@ -82,8 +77,7 @@ export function HistoryWorkspace() {
   const filtered = history.filter((item) => {
     if (filterMode === "eligible" && !item.reviewState?.approvedAt) return false;
     if (filterMode === "published" && !item.isPublished) return false;
-    if (filterMode === "archived" && !item.publishArchive?.archived)
-      return false;
+    if (filterMode === "archived" && !item.publishArchive?.archived) return false;
     if (filterMode === "viral" && !item.isViral) return false;
     const q = query.trim().toLowerCase();
     if (!q) return true;
@@ -123,22 +117,10 @@ export function HistoryWorkspace() {
     setBackfillForm({
       publishedUrl: existing?.publishedUrl ?? "",
       publishedDate: defaultDate,
-      views:
-        existing?.metrics.views !== undefined
-          ? String(existing.metrics.views)
-          : "",
-      likes:
-        existing?.metrics.likes !== undefined
-          ? String(existing.metrics.likes)
-          : "",
-      comments:
-        existing?.metrics.comments !== undefined
-          ? String(existing.metrics.comments)
-          : "",
-      shares:
-        existing?.metrics.shares !== undefined
-          ? String(existing.metrics.shares)
-          : "",
+      views: existing?.metrics.views !== undefined ? String(existing.metrics.views) : "",
+      likes: existing?.metrics.likes !== undefined ? String(existing.metrics.likes) : "",
+      comments: existing?.metrics.comments !== undefined ? String(existing.metrics.comments) : "",
+      shares: existing?.metrics.shares !== undefined ? String(existing.metrics.shares) : "",
       conversions: existing?.metrics.conversions ?? "",
       notes: existing?.notes ?? "",
       archived: existing?.archived ?? true,
@@ -207,9 +189,7 @@ export function HistoryWorkspace() {
                   type="button"
                   onClick={() => setFilterMode(tab.id)}
                   className={`rounded-[3px] px-2.5 py-1 text-xs font-medium transition ${
-                    active
-                      ? "bg-[#FCFBF8] text-[#181816]"
-                      : "text-[#78716C] hover:text-[#181816]"
+                    active ? "bg-[#FCFBF8] text-[#181816]" : "text-[#78716C] hover:text-[#181816]"
                   }`}
                 >
                   {tab.label}
@@ -319,9 +299,7 @@ export function HistoryWorkspace() {
                       <h3 className="truncate font-editorial text-[15px] font-semibold text-[#181816]">
                         {item.titles[0] || item.topic}
                       </h3>
-                      <p className="truncate text-xs text-[#78716C]">
-                        {item.body}
-                      </p>
+                      <p className="truncate text-xs text-[#78716C]">{item.body}</p>
 
                       {/* Backfilled Metrics & Link Strip */}
                       {(hasMetrics || archive?.publishedUrl) && (
@@ -364,9 +342,7 @@ export function HistoryWorkspace() {
                             </span>
                           )}
                           {(() => {
-                            const safePublishedUrl = sanitizeExternalUrl(
-                              archive?.publishedUrl
-                            );
+                            const safePublishedUrl = sanitizeExternalUrl(archive?.publishedUrl);
                             if (!safePublishedUrl) return null;
                             return (
                               <a
@@ -447,7 +423,7 @@ export function HistoryWorkspace() {
                       onClick={() =>
                         handleCopy(
                           item.id,
-                          `${item.titles[0] || ""}\n\n${item.hook}\n\n${item.body}`
+                          `${item.titles[0] || ""}\n\n${item.hook}\n\n${item.body}`,
                         )
                       }
                       className="rounded p-1.5 text-[#8C857B] transition hover:bg-[#EFECE4] hover:text-[#181816]"
@@ -495,9 +471,7 @@ export function HistoryWorkspace() {
             >
               <div className="mb-4 flex items-start justify-between gap-3 border-b border-[#F1F3F6] pb-3">
                 <div>
-                  <h2 className="text-base font-semibold text-[#0F172A]">
-                    外部发布回填与稿件归档
-                  </h2>
+                  <h2 className="text-base font-semibold text-[#0F172A]">外部发布回填与稿件归档</h2>
                   <p className="mt-0.5 text-xs text-slate-500">
                     {PLATFORMS[backfillTarget.platform].name} ·{" "}
                     {backfillTarget.titles[0] || backfillTarget.topic}
@@ -523,7 +497,7 @@ export function HistoryWorkspace() {
                     onClick={() =>
                       handleCopy(
                         `modal-${backfillTarget.id}`,
-                        `${backfillTarget.titles[0] || ""}\n\n${backfillTarget.hook}\n\n${backfillTarget.body}\n\n${backfillTarget.cta}\n\n${backfillTarget.tags.map((t) => `#${t}`).join(" ")}`
+                        `${backfillTarget.titles[0] || ""}\n\n${backfillTarget.hook}\n\n${backfillTarget.body}\n\n${backfillTarget.cta}\n\n${backfillTarget.tags.map((t) => `#${t}`).join(" ")}`,
                       )
                     }
                     className="inline-flex items-center gap-1 rounded-md border border-[#E4E7EC] bg-white px-2.5 py-1 text-xs font-medium text-[#0F172A] hover:bg-slate-100"
@@ -534,9 +508,7 @@ export function HistoryWorkspace() {
                       <Copy className="h-3 w-3" />
                     )}
                     <span>
-                      {copiedId === `modal-${backfillTarget.id}`
-                        ? "已复制全文"
-                        : "复制全文"}
+                      {copiedId === `modal-${backfillTarget.id}` ? "已复制全文" : "复制全文"}
                     </span>
                   </button>
                   <a
@@ -545,9 +517,7 @@ export function HistoryWorkspace() {
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-1 rounded-md bg-[#0F172A] px-2.5 py-1 text-xs font-medium text-white hover:bg-slate-800"
                   >
-                    <span>
-                      打开{PLATFORM_CREATOR_URLS[backfillTarget.platform].label}
-                    </span>
+                    <span>打开{PLATFORM_CREATOR_URLS[backfillTarget.platform].label}</span>
                     <ExternalLink className="h-3 w-3" />
                   </a>
                 </div>
@@ -572,15 +542,11 @@ export function HistoryWorkspace() {
                     placeholder="https://..."
                     className="w-full rounded-md border border-[#E4E7EC] px-3 py-2 text-xs text-[#0F172A] outline-none focus:border-[#1D4ED8]"
                   />
-                  {backfillError && (
-                    <p className="text-[11px] text-[#B42318]">{backfillError}</p>
-                  )}
+                  {backfillError && <p className="text-[11px] text-[#B42318]">{backfillError}</p>}
                 </label>
 
                 <label className="space-y-1">
-                  <span className="block text-xs font-medium text-slate-700">
-                    发布日期
-                  </span>
+                  <span className="block text-xs font-medium text-slate-700">发布日期</span>
                   <input
                     type="date"
                     value={backfillForm.publishedDate}
@@ -595,9 +561,7 @@ export function HistoryWorkspace() {
                 </label>
 
                 <label className="space-y-1">
-                  <span className="block text-xs font-medium text-slate-700">
-                    播放 / 阅读量
-                  </span>
+                  <span className="block text-xs font-medium text-slate-700">播放 / 阅读量</span>
                   <input
                     type="number"
                     min={0}
@@ -614,9 +578,7 @@ export function HistoryWorkspace() {
                 </label>
 
                 <label className="space-y-1">
-                  <span className="block text-xs font-medium text-slate-700">
-                    点赞 / 在看数
-                  </span>
+                  <span className="block text-xs font-medium text-slate-700">点赞 / 在看数</span>
                   <input
                     type="number"
                     min={0}
@@ -633,9 +595,7 @@ export function HistoryWorkspace() {
                 </label>
 
                 <label className="space-y-1">
-                  <span className="block text-xs font-medium text-slate-700">
-                    评论数
-                  </span>
+                  <span className="block text-xs font-medium text-slate-700">评论数</span>
                   <input
                     type="number"
                     min={0}
@@ -652,9 +612,7 @@ export function HistoryWorkspace() {
                 </label>
 
                 <label className="space-y-1">
-                  <span className="block text-xs font-medium text-slate-700">
-                    转发 / 收藏数
-                  </span>
+                  <span className="block text-xs font-medium text-slate-700">转发 / 收藏数</span>
                   <input
                     type="number"
                     min={0}

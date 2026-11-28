@@ -23,9 +23,7 @@ export async function proxy(request: NextRequest) {
   // Logged-in users visiting /login are redirected to target or home
   if (pathname === "/login") {
     if (session) {
-      const target = getSafeRedirectPath(
-        request.nextUrl.searchParams.get("redirect")
-      );
+      const target = getSafeRedirectPath(request.nextUrl.searchParams.get("redirect"));
       return NextResponse.redirect(new URL(target, request.url));
     }
     return NextResponse.next();
@@ -34,10 +32,7 @@ export async function proxy(request: NextRequest) {
   // Protected API routes return 401 JSON when unauthenticated
   if (pathname.startsWith("/api/")) {
     if (!session) {
-      return NextResponse.json(
-        { error: "未登录或登录会话已失效，请重新登录" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "未登录或登录会话已失效，请重新登录" }, { status: 401 });
     }
     return NextResponse.next();
   }

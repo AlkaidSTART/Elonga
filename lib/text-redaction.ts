@@ -1,9 +1,4 @@
-export type SensitiveCategory =
-  | "name"
-  | "address"
-  | "phone"
-  | "idCard"
-  | "school";
+export type SensitiveCategory = "name" | "address" | "phone" | "idCard" | "school";
 
 export interface SensitiveMatch {
   id: string;
@@ -128,7 +123,7 @@ export function scanSensitiveEntities(text: string): SensitiveMatch[] {
     category: SensitiveCategory,
     original: string,
     suggestedReplacement: string,
-    index: number
+    index: number,
   ) => {
     const clean = original.trim();
     if (!clean) return;
@@ -154,7 +149,7 @@ export function scanSensitiveEntities(text: string): SensitiveMatch[] {
   // 1. Names with charity/context role prefix
   const nameRegex = new RegExp(
     `(受助人|受助学生|受助儿童|学生|孩子|小女孩|小男孩|患者|老人|村民|居民|志愿者|社工|家长|同学|小朋友|老师|医生|女士|先生)[\\s：:]*([${COMMON_SURNAMES}][\\u4e00-\\u9fa5]{1,2})(?![\\u4e00-\\u9fa5]*（化名）)`,
-    "g"
+    "g",
   );
   for (const match of text.matchAll(nameRegex)) {
     const roleHint = match[1] ?? "";
@@ -172,7 +167,7 @@ export function scanSensitiveEntities(text: string): SensitiveMatch[] {
       "name",
       candidate,
       suggestNamePseudonym(candidate, roleHint),
-      (match.index ?? 0) + match[0].indexOf(candidate)
+      (match.index ?? 0) + match[0].indexOf(candidate),
     );
   }
 
@@ -240,11 +235,7 @@ export function scanSensitiveEntities(text: string): SensitiveMatch[] {
   return Array.from(found.values());
 }
 
-export function replaceAllLiteral(
-  text: string,
-  target: string,
-  replacement: string
-): string {
+export function replaceAllLiteral(text: string, target: string, replacement: string): string {
   if (!target || target === replacement) return text;
   return text.split(target).join(replacement);
 }

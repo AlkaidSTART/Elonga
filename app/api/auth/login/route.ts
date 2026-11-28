@@ -21,23 +21,15 @@ export async function POST(request: Request) {
     const remember = Boolean(body?.remember);
 
     if (!account || !password) {
-      return NextResponse.json(
-        { error: "请输入账号和密码" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "请输入账号和密码" }, { status: 400 });
     }
 
     const user = await authenticateUser(account, password);
     if (!user) {
-      return NextResponse.json(
-        { error: "账号或密码不正确，请检查后重试" },
-        { status: 401 }
-      );
+      return NextResponse.json({ error: "账号或密码不正确，请检查后重试" }, { status: 401 });
     }
 
-    const maxAge = remember
-      ? EXTENDED_SESSION_MAX_AGE
-      : DEFAULT_SESSION_MAX_AGE;
+    const maxAge = remember ? EXTENDED_SESSION_MAX_AGE : DEFAULT_SESSION_MAX_AGE;
     const token = await signSessionJwt(user, maxAge);
 
     const response = NextResponse.json({
@@ -48,9 +40,6 @@ export async function POST(request: Request) {
     response.cookies.set(AUTH_COOKIE_NAME, token, getAuthCookieOptions(maxAge));
     return response;
   } catch {
-    return NextResponse.json(
-      { error: "登录服务暂时不可用，请稍后重试" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "登录服务暂时不可用，请稍后重试" }, { status: 500 });
   }
 }

@@ -51,9 +51,7 @@ export const AVATAR_ACCENTS: {
 ];
 
 export function getAvatarAccentMeta(accent?: AvatarAccentId) {
-  return (
-    AVATAR_ACCENTS.find((item) => item.id === accent) ?? AVATAR_ACCENTS[0]
-  );
+  return AVATAR_ACCENTS.find((item) => item.id === accent) ?? AVATAR_ACCENTS[0];
 }
 
 export interface PersonalProfileExtras {
@@ -90,10 +88,7 @@ export const DEFAULT_PERSONAL_EXTRAS: PersonalProfileExtras = {
 
 interface ProfileState {
   profilesByUserId: Record<string, PersonalProfileExtras>;
-  updateExtras: (
-    userId: string,
-    partial: Partial<PersonalProfileExtras>
-  ) => void;
+  updateExtras: (userId: string, partial: Partial<PersonalProfileExtras>) => void;
   resetExtras: (userId: string) => void;
 }
 
@@ -104,8 +99,7 @@ export const useProfileStore = create<ProfileState>()(
 
       updateExtras: (userId, partial) =>
         set((state) => {
-          const current =
-            state.profilesByUserId[userId] ?? DEFAULT_PERSONAL_EXTRAS;
+          const current = state.profilesByUserId[userId] ?? DEFAULT_PERSONAL_EXTRAS;
           return {
             profilesByUserId: {
               ...state.profilesByUserId,
@@ -132,6 +126,6 @@ export const useProfileStore = create<ProfileState>()(
     {
       name: "elonga-personal-profile-storage",
       storage: createJSONStorage(() => localStorage),
-    }
-  )
+    },
+  ),
 );

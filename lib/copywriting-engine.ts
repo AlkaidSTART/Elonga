@@ -31,17 +31,13 @@ function parseKeywords(raw?: string): string[] {
     .slice(0, 6);
 }
 
-export function generateLocalCopywriting(
-  req: CopywritingRequest
-): CopywritingResult {
+export function generateLocalCopywriting(req: CopywritingRequest): CopywritingResult {
   const platformMeta = PLATFORMS[req.platform];
-  const scenarioLabel =
-    LEGACY_CONTENT_TYPE_LABELS[req.contentType] ?? "公益故事";
+  const scenarioLabel = LEGACY_CONTENT_TYPE_LABELS[req.contentType] ?? "公益故事";
   const tone: ToneId = req.tone ?? "warm";
   const topic = req.topic.trim() || "社区公益微光行动";
   const kwList = parseKeywords(req.keywords);
-  const audience =
-    req.targetAudience?.trim() || "关注公益、愿意顺手传递善意的普通人";
+  const audience = req.targetAudience?.trim() || "关注公益、愿意顺手传递善意的普通人";
 
   const titles = buildCharityTitles(req.platform, topic, req.contentType, req.trendInsights);
   const hook = buildCharityHook(req.platform, topic, req.trendInsights);
@@ -78,12 +74,12 @@ function buildActivityArchiveBlock(ctx?: ActivityContextPayload): string {
   const parts: string[] = [];
   if (ctx.activityDate || ctx.activityLocation) {
     parts.push(
-      `${ctx.activityDate ? `${ctx.activityDate}，` : ""}${ctx.orgName || "我们"}在${ctx.activityLocation || "项目一线"}开展了「${ctx.activityTitle}」。`
+      `${ctx.activityDate ? `${ctx.activityDate}，` : ""}${ctx.orgName || "我们"}在${ctx.activityLocation || "项目一线"}开展了「${ctx.activityTitle}」。`,
     );
   }
   if (ctx.participantCount || ctx.fundOrGoods) {
     parts.push(
-      `本次行动${ctx.participantCount ? `共有${ctx.participantCount}` : ""}${ctx.participantCount && ctx.fundOrGoods ? "，" : ""}${ctx.fundOrGoods ? `实际落实：${ctx.fundOrGoods}` : ""}。`
+      `本次行动${ctx.participantCount ? `共有${ctx.participantCount}` : ""}${ctx.participantCount && ctx.fundOrGoods ? "，" : ""}${ctx.fundOrGoods ? `实际落实：${ctx.fundOrGoods}` : ""}。`,
     );
   }
   if (ctx.highlights) {
@@ -96,7 +92,7 @@ function buildCharityTitles(
   platform: PlatformId,
   topic: string,
   contentType: ContentTypeId,
-  trendInsights?: DouyinTrendInsights
+  trendInsights?: DouyinTrendInsights,
 ): string[] {
   const sampleTitle = trendInsights?.samples?.[0]?.title;
 
@@ -125,11 +121,7 @@ function buildCharityTitles(
   }
 
   const angle =
-    contentType === "activity"
-      ? "行动倡议"
-      : contentType === "science"
-        ? "公益科普"
-        : "温暖记录";
+    contentType === "activity" ? "行动倡议" : contentType === "science" ? "公益科普" : "温暖记录";
 
   return [
     `「${topic}」${angle}：微光聚在一起，真的可以照亮很远的地方`,
@@ -141,7 +133,7 @@ function buildCharityTitles(
 function buildCharityHook(
   platform: PlatformId,
   topic: string,
-  trendInsights?: DouyinTrendInsights
+  trendInsights?: DouyinTrendInsights,
 ): string {
   const sampleHook = trendInsights?.samples?.[0]?.hook;
 
@@ -165,10 +157,9 @@ function buildCharityBody(
   topic: string,
   audience: string,
   kwList: string[],
-  scenarioLabel: string
+  scenarioLabel: string,
 ): string {
-  const kwNote =
-    kwList.length > 0 ? `（本次重点关注：${kwList.join("、")}）` : "";
+  const kwNote = kwList.length > 0 ? `（本次重点关注：${kwList.join("、")}）` : "";
 
   if (req.platform === "douyin") {
     const base = [
@@ -185,7 +176,7 @@ function buildCharityBody(
       base.push(
         ``,
         `第四，让善意成为可延续的日常。`,
-        `推流不是为了博眼球，而是为了让真正需要帮助的人和资源尽快相遇。如果你也认同「${topic}」的意义，欢迎一起把这份温暖接力下去。`
+        `推流不是为了博眼球，而是为了让真正需要帮助的人和资源尽快相遇。如果你也认同「${topic}」的意义，欢迎一起把这份温暖接力下去。`,
       );
     }
     return base.join("\n");
@@ -205,7 +196,7 @@ function buildCharityBody(
       sections.push(
         ``,
         `三、普通人可以如何轻松参与？`,
-        `即使暂时无法亲临现场，动动手指点赞、转发让信息进入更大的推荐流量池，本身就是非常重要的一次公益助力。`
+        `即使暂时无法亲临现场，动动手指点赞、转发让信息进入更大的推荐流量池，本身就是非常重要的一次公益助力。`,
       );
     }
     return sections.join("\n");
@@ -240,7 +231,7 @@ function buildCharityBody(
     paragraphs.push(
       ``,
       `03  期待与你同行`,
-      `一个人的力量有限，但当越来越多关注「${topic}」的人聚在一起，微光就能汇聚成实实在在的温暖。感谢你看到这里，也欢迎把这份关注传递给身边更多朋友。`
+      `一个人的力量有限，但当越来越多关注「${topic}」的人聚在一起，微光就能汇聚成实实在在的温暖。感谢你看到这里，也欢迎把这份关注传递给身边更多朋友。`,
     );
   }
   return paragraphs.join("\n");
@@ -264,7 +255,7 @@ function buildCharityTags(
   topic: string,
   kwList: string[],
   scenarioLabel: string,
-  trendInsights?: DouyinTrendInsights
+  trendInsights?: DouyinTrendInsights,
 ): string[] {
   const cleanTopic = topic.replace(/[#\s]/g, "").slice(0, 12);
   const trendTags = (trendInsights?.hotKeywords ?? [])

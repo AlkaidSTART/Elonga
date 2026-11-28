@@ -194,16 +194,11 @@ function createSampleImageDataUrl(label: string, accent: string): string {
 }
 
 type WorkflowStage =
-  | "idle"
-  | "processing-images"
-  | "researching-trends"
-  | "writing-copy"
-  | "assembling"
-  | "done";
+  "idle" | "processing-images" | "researching-trends" | "writing-copy" | "assembling" | "done";
 
 function buildDocFromResult(
   result: CopywritingResult,
-  images: WorkflowImageItem[]
+  images: WorkflowImageItem[],
 ): AssembledDocument {
   const platformMeta = PLATFORMS[result.platform] ?? PLATFORMS.douyin;
   return {
@@ -214,9 +209,7 @@ function buildDocFromResult(
     body: result.body,
     tags: result.tags,
     hook: result.hook,
-    algorithmTips: result.tips?.length
-      ? result.tips
-      : platformMeta.algorithmTips,
+    algorithmTips: result.tips?.length ? result.tips : platformMeta.algorithmTips,
     trendInsights: result.trendInsights,
     images: images.map((img) => ({
       id: img.id,
@@ -261,7 +254,7 @@ export function ContentWorkflowWorkspace() {
 
   const selectedActivity = useMemo(
     () => activities.find((a) => a.id === selectedActivityId) ?? null,
-    [activities, selectedActivityId]
+    [activities, selectedActivityId],
   );
 
   const linkedResultActivity = useMemo(() => {
@@ -284,14 +277,11 @@ export function ContentWorkflowWorkspace() {
   const [titlesExpanded, setTitlesExpanded] = useState(false);
   const [rightTab, setRightTab] = useState<"manuscript" | "compliance" | "research">("manuscript");
 
-  const candidateTitles = useMemo(
-    () => currentResult?.titles ?? [],
-    [currentResult]
-  );
+  const candidateTitles = useMemo(() => currentResult?.titles ?? [], [currentResult]);
 
   const assembledDoc = useMemo<AssembledDocument | null>(
     () => (currentResult ? buildDocFromResult(currentResult, images) : null),
-    [currentResult, images]
+    [currentResult, images],
   );
 
   const handleFiles = (fileList: FileList | null) => {
@@ -327,14 +317,8 @@ export function ContentWorkflowWorkspace() {
   };
 
   const handleLoadSamples = () => {
-    const sample1 = createSampleImageDataUrl(
-      "公益活动现场 · 社区志愿角",
-      "#1D4ED8"
-    );
-    const sample2 = createSampleImageDataUrl(
-      "物资捐赠清单 · 图书角",
-      "#0F172A"
-    );
+    const sample1 = createSampleImageDataUrl("公益活动现场 · 社区志愿角", "#1D4ED8");
+    const sample2 = createSampleImageDataUrl("物资捐赠清单 · 图书角", "#0F172A");
     setImages([
       {
         id: `wf_sample_1_${Date.now()}`,
@@ -367,13 +351,8 @@ export function ContentWorkflowWorkspace() {
     ]);
   };
 
-  const updateImageItem = (
-    id: string,
-    patch: Partial<WorkflowImageItem>
-  ) => {
-    setImages((prev) =>
-      prev.map((item) => (item.id === id ? { ...item, ...patch } : item))
-    );
+  const updateImageItem = (id: string, patch: Partial<WorkflowImageItem>) => {
+    setImages((prev) => prev.map((item) => (item.id === id ? { ...item, ...patch } : item)));
   };
 
   const removeImageItem = (id: string) => {
@@ -387,13 +366,10 @@ export function ContentWorkflowWorkspace() {
       .toLowerCase();
 
     const matched = AUTO_TOPIC_PRESETS.find((preset) =>
-      preset.matchHints.some((hint) => combinedNames.includes(hint))
+      preset.matchHints.some((hint) => combinedNames.includes(hint)),
     );
     const chosen =
-      matched ??
-      AUTO_TOPIC_PRESETS[
-        Math.floor(Math.random() * AUTO_TOPIC_PRESETS.length)
-      ];
+      matched ?? AUTO_TOPIC_PRESETS[Math.floor(Math.random() * AUTO_TOPIC_PRESETS.length)];
 
     setTopic(chosen.topic);
     setKeywords(chosen.keywords);
@@ -417,7 +393,7 @@ export function ContentWorkflowWorkspace() {
             enableStylize: item.enableStylize,
             stylePreset: item.stylePreset,
           },
-          modelConfig
+          modelConfig,
         );
         const updated: WorkflowImageItem = {
           ...item,
@@ -496,10 +472,7 @@ export function ContentWorkflowWorkspace() {
               .join("、")}，请合理分段以便图文混排）`
           : "";
 
-      const activityContext = buildActivityContextPayload(
-        orgProfile,
-        selectedActivity
-      );
+      const activityContext = buildActivityContextPayload(orgProfile, selectedActivity);
 
       const copyRes = await fetch("/api/copywriting", {
         method: "POST",
@@ -524,9 +497,8 @@ export function ContentWorkflowWorkspace() {
       }
 
       const result = copyData.result as CopywritingResult;
-      const finalTrends = (copyData.trendInsights ??
-        trendInsights ??
-        result.trendInsights) as DouyinTrendInsights | undefined;
+      const finalTrends = (copyData.trendInsights ?? trendInsights ?? result.trendInsights) as
+        DouyinTrendInsights | undefined;
 
       const enrichedResult: CopywritingResult = {
         ...result,
@@ -562,7 +534,7 @@ export function ContentWorkflowWorkspace() {
 
   const unredactedImageCount = useMemo(
     () => images.filter((img) => !img.enableRedact).length,
-    [images]
+    [images],
   );
 
   const reviewReport = useMemo(() => {
@@ -653,7 +625,7 @@ export function ContentWorkflowWorkspace() {
   const documentBlocks = assembledDoc ? buildDocumentBlocks(assembledDoc) : [];
 
   const docPlatformMeta = assembledDoc
-    ? PLATFORMS[assembledDoc.platform] ?? PLATFORMS.douyin
+    ? (PLATFORMS[assembledDoc.platform] ?? PLATFORMS.douyin)
     : activePlatformMeta;
   const matchedTrendInsights =
     assembledDoc?.trendInsights &&
@@ -678,8 +650,7 @@ export function ContentWorkflowWorkspace() {
         <ol className="flex items-center gap-4 sm:gap-5">
           {pipelineSteps.map((step, idx) => {
             const isActive = stage === step.id;
-            const isCompleted =
-              stage === "done" || (activeStepIdx > idx && activeStepIdx !== -1);
+            const isCompleted = stage === "done" || (activeStepIdx > idx && activeStepIdx !== -1);
             return (
               <li
                 key={step.id}
@@ -692,11 +663,7 @@ export function ContentWorkflowWorkspace() {
                 }`}
               >
                 <span className="font-mono text-[10px]">
-                  {isCompleted ? (
-                    <Check className="h-3 w-3 text-[#1B4D3E]" />
-                  ) : (
-                    step.num
-                  )}
+                  {isCompleted ? <Check className="h-3 w-3 text-[#1B4D3E]" /> : step.num}
                 </span>
                 <span>{step.label}</span>
               </li>
@@ -712,9 +679,7 @@ export function ContentWorkflowWorkspace() {
           {/* Step 1: Target Channel */}
           <div className="space-y-2.5">
             <div className="flex items-baseline justify-between">
-              <span className="text-xs font-semibold text-[#181816]">
-                01 传播渠道
-              </span>
+              <span className="text-xs font-semibold text-[#181816]">01 传播渠道</span>
               <span className="text-[11px] text-[#8C857B]">
                 建议 {activePlatformMeta.recommendedLength}
               </span>
@@ -735,9 +700,7 @@ export function ContentWorkflowWorkspace() {
                     }`}
                   >
                     <span className="text-xs font-semibold">{meta.name}</span>
-                    <span className="mt-0.5 truncate text-[10px] opacity-75">
-                      {meta.tagline}
-                    </span>
+                    <span className="mt-0.5 truncate text-[10px] opacity-75">{meta.tagline}</span>
                   </button>
                 );
               })}
@@ -747,9 +710,7 @@ export function ContentWorkflowWorkspace() {
           {/* Step 2: Activity Archive + Topic Brief */}
           <div className="space-y-3 border-t border-[#E2DDD3] pt-5">
             <div className="flex items-baseline justify-between">
-              <span className="text-xs font-semibold text-[#181816]">
-                02 选题与关联档案
-              </span>
+              <span className="text-xs font-semibold text-[#181816]">02 选题与关联档案</span>
               <Link
                 href="/organization"
                 className="text-[11px] font-medium text-[#1B4D3E] hover:underline"
@@ -849,9 +810,7 @@ export function ContentWorkflowWorkspace() {
             />
 
             <div className="flex items-center justify-between">
-              <span className="text-xs font-semibold text-[#181816]">
-                03 现场配图（可选）
-              </span>
+              <span className="text-xs font-semibold text-[#181816]">03 现场配图（可选）</span>
               <div className="flex items-center gap-2">
                 <button
                   type="button"
@@ -894,9 +853,7 @@ export function ContentWorkflowWorkspace() {
                       <input
                         type="text"
                         value={item.caption}
-                        onChange={(e) =>
-                          updateImageItem(item.id, { caption: e.target.value })
-                        }
+                        onChange={(e) => updateImageItem(item.id, { caption: e.target.value })}
                         placeholder="图注..."
                         className="w-full truncate bg-transparent text-xs font-medium text-[#181816] outline-none"
                       />
@@ -1000,9 +957,7 @@ export function ContentWorkflowWorkspace() {
                   <div className="grid grid-cols-2 gap-2.5 pt-3.5">
                     <select
                       value={contentType}
-                      onChange={(e) =>
-                        setContentType(e.target.value as ContentTypeId)
-                      }
+                      onChange={(e) => setContentType(e.target.value as ContentTypeId)}
                       className="rounded border border-[#D5CFC3] bg-[#FCFBF8] px-2.5 py-1.5 text-xs text-[#181816] outline-none focus:border-[#1B4D3E]"
                     >
                       {CONTENT_TYPES.map((ct) => (
@@ -1024,9 +979,7 @@ export function ContentWorkflowWorkspace() {
                     </select>
                     <select
                       value={wordCount}
-                      onChange={(e) =>
-                        setWordCount(e.target.value as WordCountId)
-                      }
+                      onChange={(e) => setWordCount(e.target.value as WordCountId)}
                       className="rounded border border-[#D5CFC3] bg-[#FCFBF8] px-2.5 py-1.5 text-xs text-[#181816] outline-none focus:border-[#1B4D3E]"
                     >
                       {WORD_COUNTS.map((wc) => (
@@ -1082,9 +1035,7 @@ export function ContentWorkflowWorkspace() {
             ) : (
               <>
                 <Play className="h-3 w-3 fill-current" />
-                <span>
-                  {images.length > 0 ? "一键生成合规图文" : "生成推流文案"}
-                </span>
+                <span>{images.length > 0 ? "一键生成合规图文" : "生成推流文案"}</span>
               </>
             )}
           </button>
@@ -1114,7 +1065,8 @@ export function ContentWorkflowWorkspace() {
                       {topic.trim() || "在左侧输入主题或选择活动档案"}
                     </h2>
                     <p className="mt-1.5 text-xs leading-relaxed text-[#78716C]">
-                      生成后将在此呈现面向「{activePlatformMeta.name}」的完整出版级成稿，支持直接编辑、隐私脱敏与多格式导出。
+                      生成后将在此呈现面向「{activePlatformMeta.name}
+                      」的完整出版级成稿，支持直接编辑、隐私脱敏与多格式导出。
                     </p>
                   </div>
 
@@ -1171,9 +1123,7 @@ export function ContentWorkflowWorkspace() {
                         { id: "manuscript", label: "成稿与编辑" },
                         {
                           id: "compliance",
-                          label: reviewReport?.isEligible
-                            ? "发布审查 ✓"
-                            : "发布审查与脱敏",
+                          label: reviewReport?.isEligible ? "发布审查 ✓" : "发布审查与脱敏",
                         },
                         { id: "research", label: "调研与建议" },
                       ] as const
@@ -1185,9 +1135,7 @@ export function ContentWorkflowWorkspace() {
                           type="button"
                           onClick={() => setRightTab(t.id)}
                           className={`relative pb-3 text-xs font-medium transition ${
-                            active
-                              ? "text-[#1B4D3E]"
-                              : "text-[#78716C] hover:text-[#181816]"
+                            active ? "text-[#1B4D3E]" : "text-[#78716C] hover:text-[#181816]"
                           }`}
                         >
                           {t.label}
@@ -1204,14 +1152,11 @@ export function ContentWorkflowWorkspace() {
                       type="button"
                       onClick={() => void handleExportDocx()}
                       disabled={
-                        isExportingDocx ||
-                        Boolean(reviewReport && !reviewReport.isEligible)
+                        isExportingDocx || Boolean(reviewReport && !reviewReport.isEligible)
                       }
                       className="inline-flex items-center gap-1 rounded border border-[#D5CFC3] bg-[#FCFBF8] px-2 py-1 text-[11px] font-medium text-[#57534E] transition hover:border-[#181816] hover:text-[#181816] disabled:cursor-not-allowed disabled:opacity-45"
                     >
-                      {isExportingDocx && (
-                        <Loader2 className="h-3 w-3 animate-spin" />
-                      )}
+                      {isExportingDocx && <Loader2 className="h-3 w-3 animate-spin" />}
                       DOCX
                     </button>
                     <button
@@ -1364,9 +1309,7 @@ export function ContentWorkflowWorkspace() {
                                 {assembledDoc.body.length} 字
                               </span>
                               <span className="font-mono tabular-nums">
-                                {new Date(
-                                  assembledDoc.createdAt
-                                ).toLocaleString("zh-CN")}
+                                {new Date(assembledDoc.createdAt).toLocaleString("zh-CN")}
                               </span>
                             </div>
                             <h2 className="font-editorial text-2xl font-semibold leading-snug text-[#181816]">
@@ -1378,18 +1321,11 @@ export function ContentWorkflowWorkspace() {
                             <div className="border-l-2 border-[#1B4D3E] bg-[#F6F4EF] py-3 pl-4 pr-3.5">
                               <div className="mb-1 flex items-center justify-between">
                                 <span className="text-[11px] font-semibold text-[#1B4D3E]">
-                                  {assembledDoc.platform === "douyin"
-                                    ? "前 3 秒钩子"
-                                    : "黄金开头"}
+                                  {assembledDoc.platform === "douyin" ? "前 3 秒钩子" : "黄金开头"}
                                 </span>
                                 <button
                                   type="button"
-                                  onClick={() =>
-                                    void handleCopyText(
-                                      assembledDoc.hook!,
-                                      "hook"
-                                    )
-                                  }
+                                  onClick={() => void handleCopyText(assembledDoc.hook!, "hook")}
                                   className="text-[11px] text-[#8C857B] hover:text-[#181816]"
                                 >
                                   {copiedKey === "hook" ? "已复制" : "复制"}
@@ -1424,7 +1360,7 @@ export function ContentWorkflowWorkspace() {
                                     </figcaption>
                                   )}
                                 </figure>
-                              )
+                              ),
                             )}
                           </div>
 
@@ -1452,11 +1388,7 @@ export function ContentWorkflowWorkspace() {
                     title={assembledDoc.title}
                     hook={assembledDoc.hook ?? ""}
                     body={assembledDoc.body}
-                    onApplyTextChange={({
-                      title: nextTitle,
-                      hook: nextHook,
-                      body: nextBody,
-                    }) => {
+                    onApplyTextChange={({ title: nextTitle, hook: nextHook, body: nextBody }) => {
                       if (currentResult) {
                         const nextTitles =
                           currentResult.titles.length > 0
@@ -1526,10 +1458,7 @@ export function ContentWorkflowWorkspace() {
                         </span>
                         <ul className="space-y-2">
                           {assembledDoc.algorithmTips.map((tip, i) => (
-                            <li
-                              key={i}
-                              className="text-xs leading-relaxed text-[#57534E]"
-                            >
+                            <li key={i} className="text-xs leading-relaxed text-[#57534E]">
                               — {tip}
                             </li>
                           ))}

@@ -1,10 +1,5 @@
 import { NextResponse } from "next/server";
-import type {
-  ContentTypeId,
-  PlatformId,
-  ToneId,
-  WordCountId,
-} from "@/lib/platforms";
+import type { ContentTypeId, PlatformId, ToneId, WordCountId } from "@/lib/platforms";
 import { runCopywritingSkillsWorkflow } from "@/lib/skills";
 import type { DouyinTrendInsights, ModelConfigPayload } from "@/lib/skills/types";
 import type { ActivityContextPayload } from "@/lib/organization";
@@ -39,10 +34,7 @@ export async function POST(req: Request) {
     } = body;
 
     if (!topic || !topic.trim()) {
-      return NextResponse.json(
-        { error: "请输入文案主题或核心内容" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "请输入文案主题或核心内容" }, { status: 400 });
     }
 
     const workflowOutput = await runCopywritingSkillsWorkflow({
@@ -65,12 +57,8 @@ export async function POST(req: Request) {
     });
   } catch (err) {
     const message = err instanceof Error ? err.message : "未知错误";
-    const status = message.includes("大模型接口调用失败") || message.includes("格式异常")
-      ? 502
-      : 500;
-    return NextResponse.json(
-      { error: `生成文案时发生错误: ${message}` },
-      { status }
-    );
+    const status =
+      message.includes("大模型接口调用失败") || message.includes("格式异常") ? 502 : 500;
+    return NextResponse.json({ error: `生成文案时发生错误: ${message}` }, { status });
   }
 }

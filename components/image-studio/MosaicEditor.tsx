@@ -52,7 +52,7 @@ const AUTO_CATEGORIES: {
 ];
 
 function getActionBounds(
-  action: RedactionAction
+  action: RedactionAction,
 ): { x: number; y: number; w: number; h: number } | null {
   if (action.shape === "rect" && action.rect) {
     const x = Math.min(action.rect.x, action.rect.x + action.rect.w);
@@ -124,9 +124,7 @@ export function MosaicEditor() {
   const [showMarkers, setShowMarkers] = useState(true);
   const [hoveredActionId, setHoveredActionId] = useState<string | null>(null);
   const [selectedActionId, setSelectedActionId] = useState<string | null>(null);
-  const [activePopover, setActivePopover] = useState<
-    "auto" | "style" | "brush" | null
-  >(null);
+  const [activePopover, setActivePopover] = useState<"auto" | "style" | "brush" | null>(null);
   const dockRef = useRef<HTMLDivElement | null>(null);
   const draftPointsRef = useRef<Point[]>([]);
   const draftRectRef = useRef<{ x: number; y: number; w: number; h: number } | null>(null);
@@ -217,7 +215,14 @@ export function MosaicEditor() {
         setAutoDetectStatus(false, "local");
       }
     },
-    [modelConfig.textApiKey, modelConfig.textBaseUrl, modelConfig.textModel, originalImage, replaceAutoActions, setAutoDetectStatus]
+    [
+      modelConfig.textApiKey,
+      modelConfig.textBaseUrl,
+      modelConfig.textModel,
+      originalImage,
+      replaceAutoActions,
+      setAutoDetectStatus,
+    ],
   );
 
   // Load image element whenever originalImage changes and trigger automatic redaction by default
@@ -233,12 +238,7 @@ export function MosaicEditor() {
         canvas.height = img.height;
         overlay.width = img.width;
         overlay.height = img.height;
-        renderRedactedCanvas(
-          canvas,
-          img,
-          useImageStudioStore.getState().actions,
-          showOriginal
-        );
+        renderRedactedCanvas(canvas, img, useImageStudioStore.getState().actions, showOriginal);
       }
       if (lastAutoScannedImageRef.current !== originalImage) {
         lastAutoScannedImageRef.current = originalImage;
@@ -280,11 +280,7 @@ export function MosaicEditor() {
       const padX = Math.round(6 * scaleUnit);
       const badgeH = Math.round(20 * scaleUnit);
 
-      const drawOne = (
-        action: RedactionAction,
-        tagText: string,
-        isAuto: boolean
-      ) => {
+      const drawOne = (action: RedactionAction, tagText: string, isAuto: boolean) => {
         const bounds = getActionBounds(action);
         if (!bounds) return;
 
@@ -321,11 +317,7 @@ export function MosaicEditor() {
             ? bounds.y - badgeH - 2
             : Math.min(canvasH - badgeH - 2, bounds.y + 2);
 
-        ctx.fillStyle = isHighlighted
-          ? "#B85D3B"
-          : isAuto
-            ? "#1B4D3E"
-            : "#57534E";
+        ctx.fillStyle = isHighlighted ? "#B85D3B" : isAuto ? "#1B4D3E" : "#57534E";
         ctx.beginPath();
         ctx.roundRect(bx, by, badgeW, badgeH, 3 * scaleUnit);
         ctx.fill();
@@ -361,7 +353,7 @@ export function MosaicEditor() {
         }
       }
     },
-    [actions, hoveredActionId, selectedActionId, showMarkers, showOriginal]
+    [actions, hoveredActionId, selectedActionId, showMarkers, showOriginal],
   );
 
   const clearOverlay = useCallback(() => {
@@ -449,7 +441,7 @@ export function MosaicEditor() {
         ctx.restore();
       }
     },
-    [brushSize, drawRegionMarkers, isDrawing, manualEnabled, toolShape]
+    [brushSize, drawRegionMarkers, isDrawing, manualEnabled, toolShape],
   );
 
   // Redraw numbered markers on overlay whenever actions, hover/selection, or visibility changes
@@ -609,9 +601,7 @@ export function MosaicEditor() {
         <div className="flex items-center gap-2.5">
           <span
             className={`h-1.5 w-1.5 rounded-full ${
-              isAutoDetecting
-                ? "animate-pulse bg-[#B85D3B]"
-                : "bg-[#1B4D3E]"
+              isAutoDetecting ? "animate-pulse bg-[#B85D3B]" : "bg-[#1B4D3E]"
             }`}
           />
           <span className="font-mono text-[11px] text-[#57534E] tabular-nums">
@@ -645,11 +635,7 @@ export function MosaicEditor() {
             }`}
             title="切换画布上的打码编号标注（导出图片不会包含标注）"
           >
-            {showMarkers ? (
-              <Eye className="h-3.5 w-3.5" />
-            ) : (
-              <EyeOff className="h-3.5 w-3.5" />
-            )}
+            {showMarkers ? <Eye className="h-3.5 w-3.5" /> : <EyeOff className="h-3.5 w-3.5" />}
             <span>编号标注</span>
           </button>
 
@@ -704,10 +690,7 @@ export function MosaicEditor() {
         </div>
 
         {/* Compact Floating Vertical Tool Dock Centered Beside the Image */}
-        <div
-          ref={dockRef}
-          className="relative z-20 flex shrink-0 items-center justify-center"
-        >
+        <div ref={dockRef} className="relative z-20 flex shrink-0 items-center justify-center">
           {/* On-Demand Floating Popover Panel (opens to the left of the dock on desktop, above on mobile) */}
           <AnimatePresence>
             {activePopover && (
@@ -799,21 +782,16 @@ export function MosaicEditor() {
                       <div className="max-h-44 space-y-1.5 overflow-y-auto border-t border-[#E2DDD3] pt-3 pr-1">
                         {autoActions.map((act, idx) => {
                           const isActive =
-                            hoveredActionId === act.id ||
-                            selectedActionId === act.id;
+                            hoveredActionId === act.id || selectedActionId === act.id;
                           return (
                             <div
                               key={act.id}
                               onMouseEnter={() => setHoveredActionId(act.id)}
                               onMouseLeave={() =>
-                                setHoveredActionId((prev) =>
-                                  prev === act.id ? null : prev
-                                )
+                                setHoveredActionId((prev) => (prev === act.id ? null : prev))
                               }
                               onClick={() =>
-                                setSelectedActionId((prev) =>
-                                  prev === act.id ? null : act.id
-                                )
+                                setSelectedActionId((prev) => (prev === act.id ? null : act.id))
                               }
                               className={`flex cursor-pointer items-center justify-between rounded border px-2.5 py-1.5 text-[11px] transition ${
                                 isActive
@@ -839,10 +817,8 @@ export function MosaicEditor() {
                                 type="button"
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  if (hoveredActionId === act.id)
-                                    setHoveredActionId(null);
-                                  if (selectedActionId === act.id)
-                                    setSelectedActionId(null);
+                                  if (hoveredActionId === act.id) setHoveredActionId(null);
+                                  if (selectedActionId === act.id) setSelectedActionId(null);
                                   removeActionById(act.id);
                                 }}
                                 className="ml-2 rounded p-0.5 text-[#8C857B] transition hover:bg-[#FDF2F2] hover:text-[#B42318]"
@@ -856,21 +832,16 @@ export function MosaicEditor() {
 
                         {manualActions.map((act, idx) => {
                           const isActive =
-                            hoveredActionId === act.id ||
-                            selectedActionId === act.id;
+                            hoveredActionId === act.id || selectedActionId === act.id;
                           return (
                             <div
                               key={act.id}
                               onMouseEnter={() => setHoveredActionId(act.id)}
                               onMouseLeave={() =>
-                                setHoveredActionId((prev) =>
-                                  prev === act.id ? null : prev
-                                )
+                                setHoveredActionId((prev) => (prev === act.id ? null : prev))
                               }
                               onClick={() =>
-                                setSelectedActionId((prev) =>
-                                  prev === act.id ? null : act.id
-                                )
+                                setSelectedActionId((prev) => (prev === act.id ? null : act.id))
                               }
                               className={`flex cursor-pointer items-center justify-between rounded border px-2.5 py-1.5 text-[11px] transition ${
                                 isActive
@@ -896,10 +867,8 @@ export function MosaicEditor() {
                                 type="button"
                                 onClick={(e) => {
                                   e.stopPropagation();
-                                  if (hoveredActionId === act.id)
-                                    setHoveredActionId(null);
-                                  if (selectedActionId === act.id)
-                                    setSelectedActionId(null);
+                                  if (hoveredActionId === act.id) setHoveredActionId(null);
+                                  if (selectedActionId === act.id) setSelectedActionId(null);
                                   removeActionById(act.id);
                                 }}
                                 className="ml-2 rounded p-0.5 text-[#8C857B] transition hover:bg-[#FDF2F2] hover:text-[#B42318]"
@@ -1016,9 +985,7 @@ export function MosaicEditor() {
             {/* Auto Detect Popover Trigger */}
             <button
               type="button"
-              onClick={() =>
-                setActivePopover((prev) => (prev === "auto" ? null : "auto"))
-              }
+              onClick={() => setActivePopover((prev) => (prev === "auto" ? null : "auto"))}
               title="自动识别与区域管理"
               className={`relative flex h-11 w-12 flex-col items-center justify-center gap-0.5 rounded-lg text-[10px] font-medium transition ${
                 activePopover === "auto"
@@ -1042,9 +1009,7 @@ export function MosaicEditor() {
             {/* Mosaic Style Popover Trigger */}
             <button
               type="button"
-              onClick={() =>
-                setActivePopover((prev) => (prev === "style" ? null : "style"))
-              }
+              onClick={() => setActivePopover((prev) => (prev === "style" ? null : "style"))}
               title="遮盖样式与强度"
               className={`flex h-11 w-12 flex-col items-center justify-center gap-0.5 rounded-lg text-[10px] font-medium transition ${
                 activePopover === "style"

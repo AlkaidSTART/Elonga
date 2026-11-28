@@ -30,11 +30,7 @@ interface RedactionAndReviewPanelProps {
   title: string;
   hook: string;
   body: string;
-  onApplyTextChange: (next: {
-    title: string;
-    hook: string;
-    body: string;
-  }) => void;
+  onApplyTextChange: (next: { title: string; hook: string; body: string }) => void;
   activity?: ActivityArchive | null;
   orgRedlines?: string;
   unredactedImageCount?: number;
@@ -62,9 +58,7 @@ export function RedactionAndReviewPanel({
   onChangeReviewState,
 }: RedactionAndReviewPanelProps) {
   const [activeTab, setActiveTab] = useState<"redaction" | "review">("review");
-  const [customReplacements, setCustomReplacements] = useState<
-    Record<string, string>
-  >({});
+  const [customReplacements, setCustomReplacements] = useState<Record<string, string>>({});
   const [manualOriginal, setManualOriginal] = useState("");
   const [manualReplacement, setManualReplacement] = useState("");
 
@@ -79,20 +73,11 @@ export function RedactionAndReviewPanel({
         redactionRecords,
         reviewState,
       }),
-    [
-      title,
-      hook,
-      body,
-      orgRedlines,
-      unredactedImageCount,
-      redactionRecords,
-      reviewState,
-    ]
+    [title, hook, body, orgRedlines, unredactedImageCount, redactionRecords, reviewState],
   );
 
   const applySingleRedaction = (match: SensitiveMatch) => {
-    const replacement =
-      customReplacements[match.id]?.trim() || match.suggestedReplacement;
+    const replacement = customReplacements[match.id]?.trim() || match.suggestedReplacement;
     const nextTitle = replaceAllLiteral(title, match.original, replacement);
     const nextHook = replaceAllLiteral(hook, match.original, replacement);
     const nextBody = replaceAllLiteral(body, match.original, replacement);
@@ -124,8 +109,7 @@ export function RedactionAndReviewPanel({
         checkedAt: new Date().toISOString(),
         checkedFingerprint: nextReport.fingerprint,
         approvedAt:
-          nextReport.unresolvedRiskCount === 0 &&
-          nextReport.unconfirmedFactCount === 0
+          nextReport.unresolvedRiskCount === 0 && nextReport.unconfirmedFactCount === 0
             ? new Date().toISOString()
             : undefined,
       });
@@ -140,8 +124,7 @@ export function RedactionAndReviewPanel({
     const newRecords: TextRedactionRecord[] = [];
 
     for (const match of report.privacyMatches) {
-      const replacement =
-        customReplacements[match.id]?.trim() || match.suggestedReplacement;
+      const replacement = customReplacements[match.id]?.trim() || match.suggestedReplacement;
       nextTitle = replaceAllLiteral(nextTitle, match.original, replacement);
       nextHook = replaceAllLiteral(nextHook, match.original, replacement);
       nextBody = replaceAllLiteral(nextBody, match.original, replacement);
@@ -174,8 +157,7 @@ export function RedactionAndReviewPanel({
         checkedAt: new Date().toISOString(),
         checkedFingerprint: nextReport.fingerprint,
         approvedAt:
-          nextReport.unresolvedRiskCount === 0 &&
-          nextReport.unconfirmedFactCount === 0
+          nextReport.unresolvedRiskCount === 0 && nextReport.unconfirmedFactCount === 0
             ? new Date().toISOString()
             : undefined,
       });
@@ -208,25 +190,11 @@ export function RedactionAndReviewPanel({
   };
 
   const revertRedaction = (record: TextRedactionRecord) => {
-    const nextTitle = replaceAllLiteral(
-      title,
-      record.replacement,
-      record.original
-    );
-    const nextHook = replaceAllLiteral(
-      hook,
-      record.replacement,
-      record.original
-    );
-    const nextBody = replaceAllLiteral(
-      body,
-      record.replacement,
-      record.original
-    );
+    const nextTitle = replaceAllLiteral(title, record.replacement, record.original);
+    const nextHook = replaceAllLiteral(hook, record.replacement, record.original);
+    const nextBody = replaceAllLiteral(body, record.replacement, record.original);
     onApplyTextChange({ title: nextTitle, hook: nextHook, body: nextBody });
-    onChangeRedactionRecords(
-      redactionRecords.filter((r) => r.id !== record.id)
-    );
+    onChangeRedactionRecords(redactionRecords.filter((r) => r.id !== record.id));
   };
 
   const handleInitiateReview = () => {
@@ -237,9 +205,7 @@ export function RedactionAndReviewPanel({
       waivedRiskIds: reviewState?.waivedRiskIds ?? [],
       confirmedFactKeys: reviewState?.confirmedFactKeys ?? [],
       approvedAt:
-        report.unresolvedRiskCount === 0 && report.unconfirmedFactCount === 0
-          ? now
-          : undefined,
+        report.unresolvedRiskCount === 0 && report.unconfirmedFactCount === 0 ? now : undefined,
     };
     onChangeReviewState(nextState);
     setActiveTab("review");
@@ -367,11 +333,7 @@ export function RedactionAndReviewPanel({
             className="inline-flex items-center gap-1 rounded bg-[#1B4D3E] px-2.5 py-1 text-[11px] font-medium text-[#FCFBF8] transition hover:bg-[#143A2F]"
           >
             <FileCheck2 className="h-3 w-3" />
-            <span>
-              {reviewState?.checkedAt && !report.isStale
-                ? "重新检查"
-                : "发起审查"}
-            </span>
+            <span>{reviewState?.checkedAt && !report.isStale ? "重新检查" : "发起审查"}</span>
           </button>
         )}
       </div>
@@ -381,9 +343,7 @@ export function RedactionAndReviewPanel({
         <div className="space-y-4">
           {!reviewState?.checkedAt ? (
             <div className="border border-dashed border-[#D5CFC3] bg-[#FCFBF8]/60 p-4 text-center">
-              <p className="text-xs font-medium text-[#181816]">
-                尚未发起发布前检查
-              </p>
+              <p className="text-xs font-medium text-[#181816]">尚未发起发布前检查</p>
               <p className="mt-1 text-[11px] leading-relaxed text-[#78716C]">
                 系统将同步脱敏状态、扫描合规风险，并标注金额与人数等事实数据供人工核对。
               </p>
@@ -439,9 +399,7 @@ export function RedactionAndReviewPanel({
                       const isWaived = risk.canWaive && waivedSet.has(risk.id);
                       const matchedPrivacy =
                         risk.category === "privacy"
-                          ? report.privacyMatches.find(
-                              (m) => `privacy:${m.id}` === risk.id
-                            )
+                          ? report.privacyMatches.find((m) => `privacy:${m.id}` === risk.id)
                           : undefined;
 
                       return (
@@ -457,9 +415,7 @@ export function RedactionAndReviewPanel({
                         >
                           <div className="flex items-start justify-between gap-2">
                             <div className="space-y-1">
-                              <p className="font-medium text-[#0F172A]">
-                                {risk.title}
-                              </p>
+                              <p className="font-medium text-[#0F172A]">{risk.title}</p>
                               <p className="text-[11px] leading-relaxed text-slate-600">
                                 {risk.detail}
                               </p>
@@ -469,9 +425,7 @@ export function RedactionAndReviewPanel({
                               {matchedPrivacy && (
                                 <button
                                   type="button"
-                                  onClick={() =>
-                                    applySingleRedaction(matchedPrivacy)
-                                  }
+                                  onClick={() => applySingleRedaction(matchedPrivacy)}
                                   className="rounded bg-[#0F172A] px-2 py-1 text-[11px] font-medium text-white transition hover:bg-slate-800"
                                 >
                                   一键脱敏
@@ -507,8 +461,8 @@ export function RedactionAndReviewPanel({
                     <span>事实信息人工核对</span>
                   </span>
                   <span className="font-mono text-[11px] text-slate-500 tabular-nums">
-                    已核对 {report.factItems.length - report.unconfirmedFactCount}{" "}
-                    / {report.factItems.length}
+                    已核对 {report.factItems.length - report.unconfirmedFactCount} /{" "}
+                    {report.factItems.length}
                   </span>
                 </div>
 
@@ -526,12 +480,8 @@ export function RedactionAndReviewPanel({
                       关联活动档案参考：{activity.title}
                     </div>
                     {activity.date && <div>日期：{activity.date}</div>}
-                    {activity.participantCount && (
-                      <div>人数：{activity.participantCount}</div>
-                    )}
-                    {activity.fundOrGoods && (
-                      <div>善款/物资：{activity.fundOrGoods}</div>
-                    )}
+                    {activity.participantCount && <div>人数：{activity.participantCount}</div>}
+                    {activity.fundOrGoods && <div>善款/物资：{activity.fundOrGoods}</div>}
                   </div>
                 )}
 
@@ -567,9 +517,7 @@ export function RedactionAndReviewPanel({
                                 >
                                   {meta.label}
                                 </span>
-                                <span className="font-semibold text-[#0F172A]">
-                                  {fact.value}
-                                </span>
+                                <span className="font-semibold text-[#0F172A]">{fact.value}</span>
                               </div>
                               <p className="truncate text-[11px] text-slate-500">
                                 {fact.contextSnippet}
@@ -598,9 +546,7 @@ export function RedactionAndReviewPanel({
       {activeTab === "redaction" && (
         <div className="space-y-4">
           <div className="flex items-center justify-between gap-2">
-            <span className="text-xs font-semibold text-[#0F172A]">
-              隐私识别与化名替换
-            </span>
+            <span className="text-xs font-semibold text-[#0F172A]">隐私识别与化名替换</span>
             {report.privacyMatches.length > 0 && (
               <button
                 type="button"
@@ -624,8 +570,7 @@ export function RedactionAndReviewPanel({
             <div className="space-y-2">
               {report.privacyMatches.map((match) => {
                 const meta = SENSITIVE_CATEGORY_META[match.category];
-                const currentValue =
-                  customReplacements[match.id] ?? match.suggestedReplacement;
+                const currentValue = customReplacements[match.id] ?? match.suggestedReplacement;
 
                 return (
                   <div
@@ -648,9 +593,7 @@ export function RedactionAndReviewPanel({
                       </div>
                     </div>
 
-                    <p className="text-[11px] text-slate-500">
-                      {match.contextSnippet}
-                    </p>
+                    <p className="text-[11px] text-slate-500">{match.contextSnippet}</p>
 
                     <div className="flex items-center gap-1.5">
                       <input
@@ -724,13 +667,9 @@ export function RedactionAndReviewPanel({
                     className="flex items-center justify-between gap-2 rounded-md border border-[#E2E8F0] bg-[#F8FAFC] px-2.5 py-1.5 text-[11px]"
                   >
                     <div className="min-w-0 truncate text-slate-600">
-                      <span className="text-slate-400 line-through">
-                        {rec.original}
-                      </span>
+                      <span className="text-slate-400 line-through">{rec.original}</span>
                       <span className="mx-1.5 text-slate-400">→</span>
-                      <span className="font-medium text-[#1D4ED8]">
-                        {rec.replacement}
-                      </span>
+                      <span className="font-medium text-[#1D4ED8]">{rec.replacement}</span>
                     </div>
                     <button
                       type="button"

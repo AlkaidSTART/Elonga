@@ -20,10 +20,7 @@ export async function POST(req: Request) {
     const { orgProfile, snapshot, focus = "internal", modelConfig } = body;
 
     if (!snapshot?.month || !orgProfile?.name) {
-      return NextResponse.json(
-        { error: "缺少机构信息或月度汇总数据" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "缺少机构信息或月度汇总数据" }, { status: 400 });
     }
 
     const apiKey =
@@ -44,10 +41,7 @@ export async function POST(req: Request) {
       process.env.TEXT_BASE_URL ||
       "https://api.deepseek.com/v1"
     ).replace(/\/+$/, "");
-    const model =
-      modelConfig?.textModel?.trim() ||
-      process.env.DEEPSEEK_MODEL ||
-      "deepseek-chat";
+    const model = modelConfig?.textModel?.trim() || process.env.DEEPSEEK_MODEL || "deepseek-chat";
 
     const focusDesc =
       focus === "donor"
@@ -94,7 +88,7 @@ ${JSON.stringify(
     topArticles: snapshot.topArticles,
   },
   null,
-  2
+  2,
 )}
 
 请生成结构完整、有洞察、可直接导出的月报。`;
@@ -137,9 +131,6 @@ ${JSON.stringify(
     });
   } catch (err) {
     const message = err instanceof Error ? err.message : "未知错误";
-    return NextResponse.json(
-      { error: `生成月报失败: ${message}` },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: `生成月报失败: ${message}` }, { status: 500 });
   }
 }

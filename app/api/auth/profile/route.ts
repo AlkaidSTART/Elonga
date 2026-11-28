@@ -11,10 +11,7 @@ import { updateUserProfile } from "@/lib/auth/users";
 export async function PATCH(request: Request) {
   const session = await getServerSession();
   if (!session) {
-    return NextResponse.json(
-      { error: "未登录或登录会话已失效，请重新登录" },
-      { status: 401 }
-    );
+    return NextResponse.json({ error: "未登录或登录会话已失效，请重新登录" }, { status: 401 });
   }
 
   const body = (await request.json().catch(() => null)) as {
@@ -40,10 +37,7 @@ export async function PATCH(request: Request) {
   }
 
   const now = Math.floor(Date.now() / 1000);
-  const remainingSeconds = Math.max(
-    session.exp - now,
-    DEFAULT_SESSION_MAX_AGE
-  );
+  const remainingSeconds = Math.max(session.exp - now, DEFAULT_SESSION_MAX_AGE);
 
   const token = await signSessionJwt(
     {
@@ -53,7 +47,7 @@ export async function PATCH(request: Request) {
       role: result.user.role,
       orgName: result.user.orgName,
     },
-    remainingSeconds
+    remainingSeconds,
   );
 
   const response = NextResponse.json({
@@ -61,10 +55,6 @@ export async function PATCH(request: Request) {
     user: result.user,
   });
 
-  response.cookies.set(
-    AUTH_COOKIE_NAME,
-    token,
-    getAuthCookieOptions(remainingSeconds)
-  );
+  response.cookies.set(AUTH_COOKIE_NAME, token, getAuthCookieOptions(remainingSeconds));
   return response;
 }

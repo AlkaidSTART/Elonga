@@ -8,7 +8,7 @@ export function Header() {
   const setActiveTab = useWorkbenchStore((s) => s.setActiveTab);
   const setSettingsOpen = useWorkbenchStore((s) => s.setSettingsOpen);
   const hasApiKey = useWorkbenchStore((s) =>
-    Boolean(s.modelConfig.textApiKey.trim() || s.modelConfig.imageApiKey.trim())
+    Boolean(s.modelConfig.textApiKey.trim() || s.modelConfig.imageApiKey.trim()),
   );
 
   return (
@@ -18,12 +18,8 @@ export function Header() {
         <div className="flex items-center gap-2.5 leading-tight">
           <BrandLogo size={26} />
           <div>
-            <h1 className="text-[15px] font-semibold tracking-tight text-neutral-900">
-              Elonga
-            </h1>
-            <p className="hidden text-xs text-neutral-500 sm:block">
-              多平台推流文案与视觉工坊
-            </p>
+            <h1 className="text-[15px] font-semibold tracking-tight text-neutral-900">Elonga</h1>
+            <p className="hidden text-xs text-neutral-500 sm:block">多平台推流文案与视觉工坊</p>
           </div>
         </div>
 
@@ -63,9 +59,7 @@ export function Header() {
           className="flex items-center gap-2 rounded-xl border border-neutral-200/80 bg-white px-3 py-2 text-xs font-medium text-neutral-700 shadow-xs transition hover:border-neutral-300 hover:bg-neutral-50"
         >
           <span
-            className={`h-2 w-2 rounded-full ${
-              hasApiKey ? "bg-emerald-500" : "bg-neutral-300"
-            }`}
+            className={`h-2 w-2 rounded-full ${hasApiKey ? "bg-emerald-500" : "bg-neutral-300"}`}
           />
           <span>{hasApiKey ? "大模型已连接" : "模型配置"}</span>
         </button>

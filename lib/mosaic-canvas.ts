@@ -5,10 +5,22 @@ function getBoundingBox(action: RedactionAction, canvasW: number, canvasH: numbe
   const strokePad = action.shape === "brush" ? action.brushSize / 2 : 0;
   const pad = Math.ceil(strokePad + action.intensity * 1.5 + 8);
   if (action.shape === "rect" && action.rect) {
-    const x1 = Math.max(0, Math.floor(Math.min(action.rect.x, action.rect.x + action.rect.w) - pad));
-    const y1 = Math.max(0, Math.floor(Math.min(action.rect.y, action.rect.y + action.rect.h) - pad));
-    const x2 = Math.min(canvasW, Math.ceil(Math.max(action.rect.x, action.rect.x + action.rect.w) + pad));
-    const y2 = Math.min(canvasH, Math.ceil(Math.max(action.rect.y, action.rect.y + action.rect.h) + pad));
+    const x1 = Math.max(
+      0,
+      Math.floor(Math.min(action.rect.x, action.rect.x + action.rect.w) - pad),
+    );
+    const y1 = Math.max(
+      0,
+      Math.floor(Math.min(action.rect.y, action.rect.y + action.rect.h) - pad),
+    );
+    const x2 = Math.min(
+      canvasW,
+      Math.ceil(Math.max(action.rect.x, action.rect.x + action.rect.w) + pad),
+    );
+    const y2 = Math.min(
+      canvasH,
+      Math.ceil(Math.max(action.rect.y, action.rect.y + action.rect.h) + pad),
+    );
     return { x: x1, y: y1, w: Math.max(1, x2 - x1), h: Math.max(1, y2 - y1) };
   }
 
@@ -37,7 +49,7 @@ function drawActionMask(
   maskCtx: CanvasRenderingContext2D,
   action: RedactionAction,
   offsetX: number,
-  offsetY: number
+  offsetY: number,
 ) {
   maskCtx.fillStyle = "#000000";
   maskCtx.strokeStyle = "#000000";
@@ -45,12 +57,7 @@ function drawActionMask(
   if (action.shape === "rect" && action.rect) {
     const rx = action.rect.w >= 0 ? action.rect.x : action.rect.x + action.rect.w;
     const ry = action.rect.h >= 0 ? action.rect.y : action.rect.y + action.rect.h;
-    maskCtx.fillRect(
-      rx - offsetX,
-      ry - offsetY,
-      Math.abs(action.rect.w),
-      Math.abs(action.rect.h)
-    );
+    maskCtx.fillRect(rx - offsetX, ry - offsetY, Math.abs(action.rect.w), Math.abs(action.rect.h));
     return;
   }
 
@@ -75,13 +82,7 @@ function drawActionMask(
 
   if (pts.length === 1) {
     maskCtx.beginPath();
-    maskCtx.arc(
-      pts[0].x - offsetX,
-      pts[0].y - offsetY,
-      action.brushSize / 2,
-      0,
-      Math.PI * 2
-    );
+    maskCtx.arc(pts[0].x - offsetX, pts[0].y - offsetY, action.brushSize / 2, 0, Math.PI * 2);
     maskCtx.fill();
     return;
   }
@@ -98,7 +99,7 @@ export function applyRedactionAction(
   ctx: CanvasRenderingContext2D,
   canvasW: number,
   canvasH: number,
-  action: RedactionAction
+  action: RedactionAction,
 ) {
   if (action.type === "solid") {
     ctx.save();
@@ -146,17 +147,7 @@ export function applyRedactionAction(
   const effectCtx = effectCanvas.getContext("2d");
   if (!effectCtx) return;
 
-  effectCtx.drawImage(
-    ctx.canvas,
-    box.x,
-    box.y,
-    box.w,
-    box.h,
-    0,
-    0,
-    box.w,
-    box.h
-  );
+  effectCtx.drawImage(ctx.canvas, box.x, box.y, box.w, box.h, 0, 0, box.w, box.h);
 
   if (action.type === "stackblur") {
     const radius = Math.max(2, Math.min(60, Math.round(action.intensity)));
@@ -195,7 +186,7 @@ export function renderRedactedCanvas(
   canvas: HTMLCanvasElement,
   img: HTMLImageElement,
   actions: RedactionAction[],
-  showOriginal = false
+  showOriginal = false,
 ) {
   const ctx = canvas.getContext("2d");
   if (!ctx) return;

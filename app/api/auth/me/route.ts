@@ -5,10 +5,7 @@ import { getUserById } from "@/lib/auth/users";
 export async function GET() {
   const session = await getServerSession();
   if (!session) {
-    return NextResponse.json(
-      { authenticated: false, user: null },
-      { status: 401 }
-    );
+    return NextResponse.json({ authenticated: false, user: null }, { status: 401 });
   }
 
   const record = getUserById(session.id);

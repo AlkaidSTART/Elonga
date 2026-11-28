@@ -5,10 +5,7 @@ import Link from "next/link";
 import { ArrowUpRight, FileBarChart2, Image as ImageIcon } from "lucide-react";
 import type { EChartsOption } from "echarts";
 import { EChartBox } from "@/components/charts/EChartBox";
-import {
-  buildDemoOverviewStats,
-  computeOverviewStats,
-} from "@/lib/overview-stats";
+import { buildDemoOverviewStats, computeOverviewStats } from "@/lib/overview-stats";
 import { useOrganizationStore } from "@/store/useOrganizationStore";
 import { useWorkbenchStore } from "@/store/useWorkbenchStore";
 
@@ -28,11 +25,7 @@ export function OverviewWorkspace() {
   const orgName = useOrganizationStore((s) => s.profile.name);
   const [dataMode, setDataMode] = useState<"auto" | "live" | "demo">("auto");
 
-  const todayKey = useSyncExternalStore(
-    emptySubscribe,
-    getClientTodayKey,
-    getServerTodayKey
-  );
+  const todayKey = useSyncExternalStore(emptySubscribe, getClientTodayKey, getServerTodayKey);
   const today = useMemo(() => {
     if (!todayKey) return null;
     const [y, m, d] = todayKey.split("-").map(Number);
@@ -47,12 +40,12 @@ export function OverviewWorkspace() {
       effectiveMode === "live"
         ? computeOverviewStats(history, today)
         : buildDemoOverviewStats(today),
-    [effectiveMode, history, today]
+    [effectiveMode, history, today],
   );
 
   const maxChannelCreated = useMemo(
     () => Math.max(1, ...stats.platformStats.map((p) => p.createdCount)),
-    [stats.platformStats]
+    [stats.platformStats],
   );
 
   const trendOption = useMemo<EChartsOption>(
@@ -148,7 +141,7 @@ export function OverviewWorkspace() {
         },
       ],
     }),
-    [stats.dailyTrend]
+    [stats.dailyTrend],
   );
 
   return (
@@ -186,9 +179,7 @@ export function OverviewWorkspace() {
               </button>
             </div>
           </div>
-          <p className="mt-1 text-xs text-[#78716C]">
-            {orgName} · 编辑部传播态势与内容产出日报
-          </p>
+          <p className="mt-1 text-xs text-[#78716C]">{orgName} · 编辑部传播态势与内容产出日报</p>
         </div>
 
         <div className="flex items-center gap-2.5">
@@ -232,13 +223,9 @@ export function OverviewWorkspace() {
                 {stats.publishRate}%
               </strong>
               ，主力传播阵地为{" "}
-              <strong className="font-semibold text-[#181816]">
-                {stats.topPlatformName}
-              </strong>
+              <strong className="font-semibold text-[#181816]">{stats.topPlatformName}</strong>
               ，已覆盖{" "}
-              <span className="font-mono tabular-nums">
-                {stats.activePlatformsCount}/4
-              </span>{" "}
+              <span className="font-mono tabular-nums">{stats.activePlatformsCount}/4</span>{" "}
               个渠道。
             </p>
           </div>
@@ -254,9 +241,7 @@ export function OverviewWorkspace() {
               <dt className="text-[#78716C]">累计创作稿件</dt>
               <dd className="font-editorial text-xl font-semibold text-[#181816] tabular-nums">
                 {stats.totalCreated}
-                <span className="ml-1 font-sans text-[11px] font-normal text-[#8C857B]">
-                  篇
-                </span>
+                <span className="ml-1 font-sans text-[11px] font-normal text-[#8C857B]">篇</span>
               </dd>
             </div>
             <div className="flex items-baseline justify-between pt-3">
@@ -284,9 +269,7 @@ export function OverviewWorkspace() {
                 对比每日创作、已发布与爆款稿件节奏
               </p>
             </div>
-            <span className="font-mono text-[11px] text-[#8C857B]">
-              7D TREND
-            </span>
+            <span className="font-mono text-[11px] text-[#8C857B]">7D TREND</span>
           </div>
           <EChartBox option={trendOption} className="h-[300px] w-full" />
         </div>
@@ -318,37 +301,21 @@ export function OverviewWorkspace() {
 
           <div className="divide-y divide-[#E2DDD3] border-y border-[#E2DDD3]">
             {stats.platformStats.map((ch, idx) => {
-              const createdWidth = Math.round(
-                (ch.createdCount / maxChannelCreated) * 100
-              );
-              const publishedWidth = Math.round(
-                (ch.publishedCount / maxChannelCreated) * 100
-              );
-              const viralWidth = Math.round(
-                (ch.viralCount / maxChannelCreated) * 100
-              );
+              const createdWidth = Math.round((ch.createdCount / maxChannelCreated) * 100);
+              const publishedWidth = Math.round((ch.publishedCount / maxChannelCreated) * 100);
+              const viralWidth = Math.round((ch.viralCount / maxChannelCreated) * 100);
 
               return (
                 <div key={ch.id} className="space-y-2 py-3.5">
                   <div className="flex items-baseline justify-between gap-2 text-xs">
                     <div className="flex items-baseline gap-2.5">
-                      <span className="font-mono text-[11px] text-[#8C857B]">
-                        0{idx + 1}
-                      </span>
-                      <span className="font-medium text-[#181816]">
-                        {ch.name}
-                      </span>
+                      <span className="font-mono text-[11px] text-[#8C857B]">0{idx + 1}</span>
+                      <span className="font-medium text-[#181816]">{ch.name}</span>
                     </div>
                     <div className="flex items-baseline gap-3 font-mono text-[11px] tabular-nums">
-                      <span className="text-[#1B4D3E]">
-                        已发 {ch.publishedCount}
-                      </span>
-                      <span className="text-[#8C857B]">
-                        创作 {ch.createdCount}
-                      </span>
-                      <span className="text-[#B85D3B]">
-                        爆款 {ch.viralCount}
-                      </span>
+                      <span className="text-[#1B4D3E]">已发 {ch.publishedCount}</span>
+                      <span className="text-[#8C857B]">创作 {ch.createdCount}</span>
+                      <span className="text-[#B85D3B]">爆款 {ch.viralCount}</span>
                       <span className="w-8 text-right font-semibold text-[#181816]">
                         {ch.sharePercent}%
                       </span>
@@ -394,21 +361,14 @@ export function OverviewWorkspace() {
 
             <div className="divide-y divide-[#E2DDD3] border-y border-[#E2DDD3]">
               {activities.slice(0, 3).map((act) => (
-                <div
-                  key={act.id}
-                  className="flex items-start justify-between gap-4 py-3.5"
-                >
+                <div key={act.id} className="flex items-start justify-between gap-4 py-3.5">
                   <div className="min-w-0 space-y-0.5">
                     <div className="flex items-center gap-2 text-[11px] text-[#8C857B]">
-                      <span className="font-mono tabular-nums">
-                        {act.date || "待定"}
-                      </span>
+                      <span className="font-mono tabular-nums">{act.date || "待定"}</span>
                       <span>·</span>
                       <span className="truncate">{act.location}</span>
                     </div>
-                    <div className="truncate text-sm font-medium text-[#181816]">
-                      {act.title}
-                    </div>
+                    <div className="truncate text-sm font-medium text-[#181816]">{act.title}</div>
                   </div>
                   <Link
                     href={`/workflow?activityId=${encodeURIComponent(act.id)}`}

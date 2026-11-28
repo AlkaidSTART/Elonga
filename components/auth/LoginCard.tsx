@@ -179,11 +179,7 @@ export function LoginCard() {
               aria-label={showPassword ? "隐藏密码" : "显示密码"}
               className="absolute right-2.5 top-1/2 -translate-y-1/2 rounded-lg p-1.5 text-[#8C857B] transition hover:bg-[#EFECE4]/70 hover:text-[#181816]"
             >
-              {showPassword ? (
-                <EyeOff className="h-4 w-4" />
-              ) : (
-                <Eye className="h-4 w-4" />
-              )}
+              {showPassword ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
             </button>
           </div>
         </div>
@@ -278,9 +274,7 @@ export function LoginCard() {
                 <div className="flex w-full items-center justify-between gap-2">
                   <span
                     className={`text-xs font-medium transition-colors ${
-                      isSelected
-                        ? "text-[#1B4D3E]"
-                        : "text-[#181816] group-hover:text-[#1B4D3E]"
+                      isSelected ? "text-[#1B4D3E]" : "text-[#181816] group-hover:text-[#1B4D3E]"
                     }`}
                   >
                     {demo.role}

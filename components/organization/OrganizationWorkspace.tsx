@@ -6,7 +6,6 @@ import { AnimatePresence, motion } from "framer-motion";
 import {
   ArrowUpRight,
   Building2,
-  Calendar,
   Check,
   Edit3,
   FolderPlus,
@@ -59,8 +58,7 @@ export function OrganizationWorkspace() {
   const router = useRouter();
   const { profile, activities, updateProfile, addActivity, updateActivity, deleteActivity } =
     useOrganizationStore();
-  const { history, setSelectedActivityId, setTopic, setContentType } =
-    useWorkbenchStore();
+  const { history, setSelectedActivityId, setTopic, setContentType } = useWorkbenchStore();
 
   const [orgForm, setOrgForm] = useState(profile);
   const [profileSaved, setProfileSaved] = useState(false);
@@ -71,9 +69,7 @@ export function OrganizationWorkspace() {
 
   const [editorOpen, setEditorOpen] = useState(false);
   const [editingId, setEditingId] = useState<string | null>(null);
-  const [activityForm, setActivityForm] = useState<ActivityFormState>(() =>
-    createEmptyForm()
-  );
+  const [activityForm, setActivityForm] = useState<ActivityFormState>(() => createEmptyForm());
   const [formError, setFormError] = useState<string | null>(null);
 
   const draftCountByActivity = useMemo(() => {
@@ -215,9 +211,7 @@ export function OrganizationWorkspace() {
             </div>
 
             {profile.mission && (
-              <p className="text-xs leading-relaxed text-[#57534E]">
-                {profile.mission}
-              </p>
+              <p className="text-xs leading-relaxed text-[#57534E]">{profile.mission}</p>
             )}
 
             <div className="flex flex-wrap items-center gap-x-5 gap-y-1.5 pt-0.5 text-[11px] text-[#78716C]">
@@ -265,24 +259,18 @@ export function OrganizationWorkspace() {
             >
               <div className="mt-6 grid grid-cols-1 gap-4 border-t border-[#E2DDD3] pt-6 md:grid-cols-2">
                 <label className="space-y-1.5">
-                  <span className="block text-xs font-medium text-[#57534E]">
-                    机构名称
-                  </span>
+                  <span className="block text-xs font-medium text-[#57534E]">机构名称</span>
                   <input
                     type="text"
                     value={orgForm.name}
-                    onChange={(e) =>
-                      setOrgForm((prev) => ({ ...prev, name: e.target.value }))
-                    }
+                    onChange={(e) => setOrgForm((prev) => ({ ...prev, name: e.target.value }))}
                     placeholder="例如：微光公益服务中心"
                     className="w-full rounded border border-[#D5CFC3] bg-[#FCFBF8] px-3 py-2 text-xs text-[#181816] outline-none transition focus:border-[#1B4D3E]"
                   />
                 </label>
 
                 <label className="space-y-1.5">
-                  <span className="block text-xs font-medium text-[#57534E]">
-                    默认传播口吻
-                  </span>
+                  <span className="block text-xs font-medium text-[#57534E]">默认传播口吻</span>
                   <select
                     value={orgForm.defaultTone}
                     onChange={(e) =>
@@ -302,15 +290,11 @@ export function OrganizationWorkspace() {
                 </label>
 
                 <label className="space-y-1.5 md:col-span-2">
-                  <span className="block text-xs font-medium text-[#57534E]">
-                    机构使命与简介
-                  </span>
+                  <span className="block text-xs font-medium text-[#57534E]">机构使命与简介</span>
                   <textarea
                     rows={2}
                     value={orgForm.mission}
-                    onChange={(e) =>
-                      setOrgForm((prev) => ({ ...prev, mission: e.target.value }))
-                    }
+                    onChange={(e) => setOrgForm((prev) => ({ ...prev, mission: e.target.value }))}
                     placeholder="简要描述机构服务领域、核心理念与公益定位，便于 AI 准确把握机构语调..."
                     className="w-full resize-none rounded border border-[#D5CFC3] bg-[#FCFBF8] px-3 py-2 text-xs leading-relaxed text-[#181816] outline-none transition focus:border-[#1B4D3E]"
                   />
@@ -465,9 +449,7 @@ export function OrganizationWorkspace() {
                       <span
                         className={`inline-flex items-center gap-1 rounded border px-1.5 py-0.5 text-[11px] font-medium ${statusMeta.badgeClass}`}
                       >
-                        <span
-                          className={`h-1.5 w-1.5 rounded-full ${statusMeta.dotClass}`}
-                        />
+                        <span className={`h-1.5 w-1.5 rounded-full ${statusMeta.dotClass}`} />
                         {statusMeta.label}
                       </span>
                       <span className="rounded bg-[#EFECE4] px-1.5 py-0.5 text-[11px] font-medium text-[#57534E]">
@@ -503,9 +485,7 @@ export function OrganizationWorkspace() {
                     </div>
 
                     {act.highlights && (
-                      <p className="text-xs leading-relaxed text-[#57534E]">
-                        {act.highlights}
-                      </p>
+                      <p className="text-xs leading-relaxed text-[#57534E]">{act.highlights}</p>
                     )}
 
                     {act.notes && (
@@ -595,9 +575,7 @@ export function OrganizationWorkspace() {
 
               <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
                 <label className="space-y-1.5 sm:col-span-2">
-                  <span className="block text-xs font-medium text-slate-700">
-                    活动名称 *
-                  </span>
+                  <span className="block text-xs font-medium text-slate-700">活动名称 *</span>
                   <input
                     type="text"
                     value={activityForm.title}
@@ -613,9 +591,7 @@ export function OrganizationWorkspace() {
                 </label>
 
                 <label className="space-y-1.5">
-                  <span className="block text-xs font-medium text-slate-700">
-                    活动日期
-                  </span>
+                  <span className="block text-xs font-medium text-slate-700">活动日期</span>
                   <input
                     type="date"
                     value={activityForm.date}
@@ -630,9 +606,7 @@ export function OrganizationWorkspace() {
                 </label>
 
                 <label className="space-y-1.5">
-                  <span className="block text-xs font-medium text-slate-700">
-                    活动地点
-                  </span>
+                  <span className="block text-xs font-medium text-slate-700">活动地点</span>
                   <input
                     type="text"
                     value={activityForm.location}
@@ -648,9 +622,7 @@ export function OrganizationWorkspace() {
                 </label>
 
                 <label className="space-y-1.5">
-                  <span className="block text-xs font-medium text-slate-700">
-                    内容场景分类
-                  </span>
+                  <span className="block text-xs font-medium text-slate-700">内容场景分类</span>
                   <select
                     value={activityForm.category}
                     onChange={(e) =>
@@ -670,9 +642,7 @@ export function OrganizationWorkspace() {
                 </label>
 
                 <label className="space-y-1.5">
-                  <span className="block text-xs font-medium text-slate-700">
-                    活动状态
-                  </span>
+                  <span className="block text-xs font-medium text-slate-700">活动状态</span>
                   <select
                     value={activityForm.status}
                     onChange={(e) =>
@@ -744,9 +714,7 @@ export function OrganizationWorkspace() {
                 </label>
 
                 <label className="space-y-1.5 sm:col-span-2">
-                  <span className="block text-xs font-medium text-slate-700">
-                    隐私与合规备注
-                  </span>
+                  <span className="block text-xs font-medium text-slate-700">隐私与合规备注</span>
                   <input
                     type="text"
                     value={activityForm.notes}
@@ -762,9 +730,7 @@ export function OrganizationWorkspace() {
                 </label>
               </div>
 
-              {formError && (
-                <p className="mt-3 text-xs text-rose-600">{formError}</p>
-              )}
+              {formError && <p className="mt-3 text-xs text-rose-600">{formError}</p>}
 
               <div className="mt-5 flex items-center justify-end gap-2 border-t border-[#F1F3F6] pt-4">
                 <button

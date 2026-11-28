@@ -7,19 +7,9 @@ export type PlatformId = "douyin" | "toutiao" | "xiaohongshu" | "wechat";
 export type CharityScenarioId = "story" | "activity" | "science";
 
 export type ContentTypeId =
-  | CharityScenarioId
-  | "knowledge"
-  | "emotion"
-  | "hotspot"
-  | "review"
-  | "opinion";
+  CharityScenarioId | "knowledge" | "emotion" | "hotspot" | "review" | "opinion";
 
-export type ToneId =
-  | "authentic"
-  | "sharp"
-  | "warm"
-  | "humorous"
-  | "professional";
+export type ToneId = "authentic" | "sharp" | "warm" | "humorous" | "professional";
 
 export type WordCountId = "short" | "medium" | "long";
 
@@ -70,7 +60,8 @@ export const PLATFORMS: Record<PlatformId, PlatformMeta> = {
     id: "xiaohongshu",
     name: "小红书",
     tagline: "强种草 · 封面吸睛",
-    description: "注重首图质感、情绪共鸣与实用干货清单，分段轻快易读，擅长以真实体验撬动收藏与评论。",
+    description:
+      "注重首图质感、情绪共鸣与实用干货清单，分段轻快易读，擅长以真实体验撬动收藏与评论。",
     accentColor: "#E11D48",
     badgeBg: "bg-rose-50",
     badgeText: "text-rose-700",

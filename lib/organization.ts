@@ -68,7 +68,8 @@ export const INITIAL_ACTIVITIES: ActivityArchive[] = [
     fundOrGoods: "募集善款18,500元，落地捐赠少儿绘本与科普图书620册、书架6组",
     highlights:
       "志愿者利用周末完成6间教室图书角搭建，受助学生王小明（需化名）第一次读到天文绘本，主动担任班级图书管理员。现场完成了全部图书编号与借阅登记。",
-    notes: "对外发布时受助学生姓名、具体班级与家庭住址须全部做化名及模糊处理，严禁出现未打码儿童正脸。",
+    notes:
+      "对外发布时受助学生姓名、具体班级与家庭住址须全部做化名及模糊处理，严禁出现未打码儿童正脸。",
     status: "completed",
     createdAt: "2026-11-19T10:00:00.000Z",
     updatedAt: "2026-11-19T10:00:00.000Z",
@@ -106,7 +107,7 @@ export interface ActivityContextPayload {
 
 export function buildActivityContextPayload(
   org: OrganizationProfile,
-  activity?: ActivityArchive | null
+  activity?: ActivityArchive | null,
 ): ActivityContextPayload {
   if (!activity) {
     return {
@@ -130,9 +131,7 @@ export function buildActivityContextPayload(
   };
 }
 
-export function formatActivityContextForPrompt(
-  ctx?: ActivityContextPayload
-): string {
+export function formatActivityContextForPrompt(ctx?: ActivityContextPayload): string {
   if (!ctx) return "";
   const lines: string[] = [];
   if (ctx.orgName) {

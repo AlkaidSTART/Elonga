@@ -125,27 +125,23 @@ export function buildDemoOverviewStats(today: Date | null): OverviewStats {
 
 export function computeOverviewStats(
   history: CopywritingResult[],
-  today: Date | null
+  today: Date | null,
 ): OverviewStats {
   const totalCreated = history.length;
   const totalPublished = history.filter((item) => item.isPublished).length;
-  const totalArchived = history.filter(
-    (item) => item.publishArchive?.archived
-  ).length;
+  const totalArchived = history.filter((item) => item.publishArchive?.archived).length;
   const totalViral = history.filter((item) => item.isViral).length;
   const totalViews = history.reduce(
     (sum, item) => sum + (item.publishArchive?.metrics.views ?? 0),
-    0
+    0,
   );
   const totalLikes = history.reduce(
     (sum, item) => sum + (item.publishArchive?.metrics.likes ?? 0),
-    0
+    0,
   );
 
-  const publishRate =
-    totalCreated > 0 ? Math.round((totalPublished / totalCreated) * 100) : 0;
-  const viralRate =
-    totalCreated > 0 ? Math.round((totalViral / totalCreated) * 100) : 0;
+  const publishRate = totalCreated > 0 ? Math.round((totalPublished / totalCreated) * 100) : 0;
+  const viralRate = totalCreated > 0 ? Math.round((totalViral / totalCreated) * 100) : 0;
 
   // Use published count as primary share denominator when any item is published;
   // otherwise fall back to created count so platform distribution stays informative.
@@ -172,19 +168,15 @@ export function computeOverviewStats(
   });
 
   const activePlatformsCount = platformStats.filter((p) =>
-    totalPublished > 0 ? p.publishedCount > 0 : p.createdCount > 0
+    totalPublished > 0 ? p.publishedCount > 0 : p.createdCount > 0,
   ).length;
 
   const sortedByMain = [...platformStats].sort((a, b) =>
-    totalPublished > 0
-      ? b.publishedCount - a.publishedCount
-      : b.createdCount - a.createdCount
+    totalPublished > 0 ? b.publishedCount - a.publishedCount : b.createdCount - a.createdCount,
   );
   const topPlatformName =
     sortedByMain[0] &&
-    (totalPublished > 0
-      ? sortedByMain[0].publishedCount > 0
-      : sortedByMain[0].createdCount > 0)
+    (totalPublished > 0 ? sortedByMain[0].publishedCount > 0 : sortedByMain[0].createdCount > 0)
       ? sortedByMain[0].name
       : "暂无";
 
@@ -195,15 +187,14 @@ export function computeOverviewStats(
         const dateKey = d.toISOString().slice(0, 10);
 
         const createdCount = history.filter(
-          (item) => item.createdAt.slice(0, 10) === dateKey
+          (item) => item.createdAt.slice(0, 10) === dateKey,
         ).length;
         const publishedCount = history.filter(
           (item) =>
-            item.isPublished &&
-            (item.publishedAt ?? item.createdAt).slice(0, 10) === dateKey
+            item.isPublished && (item.publishedAt ?? item.createdAt).slice(0, 10) === dateKey,
         ).length;
         const viralCount = history.filter(
-          (item) => item.isViral && item.createdAt.slice(0, 10) === dateKey
+          (item) => item.isViral && item.createdAt.slice(0, 10) === dateKey,
         ).length;
 
         return {

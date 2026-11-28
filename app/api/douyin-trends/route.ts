@@ -18,10 +18,7 @@ export async function POST(req: Request) {
       body.platform && body.platform in PLATFORMS ? body.platform : "douyin";
 
     if (!topic) {
-      return NextResponse.json(
-        { error: "请先提供需要调研的公益主题" },
-        { status: 400 }
-      );
+      return NextResponse.json({ error: "请先提供需要调研的公益主题" }, { status: 400 });
     }
 
     const start = Date.now();
@@ -45,9 +42,6 @@ export async function POST(req: Request) {
     });
   } catch (err) {
     const message = err instanceof Error ? err.message : "未知错误";
-    return NextResponse.json(
-      { error: `平台爆款调研失败: ${message}` },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: `平台爆款调研失败: ${message}` }, { status: 500 });
   }
 }

@@ -36,7 +36,7 @@ async function runAutoRedact(
   width: number,
   height: number,
   categories: AutoRedactCategory[],
-  modelConfig: ModelConfig
+  modelConfig: ModelConfig,
 ): Promise<{ url: string; note: string }> {
   const activeCategories: AutoRedactCategory[] =
     categories.length > 0 ? categories : ["text", "face", "qrcode"];
@@ -109,7 +109,7 @@ async function runStylize2D(
   preset: Style2DPreset,
   stylePrompt: string,
   strength: number,
-  modelConfig: ModelConfig
+  modelConfig: ModelConfig,
 ): Promise<{ url: string; note: string }> {
   try {
     const res = await fetch("/api/stylize-2d", {
@@ -150,7 +150,7 @@ export async function processWorkflowImage(
   width: number,
   height: number,
   options: ImageProcessingOptions,
-  modelConfig: ModelConfig
+  modelConfig: ModelConfig,
 ): Promise<ImageProcessingResult> {
   let currentUrl = originalUrl;
   const notes: string[] = [];
@@ -161,7 +161,7 @@ export async function processWorkflowImage(
       width,
       height,
       options.redactCategories,
-      modelConfig
+      modelConfig,
     );
     currentUrl = redacted.url;
     notes.push(redacted.note);
@@ -173,7 +173,7 @@ export async function processWorkflowImage(
       options.stylePreset,
       options.stylePrompt ?? "",
       options.stylizeStrength ?? 0.65,
-      modelConfig
+      modelConfig,
     );
     currentUrl = stylized.url;
     notes.push(stylized.note);

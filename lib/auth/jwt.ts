@@ -33,10 +33,7 @@ function base64UrlEncodeBytes(bytes: Uint8Array): string {
   for (let i = 0; i < bytes.length; i += 1) {
     binary += String.fromCharCode(bytes[i]);
   }
-  return btoa(binary)
-    .replace(/\+/g, "-")
-    .replace(/\//g, "_")
-    .replace(/=+$/g, "");
+  return btoa(binary).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/g, "");
 }
 
 function base64UrlEncodeString(value: string): string {
@@ -65,13 +62,13 @@ async function importHmacKey(secret: string): Promise<CryptoKey> {
     new TextEncoder().encode(secret),
     { name: "HMAC", hash: "SHA-256" },
     false,
-    ["sign", "verify"]
+    ["sign", "verify"],
   );
 }
 
 export async function signSessionJwt(
   user: AuthUser,
-  maxAgeSeconds: number = DEFAULT_SESSION_MAX_AGE
+  maxAgeSeconds: number = DEFAULT_SESSION_MAX_AGE,
 ): Promise<string> {
   const now = Math.floor(Date.now() / 1000);
   const header = { alg: "HS256", typ: "JWT" };
@@ -95,7 +92,7 @@ export async function signSessionJwt(
   const signatureBuffer = await crypto.subtle.sign(
     "HMAC",
     key,
-    new TextEncoder().encode(signingInput)
+    new TextEncoder().encode(signingInput),
   );
   const encodedSignature = base64UrlEncodeBytes(new Uint8Array(signatureBuffer));
 
@@ -103,7 +100,7 @@ export async function signSessionJwt(
 }
 
 export async function verifySessionJwt(
-  token: string | undefined | null
+  token: string | undefined | null,
 ): Promise<SessionPayload | null> {
   if (!token) return null;
 
@@ -132,15 +129,13 @@ export async function verifySessionJwt(
       key,
       signatureBytes.buffer.slice(
         signatureBytes.byteOffset,
-        signatureBytes.byteOffset + signatureBytes.byteLength
+        signatureBytes.byteOffset + signatureBytes.byteLength,
       ) as ArrayBuffer,
-      new TextEncoder().encode(signingInput)
+      new TextEncoder().encode(signingInput),
     );
     if (!valid) return null;
 
-    const payload = JSON.parse(
-      new TextDecoder().decode(payloadBytes)
-    ) as Partial<SessionPayload>;
+    const payload = JSON.parse(new TextDecoder().decode(payloadBytes)) as Partial<SessionPayload>;
 
     const now = Math.floor(Date.now() / 1000);
     if (

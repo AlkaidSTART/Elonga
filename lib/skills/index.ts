@@ -1,11 +1,7 @@
 import { charityCopywritingSkill } from "./charity-copywriting";
 import { douyinTrendResearchSkill } from "./douyin-trend-research";
 import { trafficOptimizerSkill } from "./traffic-optimizer";
-import type {
-  CharityCopywritingInput,
-  SkillTraceItem,
-  WorkflowOutput,
-} from "./types";
+import type { CharityCopywritingInput, SkillTraceItem, WorkflowOutput } from "./types";
 
 export const SKILLS_REGISTRY = [
   {
@@ -29,15 +25,14 @@ export const SKILLS_REGISTRY = [
 ];
 
 export async function runCopywritingSkillsWorkflow(
-  input: CharityCopywritingInput
+  input: CharityCopywritingInput,
 ): Promise<WorkflowOutput> {
   const skillTraces: SkillTraceItem[] = [];
 
   // Skill 1: 对应平台爆款趋势调研（仅当传入调研结果与当前平台一致时才复用，否则独立调用）
   let trendInsights =
     input.trendInsights &&
-    (!input.trendInsights.platform ||
-      input.trendInsights.platform === input.platform)
+    (!input.trendInsights.platform || input.trendInsights.platform === input.platform)
       ? input.trendInsights
       : undefined;
   if (trendInsights) {
@@ -103,8 +98,4 @@ export async function runCopywritingSkillsWorkflow(
   };
 }
 
-export {
-  douyinTrendResearchSkill,
-  charityCopywritingSkill,
-  trafficOptimizerSkill,
-};
+export { douyinTrendResearchSkill, charityCopywritingSkill, trafficOptimizerSkill };

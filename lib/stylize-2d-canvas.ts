@@ -52,7 +52,7 @@ function clamp(v: number): number {
 export async function stylizeImage2DLocal(
   imageDataUrl: string,
   preset: Style2DPreset,
-  strength: number
+  strength: number,
 ): Promise<string> {
   const img = await new Promise<HTMLImageElement>((resolve, reject) => {
     const el = new Image();
@@ -92,10 +92,7 @@ export async function stylizeImage2DLocal(
   const lum = new Float32Array(w * h);
   for (let i = 0; i < w * h; i++) {
     const idx = i * 4;
-    lum[i] =
-      0.299 * sharpData[idx] +
-      0.587 * sharpData[idx + 1] +
-      0.114 * sharpData[idx + 2];
+    lum[i] = 0.299 * sharpData[idx] + 0.587 * sharpData[idx + 1] + 0.114 * sharpData[idx + 2];
   }
 
   const out = ctx.createImageData(w, h);
@@ -144,7 +141,7 @@ export async function stylizeImage2DLocal(
         if (mag > cfg.edgeThreshold) {
           const edgeAlpha = Math.min(
             cfg.edgeDarkness,
-            ((mag - cfg.edgeThreshold) / 140) * cfg.edgeDarkness
+            ((mag - cfg.edgeThreshold) / 140) * cfg.edgeDarkness,
           );
           // Deep ink blue-slate tone instead of harsh pure black
           r = r * (1 - edgeAlpha) + 26 * edgeAlpha;

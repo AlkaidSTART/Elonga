@@ -9,6 +9,7 @@ Elonga 是一款面向公益机构与内容团队的一体化新媒体创作与�
 ## 核心功能
 
 ### 1. 内容创作工作流（`/workflow`）
+
 - **多平台适配**：支持 **抖音、今日头条、小红书、微信公众号** 四大平台，针对各平台算法特征提供推荐字数、黄金开头钩子、排版策略与互动引导建议。
 - **三段式 Skill 协作链路**：
   1. `douyin-trend-research` — 平台爆款趋势调研，提炼热门关键词与爆款开头钩子；
@@ -18,18 +19,22 @@ Elonga 是一款面向公益机构与内容团队的一体化新媒体创作与�
 - **图文混排与多格式导出**：支持为稿件批量上传配图并一键执行打码/风格化，自动进行图文混排，支持导出为 **Word（`.docx`）**、**Markdown（`.md`）** 和 **PDF**。
 
 ### 2. 图片工坊（`/image-studio`）
+
 - **智能隐私打码与手工精修**：支持人脸、敏感文本、二维码/条形码的自动检测（支持配置 Vision 大模型识别，未配置时自动降级为本地检测），基于 Canvas 与 StackBlur 提供马赛克/高斯模糊区域打码与手动涂抹编辑。
 - **二维风格化转换**：内置 **日漫（`anime`）**、**绘本（`ghibli`）**、**扁平（`cel`）**、**水彩（`watercolor`）** 四种风格预设，支持自定义风格提示词；配置图像模型后调用云端图像编辑接口，未配置时自动使用本地 Canvas 算法处理。
 
 ### 3. 工作台概览与运营月报（`/`、`/reports`）
+
 - **数据看板**：汇总机构内容创作量、审校通过率、发布与归档数据及各平台互动表现，集成 ECharts 可视化图表。
 - **运营月报生成**：基于指定月份的活动档案与发布归档数据，一键生成「内部团队复盘月报」或「面向资助方/理事会的对外公益月报」，支持 AI 撰写与本地结构化模板降级。
 
 ### 4. 机构中心与创作记录（`/organization`、`/history`）
+
 - **机构中心**：维护机构基本信息、使命愿景、合规词库及公益活动台账（时间、地点、参与人数、物资/资金、活动亮点），供内容创作与月报直接引用。
 - **创作记录**：管理历史稿件，支持标记已发布/爆款、回填平台发布链接与阅读/点赞/评论/转发数据并归档，内置各大平台创作者后台快捷入口。
 
 ### 5. 模型配置、个人中心与鉴权（`/settings`、`/profile`、`/login`）
+
 - **可视化模型配置**：支持在界面内配置文本大模型与图像大模型的 `Base URL`、`API Key` 与模型名称。
 - **会话鉴权**：基于 HTTP-only Cookie + JWT 实现登录态校验，通过 `proxy.ts` 保护页面与受保护 API 路由；支持修改个人资料与密码。
 
@@ -37,15 +42,15 @@ Elonga 是一款面向公益机构与内容团队的一体化新媒体创作与�
 
 ## 技术栈
 
-| 类别 | 技术选型 |
-| --- | --- |
-| 应用框架 | Next.js `16.4.6`（App Router、Standalone 输出、Turbopack） |
-| 前端基础 | React `19.3.0`、TypeScript `5`、Tailwind CSS `4.3.3` |
-| 状态管理 | Zustand `5.1.0`（支持浏览器 `localStorage` 持久化） |
-| 动效与图标 | Framer Motion `14.14.0`、Lucide React `1.77.0` |
+| 类别               | 技术选型                                                   |
+| ------------------ | ---------------------------------------------------------- |
+| 应用框架           | Next.js `16.4.6`（App Router、Standalone 输出、Turbopack） |
+| 前端基础           | React `19.3.0`、TypeScript `5`、Tailwind CSS `4.3.3`       |
+| 状态管理           | Zustand `5.1.0`（支持浏览器 `localStorage` 持久化）        |
+| 动效与图标         | Framer Motion `14.14.0`、Lucide React `1.77.0`             |
 | 图表 / 文档 / 图像 | ECharts `6.1.0`、`docx` `9.16.0`、StackBlur Canvas `3.0.1` |
-| 运行环境与包管理 | Node.js `22+`、`pnpm@11.17.0` |
-| 容器化与数据库 | Docker、Docker Compose、MySQL `8.0` |
+| 运行环境与包管理   | Node.js `22+`、`pnpm@11.17.0`                              |
+| 容器化与数据库     | Docker、Docker Compose、MySQL `8.0`                        |
 
 ---
 
@@ -96,10 +101,10 @@ pnpm dev
 
 系统内置两个演示账号（支持用户名或邮箱登录，初始密码可通过环境变量覆盖）：
 
-| 角色 | 用户名 | 邮箱 | 默认密码 | 对应环境变量 |
-| --- | --- | --- | --- | --- |
-| 主理人 / 管理员 | `admin` | `admin@elonga.cn` | `elonga2026` | `AUTH_ADMIN_PASSWORD` |
-| 内容运营 | `editor` | `editor@elonga.cn` | `editor2026` | `AUTH_EDITOR_PASSWORD` |
+| 角色            | 用户名   | 邮箱               | 默认密码     | 对应环境变量           |
+| --------------- | -------- | ------------------ | ------------ | ---------------------- |
+| 主理人 / 管理员 | `admin`  | `admin@elonga.cn`  | `elonga2026` | `AUTH_ADMIN_PASSWORD`  |
+| 内容运营        | `editor` | `editor@elonga.cn` | `editor2026` | `AUTH_EDITOR_PASSWORD` |
 
 ---
 
@@ -107,27 +112,27 @@ pnpm dev
 
 完整模板见 [`.env.example`](./.env.example)。所有 AI 相关环境变量均为**可选项**，也可以在前端「模型配置（`/settings`）」页面中动态填写（前端配置优先级高于服务端环境变量）。
 
-| 变量名 | 默认值 | 说明 |
-| --- | --- | --- |
-| `APP_PORT` | `3000` | 应用对外暴露端口 |
-| `MYSQL_PORT` | `3306` | MySQL 宿主机映射端口 |
-| `MYSQL_DATABASE` | `elonga` | MySQL 数据库名 |
-| `MYSQL_USER` / `MYSQL_PASSWORD` | `elonga` / `elonga_pass_2026` | MySQL 应用连接账号与密码 |
-| `MYSQL_ROOT_PASSWORD` | `elonga_root_2026` | MySQL root 密码 |
-| `JWT_SECRET` | — | JWT 会话签名密钥（生产环境务必使用 32 位以上随机串） |
-| `AUTH_COOKIE_SECURE` | `false` | 本地 HTTP 保持 `false`；HTTPS 部署建议设为 `true` |
-| `AUTH_ADMIN_PASSWORD` | `elonga2026` | `admin` 账号初始密码 |
-| `AUTH_EDITOR_PASSWORD` | `editor2026` | `editor` 账号初始密码 |
-| `DEEPSEEK_API_KEY` / `TEXT_API_KEY` / `OPENAI_API_KEY` | — | 文本大模型 API Key（用于文案生成、趋势分析与月报撰写） |
-| `DEEPSEEK_BASE_URL` / `TEXT_BASE_URL` | `https://api.deepseek.com/v1` | 文本大模型 OpenAI 兼容接口地址 |
-| `DEEPSEEK_MODEL` | `deepseek-chat` | 文本大模型名称 |
-| `IMAGE_API_KEY` / `ARK_API_KEY` | — | 图像大模型 API Key（用于图片二维风格化） |
-| `IMAGE_BASE_URL` / `ARK_BASE_URL` | `https://ark.cn-beijing.volces.com/api/v3` | 图像编辑接口地址 |
-| `IMAGE_MODEL` | `doubao-seedream-3-0-t2i-250415` | 图像模型名称 |
-| `VISION_API_KEY` | — | 多模态视觉模型 API Key（用于敏感区域自动识别打码） |
-| `VISION_BASE_URL` | `https://api.openai.com/v1` | 视觉模型接口地址 |
-| `VISION_MODEL` | `gpt-4o-mini` | 视觉模型名称 |
-| `DOUYIN_TRENDS_API_URL` / `DOUYIN_TRENDS_API_KEY` | — | 可选的外部热点趋势数据源接口与密钥 |
+| 变量名                                                 | 默认值                                     | 说明                                                   |
+| ------------------------------------------------------ | ------------------------------------------ | ------------------------------------------------------ |
+| `APP_PORT`                                             | `3000`                                     | 应用对外暴露端口                                       |
+| `MYSQL_PORT`                                           | `3306`                                     | MySQL 宿主机映射端口                                   |
+| `MYSQL_DATABASE`                                       | `elonga`                                   | MySQL 数据库名                                         |
+| `MYSQL_USER` / `MYSQL_PASSWORD`                        | `elonga` / `elonga_pass_2026`              | MySQL 应用连接账号与密码                               |
+| `MYSQL_ROOT_PASSWORD`                                  | `elonga_root_2026`                         | MySQL root 密码                                        |
+| `JWT_SECRET`                                           | —                                          | JWT 会话签名密钥（生产环境务必使用 32 位以上随机串）   |
+| `AUTH_COOKIE_SECURE`                                   | `false`                                    | 本地 HTTP 保持 `false`；HTTPS 部署建议设为 `true`      |
+| `AUTH_ADMIN_PASSWORD`                                  | `elonga2026`                               | `admin` 账号初始密码                                   |
+| `AUTH_EDITOR_PASSWORD`                                 | `editor2026`                               | `editor` 账号初始密码                                  |
+| `DEEPSEEK_API_KEY` / `TEXT_API_KEY` / `OPENAI_API_KEY` | —                                          | 文本大模型 API Key（用于文案生成、趋势分析与月报撰写） |
+| `DEEPSEEK_BASE_URL` / `TEXT_BASE_URL`                  | `https://api.deepseek.com/v1`              | 文本大模型 OpenAI 兼容接口地址                         |
+| `DEEPSEEK_MODEL`                                       | `deepseek-chat`                            | 文本大模型名称                                         |
+| `IMAGE_API_KEY` / `ARK_API_KEY`                        | —                                          | 图像大模型 API Key（用于图片二维风格化）               |
+| `IMAGE_BASE_URL` / `ARK_BASE_URL`                      | `https://ark.cn-beijing.volces.com/api/v3` | 图像编辑接口地址                                       |
+| `IMAGE_MODEL`                                          | `doubao-seedream-3-0-t2i-250415`           | 图像模型名称                                           |
+| `VISION_API_KEY`                                       | —                                          | 多模态视觉模型 API Key（用于敏感区域自动识别打码）     |
+| `VISION_BASE_URL`                                      | `https://api.openai.com/v1`                | 视觉模型接口地址                                       |
+| `VISION_MODEL`                                         | `gpt-4o-mini`                              | 视觉模型名称                                           |
+| `DOUYIN_TRENDS_API_URL` / `DOUYIN_TRENDS_API_KEY`      | —                                          | 可选的外部热点趋势数据源接口与密钥                     |
 
 ---
 

@@ -16,12 +16,7 @@ import {
   SlidersHorizontal,
   Trash2,
 } from "lucide-react";
-import {
-  CONTENT_TYPES,
-  PLATFORMS,
-  WORD_COUNTS,
-  type PlatformId,
-} from "@/lib/platforms";
+import { CONTENT_TYPES, PLATFORMS, WORD_COUNTS, type PlatformId } from "@/lib/platforms";
 import { buildActivityContextPayload } from "@/lib/organization";
 import { evaluatePublishReview } from "@/lib/publish-review";
 import type { DouyinTrendInsights } from "@/lib/skills/types";
@@ -72,7 +67,7 @@ export function CopywritingWorkspace() {
 
   const selectedActivity = useMemo(
     () => activities.find((a) => a.id === selectedActivityId) ?? null,
-    [activities, selectedActivityId]
+    [activities, selectedActivityId],
   );
 
   const linkedResultActivity = useMemo(() => {
@@ -85,9 +80,9 @@ export function CopywritingWorkspace() {
   const [showHistory, setShowHistory] = useState(false);
   const [showMoreOptions, setShowMoreOptions] = useState(false);
   const [selectedTitleIdx, setSelectedTitleIdx] = useState(0);
-  const [generationStage, setGenerationStage] = useState<
-    "idle" | "researching" | "writing"
-  >("idle");
+  const [generationStage, setGenerationStage] = useState<"idle" | "researching" | "writing">(
+    "idle",
+  );
 
   const handleCopy = async (text: string, key: string) => {
     try {
@@ -137,10 +132,7 @@ export function CopywritingWorkspace() {
       }
 
       setGenerationStage("writing");
-      const activityContext = buildActivityContextPayload(
-        orgProfile,
-        selectedActivity
-      );
+      const activityContext = buildActivityContextPayload(orgProfile, selectedActivity);
       const res = await fetch("/api/copywriting", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -166,9 +158,7 @@ export function CopywritingWorkspace() {
       setCurrentResult(data.result);
       addToHistory(data.result);
     } catch (err) {
-      setGenerationError(
-        err instanceof Error ? err.message : "请求失败，请检查配置"
-      );
+      setGenerationError(err instanceof Error ? err.message : "请求失败，请检查配置");
     } finally {
       setIsGenerating(false);
       setGenerationStage("idle");
@@ -201,9 +191,7 @@ export function CopywritingWorkspace() {
       currentResult.hook ? `\n${currentResult.hook}` : "",
       currentResult.body ? `\n${currentResult.body}` : "",
       currentResult.cta ? `\n${currentResult.cta}` : "",
-      currentResult.tags.length > 0
-        ? `\n${currentResult.tags.map((t) => `#${t}`).join(" ")}`
-        : "",
+      currentResult.tags.length > 0 ? `\n${currentResult.tags.map((t) => `#${t}`).join(" ")}` : "",
     ]
       .filter(Boolean)
       .join("\n");
@@ -218,9 +206,7 @@ export function CopywritingWorkspace() {
       {/* Top Open Control Ribbon (No Card Border) */}
       <header className="flex flex-wrap items-center justify-between gap-4 border-b border-[#DFDCD2] pb-4">
         <div className="flex flex-wrap items-center gap-4">
-          <h1 className="text-xl font-semibold tracking-tight text-[#141413]">
-            推流文案
-          </h1>
+          <h1 className="text-xl font-semibold tracking-tight text-[#141413]">推流文案</h1>
 
           {/* Platform Segmented Strip */}
           <div className="flex items-center gap-1 rounded-full bg-[#ECE9E1] p-1">
@@ -233,9 +219,7 @@ export function CopywritingWorkspace() {
                   type="button"
                   onClick={() => setPlatform(pid)}
                   className={`relative rounded-full px-3.5 py-1 text-xs font-medium transition-colors ${
-                    isSelected
-                      ? "text-white"
-                      : "text-zinc-600 hover:text-[#141413]"
+                    isSelected ? "text-white" : "text-zinc-600 hover:text-[#141413]"
                   }`}
                 >
                   {isSelected && (
@@ -289,9 +273,7 @@ export function CopywritingWorkspace() {
                 type="button"
                 onClick={() => setWordCount(wc.id)}
                 className={`relative rounded-full px-2.5 py-0.5 text-[11px] font-medium transition-colors ${
-                  wordCount === wc.id
-                    ? "text-[#141413]"
-                    : "text-zinc-500 hover:text-zinc-800"
+                  wordCount === wc.id ? "text-[#141413]" : "text-zinc-500 hover:text-zinc-800"
                 }`}
               >
                 {wordCount === wc.id && (
@@ -357,9 +339,7 @@ export function CopywritingWorkspace() {
                       <span className="text-[10px] font-medium text-[#0F6E5D]">
                         {PLATFORMS[item.platform].name}
                       </span>
-                      <span className="max-w-[180px] truncate text-[#141413]">
-                        {item.topic}
-                      </span>
+                      <span className="max-w-[180px] truncate text-[#141413]">{item.topic}</span>
                     </button>
                     <button
                       type="button"
@@ -408,9 +388,7 @@ export function CopywritingWorkspace() {
                 ))}
               </select>
               {selectedActivity && (
-                <span className="text-[11px] text-zinc-500">
-                  AI 将自动读取人数、物资与现场亮点
-                </span>
+                <span className="text-[11px] text-zinc-500">AI 将自动读取人数、物资与现场亮点</span>
               )}
             </div>
             <Link
@@ -438,9 +416,7 @@ export function CopywritingWorkspace() {
               {isGenerating ? (
                 <>
                   <Loader2 className="h-3.5 w-3.5 animate-spin" />
-                  <span>
-                    {generationStage === "researching" ? "调研中" : "撰稿中"}
-                  </span>
+                  <span>{generationStage === "researching" ? "调研中" : "撰稿中"}</span>
                 </>
               ) : (
                 <>
@@ -470,9 +446,7 @@ export function CopywritingWorkspace() {
               type="button"
               onClick={() => setShowMoreOptions((v) => !v)}
               className={`inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-[11px] font-medium transition ${
-                showMoreOptions
-                  ? "bg-[#161715] text-white"
-                  : "text-zinc-500 hover:text-[#141413]"
+                showMoreOptions ? "bg-[#161715] text-white" : "text-zinc-500 hover:text-[#141413]"
               }`}
             >
               <SlidersHorizontal className="h-3 w-3" />
@@ -510,9 +484,7 @@ export function CopywritingWorkspace() {
           </AnimatePresence>
         </div>
 
-        {generationError && (
-          <p className="mt-2.5 px-3 text-xs text-rose-600">{generationError}</p>
-        )}
+        {generationError && <p className="mt-2.5 px-3 text-xs text-rose-600">{generationError}</p>}
       </section>
 
       {/* Open Editorial Manuscript Spread */}
@@ -526,9 +498,7 @@ export function CopywritingWorkspace() {
             className="flex min-h-[300px] flex-col items-center justify-center text-center"
           >
             <div className="h-8 w-px bg-[#D6D2C8]" />
-            <p className="mt-4 font-editorial text-lg text-zinc-400">
-              等待落笔
-            </p>
+            <p className="mt-4 font-editorial text-lg text-zinc-400">等待落笔</p>
           </motion.div>
         ) : (
           <motion.div
@@ -612,14 +582,8 @@ export function CopywritingWorkspace() {
                       }`}
                     >
                       <div className="flex items-baseline gap-3">
-                        <span className="font-mono text-[11px] text-zinc-400">
-                          0{idx + 1}
-                        </span>
-                        <span
-                          className={`text-sm ${
-                            active ? "font-semibold" : "font-normal"
-                          }`}
-                        >
+                        <span className="font-mono text-[11px] text-zinc-400">0{idx + 1}</span>
+                        <span className={`text-sm ${active ? "font-semibold" : "font-normal"}`}>
                           {title}
                         </span>
                       </div>
@@ -646,9 +610,7 @@ export function CopywritingWorkspace() {
               {/* Golden Hook */}
               <div className="my-7 border-l-2 border-[#0F6E5D] pl-4">
                 <div className="mb-1 flex items-center justify-between">
-                  <span className="text-[11px] font-medium text-[#0F6E5D]">
-                    前 3 秒钩子
-                  </span>
+                  <span className="text-[11px] font-medium text-[#0F6E5D]">前 3 秒钩子</span>
                   <button
                     type="button"
                     onClick={() => handleCopy(currentResult.hook, "hook")}
@@ -700,9 +662,7 @@ export function CopywritingWorkspace() {
               {currentResult.trendInsights && (
                 <div className="border-t border-[#DFDCD2] pt-4">
                   <div className="mb-2.5 flex items-center justify-between">
-                    <span className="text-xs font-semibold text-[#141413]">
-                      热词参考
-                    </span>
+                    <span className="text-xs font-semibold text-[#141413]">热词参考</span>
                     <span className="font-mono text-[10px] text-zinc-400">
                       {currentResult.trendInsights.sourceLabel}
                     </span>
@@ -723,12 +683,8 @@ export function CopywritingWorkspace() {
               {/* CTA */}
               {currentResult.cta && (
                 <div className="border-t border-[#DFDCD2] pt-4">
-                  <span className="mb-2 block text-xs font-semibold text-[#141413]">
-                    互动引导
-                  </span>
-                  <p className="text-xs leading-relaxed text-zinc-600">
-                    {currentResult.cta}
-                  </p>
+                  <span className="mb-2 block text-xs font-semibold text-[#141413]">互动引导</span>
+                  <p className="text-xs leading-relaxed text-zinc-600">{currentResult.cta}</p>
                 </div>
               )}
 
@@ -740,10 +696,7 @@ export function CopywritingWorkspace() {
                   </span>
                   <div className="flex flex-wrap gap-1.5">
                     {currentResult.tags.map((tag) => (
-                      <span
-                        key={tag}
-                        className="text-xs font-medium text-[#0F6E5D]"
-                      >
+                      <span key={tag} className="text-xs font-medium text-[#0F6E5D]">
                         #{tag}
                       </span>
                     ))}
@@ -754,15 +707,10 @@ export function CopywritingWorkspace() {
               {/* Platform Tips */}
               {currentResult.tips.length > 0 && (
                 <div className="border-t border-[#DFDCD2] pt-4">
-                  <span className="mb-2 block text-xs font-semibold text-[#141413]">
-                    发布建议
-                  </span>
+                  <span className="mb-2 block text-xs font-semibold text-[#141413]">发布建议</span>
                   <ul className="space-y-1.5">
                     {currentResult.tips.map((tip, i) => (
-                      <li
-                        key={i}
-                        className="text-xs leading-relaxed text-zinc-500"
-                      >
+                      <li key={i} className="text-xs leading-relaxed text-zinc-500">
                         — {tip}
                       </li>
                     ))}

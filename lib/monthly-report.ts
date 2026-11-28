@@ -66,50 +66,35 @@ export interface SavedMonthlyReport {
 const PLATFORM_ORDER: PlatformId[] = ["douyin", "toutiao", "xiaohongshu", "wechat"];
 
 function getItemMonth(item: CopywritingResult): string {
-  const refDate =
-    item.publishArchive?.publishedAt ?? item.publishedAt ?? item.createdAt;
+  const refDate = item.publishArchive?.publishedAt ?? item.publishedAt ?? item.createdAt;
   return refDate.slice(0, 7);
 }
 
 export function buildMonthlySnapshot(
   month: string,
   history: CopywritingResult[],
-  activities: ActivityArchive[]
+  activities: ActivityArchive[],
 ): MonthlyReportSnapshot {
   const monthItems = history.filter((item) => getItemMonth(item) === month);
   const monthActivities = activities.filter(
-    (act) => act.date.slice(0, 7) === month || act.createdAt.slice(0, 7) === month
+    (act) => act.date.slice(0, 7) === month || act.createdAt.slice(0, 7) === month,
   );
 
-  const platformBreakdown: MonthlyPlatformSummary[] = PLATFORM_ORDER.map(
-    (pid) => {
-      const items = monthItems.filter((item) => item.platform === pid);
-      return {
-        platform: pid,
-        platformName: PLATFORMS[pid].name,
-        createdCount: items.length,
-        publishedCount: items.filter((i) => i.isPublished).length,
-        archivedCount: items.filter((i) => i.publishArchive?.archived).length,
-        viralCount: items.filter((i) => i.isViral).length,
-        views: items.reduce(
-          (sum, i) => sum + (i.publishArchive?.metrics.views ?? 0),
-          0
-        ),
-        likes: items.reduce(
-          (sum, i) => sum + (i.publishArchive?.metrics.likes ?? 0),
-          0
-        ),
-        comments: items.reduce(
-          (sum, i) => sum + (i.publishArchive?.metrics.comments ?? 0),
-          0
-        ),
-        shares: items.reduce(
-          (sum, i) => sum + (i.publishArchive?.metrics.shares ?? 0),
-          0
-        ),
-      };
-    }
-  );
+  const platformBreakdown: MonthlyPlatformSummary[] = PLATFORM_ORDER.map((pid) => {
+    const items = monthItems.filter((item) => item.platform === pid);
+    return {
+      platform: pid,
+      platformName: PLATFORMS[pid].name,
+      createdCount: items.length,
+      publishedCount: items.filter((i) => i.isPublished).length,
+      archivedCount: items.filter((i) => i.publishArchive?.archived).length,
+      viralCount: items.filter((i) => i.isViral).length,
+      views: items.reduce((sum, i) => sum + (i.publishArchive?.metrics.views ?? 0), 0),
+      likes: items.reduce((sum, i) => sum + (i.publishArchive?.metrics.likes ?? 0), 0),
+      comments: items.reduce((sum, i) => sum + (i.publishArchive?.metrics.comments ?? 0), 0),
+      shares: items.reduce((sum, i) => sum + (i.publishArchive?.metrics.shares ?? 0), 0),
+    };
+  });
 
   const digests: MonthlyArticleDigest[] = monthItems
     .map((item) => ({
@@ -137,8 +122,7 @@ export function buildMonthlySnapshot(
   return {
     month,
     createdCount: monthItems.length,
-    reviewApprovedCount: monthItems.filter((i) => i.reviewState?.approvedAt)
-      .length,
+    reviewApprovedCount: monthItems.filter((i) => i.reviewState?.approvedAt).length,
     publishedCount: monthItems.filter((i) => i.isPublished).length,
     archivedCount: monthItems.filter((i) => i.publishArchive?.archived).length,
     viralCount: monthItems.filter((i) => i.isViral).length,
@@ -161,13 +145,11 @@ export function generateLocalMonthlyReport(params: {
   const { orgProfile, snapshot, focus } = params;
   const [year, mon] = snapshot.month.split("-");
   const monthLabel = `${year}年${Number(mon)}月`;
-  const focusLabel =
-    focus === "donor" ? "对外传播与公益进展月报" : "新媒体运营复盘月报";
+  const focusLabel = focus === "donor" ? "对外传播与公益进展月报" : "新媒体运营复盘月报";
   const title = `${orgProfile.name} ${monthLabel}${focusLabel}`;
 
   const topPlatform = [...snapshot.platformBreakdown].sort(
-    (a, b) =>
-      b.views + b.publishedCount * 500 - (a.views + a.publishedCount * 500)
+    (a, b) => b.views + b.publishedCount * 500 - (a.views + a.publishedCount * 500),
   )[0];
 
   const summary =
@@ -185,7 +167,7 @@ export function generateLocalMonthlyReport(params: {
     `二、各渠道表现对比`,
     ...snapshot.platformBreakdown.map(
       (p) =>
-        `- ${p.platformName}：创作 ${p.createdCount} 篇 / 发布 ${p.publishedCount} 篇 / 归档 ${p.archivedCount} 篇，回填播放/阅读 ${p.views.toLocaleString("zh-CN")}，点赞 ${p.likes.toLocaleString("zh-CN")}，转发 ${p.shares.toLocaleString("zh-CN")}`
+        `- ${p.platformName}：创作 ${p.createdCount} 篇 / 发布 ${p.publishedCount} 篇 / 归档 ${p.archivedCount} 篇，回填播放/阅读 ${p.views.toLocaleString("zh-CN")}，点赞 ${p.likes.toLocaleString("zh-CN")}，转发 ${p.shares.toLocaleString("zh-CN")}`,
     ),
     topPlatform && (topPlatform.createdCount > 0 || topPlatform.views > 0)
       ? `综合来看，本月主力传播渠道为「${topPlatform.platformName}」，建议下月继续保持该渠道的高频真实故事更新，并同步将优质素材二次改编至其余平台。`
@@ -195,15 +177,17 @@ export function generateLocalMonthlyReport(params: {
     ...(snapshot.activities.length > 0
       ? snapshot.activities.map(
           (act, idx) =>
-            `${idx + 1}. 【${act.title}】（${act.date || "日期待补"} · ${act.location || "项目现场"}）\n   参与/受益情况：${act.participantCount || "待补充"}；善款/物资：${act.fundOrGoods || "待补充"}。\n   亮点摘要：${act.highlights || "已建档留存。"}`
+            `${idx + 1}. 【${act.title}】（${act.date || "日期待补"} · ${act.location || "项目现场"}）\n   参与/受益情况：${act.participantCount || "待补充"}；善款/物资：${act.fundOrGoods || "待补充"}。\n   亮点摘要：${act.highlights || "已建档留存。"}`,
         )
-      : [`本月暂未在「机构中心」新增对应月份的活动档案，建议将每次线下行动及时建档，便于下月自动生成完整活动传播总结。`]),
+      : [
+          `本月暂未在「机构中心」新增对应月份的活动档案，建议将每次线下行动及时建档，便于下月自动生成完整活动传播总结。`,
+        ]),
     ``,
     `四、代表稿件与复盘亮点`,
     ...(snapshot.topArticles.length > 0
       ? snapshot.topArticles.map(
           (art, idx) =>
-            `${idx + 1}. [${art.platformName}] ${art.title}${art.isViral ? "（爆款）" : ""}\n   数据表现：播放/阅读 ${art.views.toLocaleString("zh-CN")}｜点赞 ${art.likes.toLocaleString("zh-CN")}｜评论 ${art.comments.toLocaleString("zh-CN")}｜转发 ${art.shares.toLocaleString("zh-CN")}${art.conversions ? `｜转化：${art.conversions}` : ""}${art.notes ? `\n   复盘备注：${art.notes}` : ""}`
+            `${idx + 1}. [${art.platformName}] ${art.title}${art.isViral ? "（爆款）" : ""}\n   数据表现：播放/阅读 ${art.views.toLocaleString("zh-CN")}｜点赞 ${art.likes.toLocaleString("zh-CN")}｜评论 ${art.comments.toLocaleString("zh-CN")}｜转发 ${art.shares.toLocaleString("zh-CN")}${art.conversions ? `｜转化：${art.conversions}` : ""}${art.notes ? `\n   复盘备注：${art.notes}` : ""}`,
         )
       : [`本月暂无已回填数据的重点稿件，建议发布后及时在「创作记录」中回填链接与核心指标。`]),
     ``,

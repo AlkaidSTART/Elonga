@@ -105,11 +105,9 @@ export function ProfileWorkspace() {
   // Preferences form state
   const [signature, setSignature] = useState("");
   const [preferredPlatforms, setPreferredPlatforms] = useState<PlatformId[]>(
-    DEFAULT_PERSONAL_EXTRAS.preferredPlatforms
+    DEFAULT_PERSONAL_EXTRAS.preferredPlatforms,
   );
-  const [defaultTone, setDefaultTone] = useState<ToneId>(
-    DEFAULT_PERSONAL_EXTRAS.defaultTone
-  );
+  const [defaultTone, setDefaultTone] = useState<ToneId>(DEFAULT_PERSONAL_EXTRAS.defaultTone);
   const [autoAppendSignature, setAutoAppendSignature] = useState(true);
   const [autoComplianceReminder, setAutoComplianceReminder] = useState(true);
   const [includeEditorInExport, setIncludeEditorInExport] = useState(true);
@@ -140,7 +138,7 @@ export function ProfileWorkspace() {
             user?: SessionUser;
             iat?: number;
             exp?: number;
-          } | null
+          } | null,
         ) => {
           if (cancelled) return;
           if (data?.authenticated && data.user) {
@@ -152,8 +150,7 @@ export function ProfileWorkspace() {
             setOrgName(data.user.orgName);
 
             const extras =
-              useProfileStore.getState().profilesByUserId[data.user.id] ??
-              DEFAULT_PERSONAL_EXTRAS;
+              useProfileStore.getState().profilesByUserId[data.user.id] ?? DEFAULT_PERSONAL_EXTRAS;
             setPhone(extras.phone);
             setWechat(extras.wechat);
             setLocation(extras.location);
@@ -168,7 +165,7 @@ export function ProfileWorkspace() {
             setIncludeEditorInExport(extras.includeEditorInExport);
           }
           setLoading(false);
-        }
+        },
       )
       .catch(() => {
         if (!cancelled) setLoading(false);
@@ -181,11 +178,11 @@ export function ProfileWorkspace() {
 
   const publishedCount = useMemo(
     () => history.filter((item) => item.isPublished).length,
-    [history]
+    [history],
   );
 
   const hasModelConfigured = Boolean(
-    modelConfig.textApiKey.trim() || modelConfig.imageApiKey.trim()
+    modelConfig.textApiKey.trim() || modelConfig.imageApiKey.trim(),
   );
 
   const accentMeta = getAvatarAccentMeta(avatarAccent);
@@ -276,8 +273,7 @@ export function ProfileWorkspace() {
     if (!user) return;
     updateExtras(user.id, {
       signature: signature.trim(),
-      preferredPlatforms:
-        preferredPlatforms.length > 0 ? preferredPlatforms : ["douyin"],
+      preferredPlatforms: preferredPlatforms.length > 0 ? preferredPlatforms : ["douyin"],
       defaultTone,
       autoAppendSignature,
       autoComplianceReminder,
@@ -310,9 +306,7 @@ export function ProfileWorkspace() {
 
   const togglePreferredPlatform = (platformId: PlatformId) => {
     setPreferredPlatforms((prev) =>
-      prev.includes(platformId)
-        ? prev.filter((id) => id !== platformId)
-        : [...prev, platformId]
+      prev.includes(platformId) ? prev.filter((id) => id !== platformId) : [...prev, platformId],
     );
   };
 
@@ -492,9 +486,7 @@ export function ProfileWorkspace() {
             <div className="font-editorial text-xl font-semibold text-[#181816] tabular-nums">
               {history.length}
             </div>
-            <div className="text-[11px] text-[#78716C]">
-              稿件（{publishedCount} 已发）
-            </div>
+            <div className="text-[11px] text-[#78716C]">稿件（{publishedCount} 已发）</div>
           </Link>
           <Link href="/organization" className="px-5 transition hover:opacity-75">
             <div className="font-editorial text-xl font-semibold text-[#181816] tabular-nums">
@@ -533,16 +525,12 @@ export function ProfileWorkspace() {
               type="button"
               onClick={() => setActiveTab(tab.id)}
               className={`relative inline-flex items-center gap-1.5 pb-3 text-xs font-medium transition ${
-                active
-                  ? "text-[#1B4D3E]"
-                  : "text-[#78716C] hover:text-[#181816]"
+                active ? "text-[#1B4D3E]" : "text-[#78716C] hover:text-[#181816]"
               }`}
             >
               <Icon className="h-3.5 w-3.5" />
               <span>{tab.label}</span>
-              {active && (
-                <span className="absolute inset-x-0 -bottom-px h-[2px] bg-[#1B4D3E]" />
-              )}
+              {active && <span className="absolute inset-x-0 -bottom-px h-[2px] bg-[#1B4D3E]" />}
             </button>
           );
         })}
@@ -550,10 +538,7 @@ export function ProfileWorkspace() {
 
       {/* Tab 1: Basic Profile */}
       {activeTab === "basic" && (
-        <form
-          onSubmit={handleSaveBasic}
-          className="divide-y divide-[#E2DDD3]"
-        >
+        <form onSubmit={handleSaveBasic} className="divide-y divide-[#E2DDD3]">
           {/* Identity & Org Band */}
           <section className="grid grid-cols-1 gap-6 pb-8 lg:grid-cols-12">
             <div className="lg:col-span-4">
@@ -607,9 +592,7 @@ export function ProfileWorkspace() {
 
               <div>
                 <div className="mb-1.5 flex items-center justify-between">
-                  <label className="text-xs font-medium text-[#57534E]">
-                    所属机构
-                  </label>
+                  <label className="text-xs font-medium text-[#57534E]">所属机构</label>
                   <Link
                     href="/organization"
                     className="inline-flex items-center gap-0.5 text-[11px] font-medium text-[#1B4D3E] hover:underline"
@@ -681,9 +664,7 @@ export function ProfileWorkspace() {
                             : "border-[#E2DDD3] bg-[#FCFBF8] text-[#57534E] hover:border-[#CFC8BA]"
                         }`}
                       >
-                        <span
-                          className={`h-2.5 w-2.5 rounded-full ${item.swatchClass}`}
-                        />
+                        <span className={`h-2.5 w-2.5 rounded-full ${item.swatchClass}`} />
                         <span>{item.label}</span>
                       </button>
                     );
@@ -773,9 +754,7 @@ export function ProfileWorkspace() {
                       : "font-medium text-[#B42318]"
                   }
                 >
-                  {basicMessage.type === "success" && (
-                    <Check className="h-3.5 w-3.5" />
-                  )}
+                  {basicMessage.type === "success" && <Check className="h-3.5 w-3.5" />}
                   {basicMessage.text}
                 </span>
               )}
@@ -815,9 +794,7 @@ export function ProfileWorkspace() {
             <div className="space-y-4 lg:col-span-8">
               <div>
                 <div className="mb-1.5 flex items-center justify-between">
-                  <label className="text-xs font-medium text-[#57534E]">
-                    当前密码
-                  </label>
+                  <label className="text-xs font-medium text-[#57534E]">当前密码</label>
                   <button
                     type="button"
                     onClick={() => setShowPasswords((v) => !v)}
@@ -886,9 +863,7 @@ export function ProfileWorkspace() {
                           : "font-medium text-[#B42318]"
                       }
                     >
-                      {passwordMessage.type === "success" && (
-                        <Check className="h-3.5 w-3.5" />
-                      )}
+                      {passwordMessage.type === "success" && <Check className="h-3.5 w-3.5" />}
                       {passwordMessage.text}
                     </span>
                   )}
@@ -949,9 +924,7 @@ export function ProfileWorkspace() {
 
               <div className="flex items-center justify-between border-l-2 border-[#B42318] bg-[#FDF2F2]/60 px-4 py-3">
                 <div>
-                  <div className="text-xs font-medium text-[#181816]">
-                    退出当前系统登录
-                  </div>
+                  <div className="text-xs font-medium text-[#181816]">退出当前系统登录</div>
                   <div className="mt-0.5 text-[11px] text-[#78716C]">
                     清除当前浏览器会话凭证并返回登录页
                   </div>
@@ -973,10 +946,7 @@ export function ProfileWorkspace() {
 
       {/* Tab 3: Creative Preferences */}
       {activeTab === "preferences" && (
-        <form
-          onSubmit={handleSavePreferences}
-          className="divide-y divide-[#E2DDD3]"
-        >
+        <form onSubmit={handleSavePreferences} className="divide-y divide-[#E2DDD3]">
           {/* Default Platforms & Tone */}
           <section className="grid grid-cols-1 gap-6 pb-8 lg:grid-cols-12">
             <div className="lg:col-span-4">
@@ -1085,12 +1055,8 @@ export function ProfileWorkspace() {
                   className="flex cursor-pointer items-start justify-between gap-4 py-3.5 transition hover:bg-[#FCFBF8]/60"
                 >
                   <div>
-                    <div className="text-xs font-medium text-[#181816]">
-                      {item.title}
-                    </div>
-                    <div className="mt-0.5 text-[11px] text-[#78716C]">
-                      {item.desc}
-                    </div>
+                    <div className="text-xs font-medium text-[#181816]">{item.title}</div>
+                    <div className="mt-0.5 text-[11px] text-[#78716C]">{item.desc}</div>
                   </div>
                   <input
                     type="checkbox"
@@ -1106,7 +1072,9 @@ export function ProfileWorkspace() {
           {/* Quick Links to Related Settings */}
           <section className="grid grid-cols-1 gap-6 py-8 lg:grid-cols-12">
             <div className="lg:col-span-4">
-              <h2 className="font-editorial text-base font-semibold text-[#181816]">关联配置入口</h2>
+              <h2 className="font-editorial text-base font-semibold text-[#181816]">
+                关联配置入口
+              </h2>
               <p className="mt-1 text-xs leading-relaxed text-[#78716C]">
                 快速跳转至模型密钥与机构档案配置。
               </p>
@@ -1120,9 +1088,7 @@ export function ProfileWorkspace() {
                 <div className="flex items-center gap-2.5">
                   <SlidersHorizontal className="h-4 w-4 text-[#1B4D3E]" />
                   <div>
-                    <div className="text-xs font-medium text-[#181816]">
-                      模型配置
-                    </div>
+                    <div className="text-xs font-medium text-[#181816]">模型配置</div>
                     <div className="text-[11px] text-[#78716C]">
                       {hasModelConfigured ? "已配置 API 密钥" : "尚未配置密钥"}
                     </div>
@@ -1138,9 +1104,7 @@ export function ProfileWorkspace() {
                 <div className="flex items-center gap-2.5">
                   <FileText className="h-4 w-4 text-[#1B4D3E]" />
                   <div>
-                    <div className="text-xs font-medium text-[#181816]">
-                      机构中心
-                    </div>
+                    <div className="text-xs font-medium text-[#181816]">机构中心</div>
                     <div className="text-[11px] text-[#78716C]">
                       管理机构使命与 {activities.length} 项活动档案
                     </div>

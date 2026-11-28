@@ -29,10 +29,7 @@ export async function POST(req: Request) {
     }
 
     const apiKey =
-      modelConfig?.apiKey?.trim() ||
-      process.env.VISION_API_KEY ||
-      process.env.OPENAI_API_KEY ||
-      "";
+      modelConfig?.apiKey?.trim() || process.env.VISION_API_KEY || process.env.OPENAI_API_KEY || "";
 
     // Only use remote vision detection if a vision API key is explicitly configured
     if (!apiKey) {
@@ -45,10 +42,7 @@ export async function POST(req: Request) {
       "https://api.openai.com/v1"
     ).replace(/\/+$/, "");
 
-    const model =
-      modelConfig?.model?.trim() ||
-      process.env.VISION_MODEL ||
-      "gpt-4o-mini";
+    const model = modelConfig?.model?.trim() || process.env.VISION_MODEL || "gpt-4o-mini";
 
     // Skip if configured model is known text-only DeepSeek chat
     if (model.toLowerCase().includes("deepseek-chat")) {
@@ -117,7 +111,7 @@ If nothing is found, return [].`;
           typeof item.w === "number" &&
           typeof item.h === "number" &&
           item.w > 0 &&
-          item.h > 0
+          item.h > 0,
       )
       .map((item, idx) => {
         const px = Math.max(0, Math.floor((item.x! / 1000) * width));

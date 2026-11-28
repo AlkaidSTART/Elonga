@@ -16,14 +16,7 @@ interface Box {
   score: number;
 }
 
-function clampRect(
-  x: number,
-  y: number,
-  w: number,
-  h: number,
-  maxW: number,
-  maxH: number
-) {
+function clampRect(x: number, y: number, w: number, h: number, maxW: number, maxH: number) {
   const x1 = Math.max(0, Math.floor(x));
   const y1 = Math.max(0, Math.floor(y));
   const x2 = Math.min(maxW, Math.ceil(x + w));
@@ -73,12 +66,7 @@ function mergeOverlappingBoxes(boxes: Box[], iouThreshold = 0.25): Box[] {
 /**
  * Find connected components on a binary mask (0 or 1) using iterative BFS.
  */
-function findConnectedComponents(
-  mask: Uint8Array,
-  w: number,
-  h: number,
-  minArea: number
-) {
+function findConnectedComponents(mask: Uint8Array, w: number, h: number, minArea: number) {
   const visited = new Uint8Array(w * h);
   const queue = new Int32Array(w * h);
   const components: {
@@ -160,11 +148,7 @@ function findConnectedComponents(
 /**
  * Local text-line / dense-character block detector using horizontal gradient + morphological dilation.
  */
-function detectTextRegionsLocal(
-  data: Uint8ClampedArray,
-  w: number,
-  h: number
-): Box[] {
+function detectTextRegionsLocal(data: Uint8ClampedArray, w: number, h: number): Box[] {
   const gray = new Uint8Array(w * h);
   for (let i = 0; i < w * h; i++) {
     const p = i * 4;
@@ -263,11 +247,7 @@ function detectTextRegionsLocal(
 /**
  * Local face/skin-cluster detector using YCbCr skin-tone segmentation + aspect/edge verification.
  */
-function detectFaceRegionsLocal(
-  data: Uint8ClampedArray,
-  w: number,
-  h: number
-): Box[] {
+function detectFaceRegionsLocal(data: Uint8ClampedArray, w: number, h: number): Box[] {
   const skin = new Uint8Array(w * h);
   for (let i = 0; i < w * h; i++) {
     const p = i * 4;
@@ -330,7 +310,7 @@ function detectFaceRegionsLocal(
  */
 export async function detectSensitiveRegionsLocal(
   img: HTMLImageElement,
-  categories: AutoRedactCategory[]
+  categories: AutoRedactCategory[],
 ): Promise<DetectedRegion[]> {
   if (categories.length === 0 || img.width === 0 || img.height === 0) {
     return [];
@@ -342,7 +322,9 @@ export async function detectSensitiveRegionsLocal(
       detect: (source: ImageBitmapSource) => Promise<Array<{ boundingBox: DOMRectReadOnly }>>;
     };
     BarcodeDetector?: new (opts?: { formats?: string[] }) => {
-      detect: (source: ImageBitmapSource) => Promise<Array<{ boundingBox: DOMRectReadOnly; rawValue?: string }>>;
+      detect: (
+        source: ImageBitmapSource,
+      ) => Promise<Array<{ boundingBox: DOMRectReadOnly; rawValue?: string }>>;
     };
   };
 
@@ -421,7 +403,7 @@ export async function detectSensitiveRegionsLocal(
               box.w / scale,
               box.h / scale,
               img.width,
-              img.height
+              img.height,
             ),
             confidence: box.score,
           });
@@ -441,7 +423,7 @@ export async function detectSensitiveRegionsLocal(
               box.w / scale,
               box.h / scale,
               img.width,
-              img.height
+              img.height,
             ),
             confidence: box.score,
           });

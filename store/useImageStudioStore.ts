@@ -71,10 +71,7 @@ interface ImageStudioState {
   resetActions: () => void;
 
   toggleAutoCategory: (category: AutoRedactCategory) => void;
-  setAutoDetectStatus: (
-    loading: boolean,
-    mode?: "ai" | "local" | null
-  ) => void;
+  setAutoDetectStatus: (loading: boolean, mode?: "ai" | "local" | null) => void;
   setManualEnabled: (enabled: boolean) => void;
 
   setStylePreset: (preset: Style2DPreset) => void;
@@ -84,7 +81,7 @@ interface ImageStudioState {
   setStylizeResult: (
     image: string | null,
     mode: "ai" | "local" | null,
-    error?: string | null
+    error?: string | null,
   ) => void;
 }
 
@@ -140,18 +137,14 @@ export const useImageStudioStore = create<ImageStudioState>((set) => ({
   setMosaicType: (mosaicType) =>
     set((state) => ({
       mosaicType,
-      actions: state.actions.map((a) =>
-        a.source === "auto" ? { ...a, type: mosaicType } : a
-      ),
+      actions: state.actions.map((a) => (a.source === "auto" ? { ...a, type: mosaicType } : a)),
     })),
   setToolShape: (toolShape) => set({ toolShape }),
   setBrushSize: (brushSize) => set({ brushSize }),
   setIntensity: (intensity) =>
     set((state) => ({
       intensity,
-      actions: state.actions.map((a) =>
-        a.source === "auto" ? { ...a, intensity } : a
-      ),
+      actions: state.actions.map((a) => (a.source === "auto" ? { ...a, intensity } : a)),
     })),
 
   pushAction: (action) =>
@@ -161,10 +154,7 @@ export const useImageStudioStore = create<ImageStudioState>((set) => ({
     })),
   replaceAutoActions: (autoActions) =>
     set((state) => ({
-      actions: [
-        ...autoActions,
-        ...state.actions.filter((a) => a.source === "manual"),
-      ],
+      actions: [...autoActions, ...state.actions.filter((a) => a.source === "manual")],
       redoStack: [],
     })),
   removeActionById: (id) =>
@@ -202,8 +192,7 @@ export const useImageStudioStore = create<ImageStudioState>((set) => ({
   setAutoDetectStatus: (isAutoDetecting, autoDetectMode) =>
     set((state) => ({
       isAutoDetecting,
-      autoDetectMode:
-        autoDetectMode !== undefined ? autoDetectMode : state.autoDetectMode,
+      autoDetectMode: autoDetectMode !== undefined ? autoDetectMode : state.autoDetectMode,
     })),
   setManualEnabled: (manualEnabled) => set({ manualEnabled }),
 

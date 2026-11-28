@@ -91,7 +91,7 @@ export async function POST(req: Request) {
         {
           error: `图像大模型调用失败 (${response.status}): ${errText.slice(0, 200)}`,
         },
-        { status: 502 }
+        { status: 502 },
       );
     }
 
@@ -106,10 +106,7 @@ export async function POST(req: Request) {
     if (first?.url) {
       const safeUrl = sanitizeExternalUrl(String(first.url));
       if (!safeUrl) {
-        return NextResponse.json(
-          { error: "图像大模型返回的图片链接不安全" },
-          { status: 502 }
-        );
+        return NextResponse.json({ error: "图像大模型返回的图片链接不安全" }, { status: 502 });
       }
       return NextResponse.json({
         imageUrl: safeUrl,
@@ -117,15 +114,9 @@ export async function POST(req: Request) {
       });
     }
 
-    return NextResponse.json(
-      { error: "图像大模型未返回有效的图片结果" },
-      { status: 502 }
-    );
+    return NextResponse.json({ error: "图像大模型未返回有效的图片结果" }, { status: 502 });
   } catch (err) {
     const message = err instanceof Error ? err.message : "未知错误";
-    return NextResponse.json(
-      { error: `二维风格化处理失败: ${message}` },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: `二维风格化处理失败: ${message}` }, { status: 500 });
   }
 }

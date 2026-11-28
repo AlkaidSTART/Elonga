@@ -6,21 +6,16 @@ export interface TrafficOptimizerInput {
   trendInsights?: DouyinTrendInsights;
 }
 
-const EMOJI_REGEX =
-  /[\p{Emoji_Presentation}\p{Extended_Pictographic}\uFE0F]/gu;
+const EMOJI_REGEX = /[\p{Emoji_Presentation}\p{Extended_Pictographic}\uFE0F]/gu;
 
 function cleanText(text: string): string {
   return text.replace(EMOJI_REGEX, "").trim();
 }
 
-export const trafficOptimizerSkill: SkillDefinition<
-  TrafficOptimizerInput,
-  CopywritingResult
-> = {
+export const trafficOptimizerSkill: SkillDefinition<TrafficOptimizerInput, CopywritingResult> = {
   id: "traffic-optimizer",
   name: "公益推流与合规校验",
-  description:
-    "统一清理表情符号、融合平台热门推流标签并校验评论区互动钩子。",
+  description: "统一清理表情符号、融合平台热门推流标签并校验评论区互动钩子。",
   version: "1.0.0",
   async execute({ draft, trendInsights }) {
     const cleanedTitles = draft.titles.map(cleanText).filter(Boolean);
@@ -34,14 +29,9 @@ export const trafficOptimizerSkill: SkillDefinition<
       .map((t) => cleanText(t).replace(/^#+/, ""))
       .filter(Boolean);
 
-    const baseTags = draft.tags
-      .map((t) => cleanText(t).replace(/^#+/, ""))
-      .filter(Boolean);
+    const baseTags = draft.tags.map((t) => cleanText(t).replace(/^#+/, "")).filter(Boolean);
 
-    const mergedTags = Array.from(new Set([...baseTags, ...trendTags])).slice(
-      0,
-      5
-    );
+    const mergedTags = Array.from(new Set([...baseTags, ...trendTags])).slice(0, 5);
 
     return {
       ...draft,

@@ -64,9 +64,7 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
   const historyCount = useWorkbenchStore((s) => s.history.length);
   const profilesByUserId = useProfileStore((s) => s.profilesByUserId);
 
-  const routeIndex = WORKSPACE_ROUTES.findIndex((route) =>
-    isWorkspaceRouteActive(pathname, route)
-  );
+  const routeIndex = WORKSPACE_ROUTES.findIndex((route) => isWorkspaceRouteActive(pathname, route));
   const [navMotion, setNavMotion] = useState<{
     pathname: string;
     index: number;
@@ -81,9 +79,7 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
 
   if (navMotion.pathname !== pathname) {
     const direction =
-      routeIndex >= 0 && navMotion.index >= 0
-        ? Math.sign(routeIndex - navMotion.index)
-        : 0;
+      routeIndex >= 0 && navMotion.index >= 0 ? Math.sign(routeIndex - navMotion.index) : 0;
     setNavMotion({
       pathname,
       index: routeIndex,
@@ -93,14 +89,12 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
   }
 
   const effectivePathname =
-    pendingNav && pendingNav.fromPathname === pathname
-      ? pendingNav.targetHref
-      : pathname;
+    pendingNav && pendingNav.fromPathname === pathname ? pendingNav.targetHref : pathname;
 
   const handleNavClick = (
     event: MouseEvent<HTMLAnchorElement>,
     href: string,
-    closeMobile?: boolean
+    closeMobile?: boolean,
   ) => {
     if (closeMobile) {
       setMobileOpen(false);
@@ -184,18 +178,13 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
               </button>
             ) : (
               <>
-                <Link
-                  href="/"
-                  className="flex items-center gap-2.5 whitespace-nowrap"
-                >
+                <Link href="/" className="flex items-center gap-2.5 whitespace-nowrap">
                   <BrandLogo size={22} />
                   <div className="flex items-baseline gap-1.5">
                     <span className="font-editorial text-[16px] font-semibold tracking-tight text-[#181816]">
                       Elonga
                     </span>
-                    <span className="text-[10px] tracking-wider text-[#8C857B]">
-                      简悦工坊
-                    </span>
+                    <span className="text-[10px] tracking-wider text-[#8C857B]">简悦工坊</span>
                   </div>
                 </Link>
 
@@ -237,7 +226,9 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
                           title={collapsed ? item.label : undefined}
                           onMouseEnter={() => setHoveredHref(item.href)}
                           onFocus={() => setHoveredHref(item.href)}
-                          onBlur={() => setHoveredHref((prev) => (prev === item.href ? null : prev))}
+                          onBlur={() =>
+                            setHoveredHref((prev) => (prev === item.href ? null : prev))
+                          }
                           onClick={(e) => handleNavClick(e, item.href)}
                           className={`group relative flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-[13px] transition-transform duration-150 ease-out active:scale-[0.98] ${
                             active
@@ -357,9 +348,7 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
                   title="进入个人中心"
                   onClick={(e) => handleNavClick(e, "/profile")}
                   className={`group relative flex items-center justify-between gap-2 rounded-lg px-2.5 py-2 transition-transform duration-150 ease-out active:scale-[0.98] ${
-                    profileActive
-                      ? "text-[#1B4D3E]"
-                      : "hover:bg-[#E5E0D5]/70"
+                    profileActive ? "text-[#1B4D3E]" : "hover:bg-[#E5E0D5]/70"
                   }`}
                 >
                   {profileActive && (
@@ -410,9 +399,7 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
                   </div>
                   <ChevronRight
                     className={`relative z-10 h-3.5 w-3.5 shrink-0 transition-all duration-200 group-hover:translate-x-0.5 ${
-                      profileActive
-                        ? "text-[#1B4D3E]"
-                        : "text-[#8C857B] group-hover:text-[#57534E]"
+                      profileActive ? "text-[#1B4D3E]" : "text-[#8C857B] group-hover:text-[#57534E]"
                     }`}
                   />
                 </Link>
@@ -533,9 +520,7 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
                         href="/profile"
                         onClick={(e) => handleNavClick(e, "/profile", true)}
                         className={`relative flex items-center justify-between gap-2 rounded-lg px-2.5 py-2 transition-transform duration-150 active:scale-[0.98] ${
-                          profileActive
-                            ? "text-[#1B4D3E]"
-                            : "hover:bg-[#E7E2D8]/60"
+                          profileActive ? "text-[#1B4D3E]" : "hover:bg-[#E7E2D8]/60"
                         }`}
                       >
                         {profileActive && (
@@ -601,11 +586,7 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
           <main className="mx-auto w-full max-w-[1280px] flex-1 px-6 py-7 sm:px-9 lg:px-12 lg:py-9">
             <motion.div
               key={pathname}
-              initial={
-                navMotion.hasNavigated
-                  ? { opacity: 0, y: navMotion.direction * 10 }
-                  : false
-              }
+              initial={navMotion.hasNavigated ? { opacity: 0, y: navMotion.direction * 10 } : false}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.22, ease: ROUTE_VIEW_EASE }}
             >

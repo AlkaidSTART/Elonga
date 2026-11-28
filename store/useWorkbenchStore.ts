@@ -122,9 +122,7 @@ export const useWorkbenchStore = create<WorkbenchState>()(
           const updated = { ...state.currentResult, body };
           return {
             currentResult: updated,
-            history: state.history.map((item) =>
-              item.id === updated.id ? updated : item
-            ),
+            history: state.history.map((item) => (item.id === updated.id ? updated : item)),
           };
         }),
       updateCurrentResult: (partial) =>
@@ -133,9 +131,7 @@ export const useWorkbenchStore = create<WorkbenchState>()(
           const updated = { ...state.currentResult, ...partial };
           return {
             currentResult: updated,
-            history: state.history.map((item) =>
-              item.id === updated.id ? updated : item
-            ),
+            history: state.history.map((item) => (item.id === updated.id ? updated : item)),
           };
         }),
       updateCurrentResultPatch: (partial) =>
@@ -144,9 +140,7 @@ export const useWorkbenchStore = create<WorkbenchState>()(
           const updated = { ...state.currentResult, ...partial };
           return {
             currentResult: updated,
-            history: state.history.map((item) =>
-              item.id === updated.id ? updated : item
-            ),
+            history: state.history.map((item) => (item.id === updated.id ? updated : item)),
           };
         }),
       updateCurrentRedactionRecords: (redactionRecords) =>
@@ -155,9 +149,7 @@ export const useWorkbenchStore = create<WorkbenchState>()(
           const updated = { ...state.currentResult, redactionRecords };
           return {
             currentResult: updated,
-            history: state.history.map((item) =>
-              item.id === updated.id ? updated : item
-            ),
+            history: state.history.map((item) => (item.id === updated.id ? updated : item)),
           };
         }),
       updateCurrentReviewState: (reviewState) =>
@@ -166,9 +158,7 @@ export const useWorkbenchStore = create<WorkbenchState>()(
           const updated = { ...state.currentResult, reviewState };
           return {
             currentResult: updated,
-            history: state.history.map((item) =>
-              item.id === updated.id ? updated : item
-            ),
+            history: state.history.map((item) => (item.id === updated.id ? updated : item)),
           };
         }),
       addToHistory: (result) =>
@@ -190,8 +180,7 @@ export const useWorkbenchStore = create<WorkbenchState>()(
       removeFromHistory: (id) =>
         set((state) => ({
           history: state.history.filter((h) => h.id !== id),
-          currentResult:
-            state.currentResult?.id === id ? null : state.currentResult,
+          currentResult: state.currentResult?.id === id ? null : state.currentResult,
         })),
       togglePublished: (id) =>
         set((state) => {
@@ -202,15 +191,13 @@ export const useWorkbenchStore = create<WorkbenchState>()(
               ...item,
               isPublished: nextPublished,
               publishedAt: nextPublished
-                ? item.publishedAt ?? new Date().toISOString()
+                ? (item.publishedAt ?? new Date().toISOString())
                 : undefined,
             };
           };
           return {
             history: state.history.map(updateItem),
-            currentResult: state.currentResult
-              ? updateItem(state.currentResult)
-              : null,
+            currentResult: state.currentResult ? updateItem(state.currentResult) : null,
           };
         }),
       toggleViral: (id) =>
@@ -219,19 +206,14 @@ export const useWorkbenchStore = create<WorkbenchState>()(
             item.id === id ? { ...item, isViral: !item.isViral } : item;
           return {
             history: state.history.map(updateItem),
-            currentResult: state.currentResult
-              ? updateItem(state.currentResult)
-              : null,
+            currentResult: state.currentResult ? updateItem(state.currentResult) : null,
           };
         }),
       updatePublishArchive: (id, archive) =>
         set((state) => {
           const updateItem = (item: CopywritingResult): CopywritingResult => {
             if (item.id !== id) return item;
-            const publishedAt =
-              archive.publishedAt ||
-              item.publishedAt ||
-              new Date().toISOString();
+            const publishedAt = archive.publishedAt || item.publishedAt || new Date().toISOString();
             return {
               ...item,
               isPublished: true,
@@ -247,9 +229,7 @@ export const useWorkbenchStore = create<WorkbenchState>()(
           };
           return {
             history: state.history.map(updateItem),
-            currentResult: state.currentResult
-              ? updateItem(state.currentResult)
-              : null,
+            currentResult: state.currentResult ? updateItem(state.currentResult) : null,
           };
         }),
       toggleArchived: (id) =>
@@ -262,15 +242,10 @@ export const useWorkbenchStore = create<WorkbenchState>()(
               ...item,
               isPublished: nextArchived ? true : item.isPublished,
               publishedAt:
-                nextArchived && !item.publishedAt
-                  ? new Date().toISOString()
-                  : item.publishedAt,
+                nextArchived && !item.publishedAt ? new Date().toISOString() : item.publishedAt,
               publishArchive: {
                 publishedUrl: prev?.publishedUrl,
-                publishedAt:
-                  prev?.publishedAt ??
-                  item.publishedAt ??
-                  new Date().toISOString(),
+                publishedAt: prev?.publishedAt ?? item.publishedAt ?? new Date().toISOString(),
                 metrics: prev?.metrics ?? {},
                 notes: prev?.notes,
                 archived: nextArchived,
@@ -280,9 +255,7 @@ export const useWorkbenchStore = create<WorkbenchState>()(
           };
           return {
             history: state.history.map(updateItem),
-            currentResult: state.currentResult
-              ? updateItem(state.currentResult)
-              : null,
+            currentResult: state.currentResult ? updateItem(state.currentResult) : null,
           };
         }),
     }),
@@ -305,18 +278,12 @@ export const useWorkbenchStore = create<WorkbenchState>()(
           | undefined;
         const oldConfig = persisted?.modelConfig;
         const legacyBaseUrl =
-          oldConfig?.baseUrl &&
-          oldConfig.baseUrl !== "https://api.openai.com/v1"
+          oldConfig?.baseUrl && oldConfig.baseUrl !== "https://api.openai.com/v1"
             ? oldConfig.baseUrl
             : undefined;
 
         const normalizePlatform = (p?: string): PlatformId => {
-          if (
-            p === "douyin" ||
-            p === "toutiao" ||
-            p === "xiaohongshu" ||
-            p === "wechat"
-          ) {
+          if (p === "douyin" || p === "toutiao" || p === "xiaohongshu" || p === "wechat") {
             return p;
           }
           if (p === "kuaishou") return "xiaohongshu";
@@ -337,20 +304,16 @@ export const useWorkbenchStore = create<WorkbenchState>()(
           history: migratedHistory,
           modelConfig: {
             ...DEFAULT_MODEL_CONFIG,
-            ...(oldConfig ?? {}),
-            textApiKey:
-              oldConfig?.textApiKey ?? oldConfig?.apiKey ?? "",
+            ...oldConfig,
+            textApiKey: oldConfig?.textApiKey ?? oldConfig?.apiKey ?? "",
             textBaseUrl:
-              oldConfig?.textBaseUrl ??
-              legacyBaseUrl ??
-              DEFAULT_MODEL_CONFIG.textBaseUrl,
+              oldConfig?.textBaseUrl ?? legacyBaseUrl ?? DEFAULT_MODEL_CONFIG.textBaseUrl,
             textModel:
               oldConfig?.textModel && oldConfig.textModel !== "gpt-4o-mini"
                 ? oldConfig.textModel
                 : DEFAULT_MODEL_CONFIG.textModel,
             imageApiKey: oldConfig?.imageApiKey ?? "",
-            imageBaseUrl:
-              oldConfig?.imageBaseUrl ?? DEFAULT_MODEL_CONFIG.imageBaseUrl,
+            imageBaseUrl: oldConfig?.imageBaseUrl ?? DEFAULT_MODEL_CONFIG.imageBaseUrl,
             imageModel:
               oldConfig?.imageModel && oldConfig.imageModel !== "gpt-image-1"
                 ? oldConfig.imageModel
@@ -358,6 +321,6 @@ export const useWorkbenchStore = create<WorkbenchState>()(
           },
         };
       },
-    }
-  )
+    },
+  ),
 );

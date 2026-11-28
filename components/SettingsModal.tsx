@@ -11,9 +11,7 @@ export function SettingsModal() {
 
   if (!settingsOpen) return null;
 
-  const hasAnyKey = Boolean(
-    modelConfig.textApiKey.trim() || modelConfig.imageApiKey.trim()
-  );
+  const hasAnyKey = Boolean(modelConfig.textApiKey.trim() || modelConfig.imageApiKey.trim());
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center bg-neutral-950/30 p-4 backdrop-blur-xs">
@@ -25,10 +23,7 @@ export function SettingsModal() {
       >
         <div className="flex items-center justify-between border-b border-neutral-100 pb-4">
           <div>
-            <h2
-              id="settings-modal-title"
-              className="text-base font-semibold text-neutral-900"
-            >
+            <h2 id="settings-modal-title" className="text-base font-semibold text-neutral-900">
               大模型接口配置
             </h2>
             <p className="mt-0.5 text-xs text-neutral-500">
@@ -59,9 +54,7 @@ export function SettingsModal() {
               <input
                 type="password"
                 value={modelConfig.textApiKey}
-                onChange={(e) =>
-                  updateModelConfig({ textApiKey: e.target.value })
-                }
+                onChange={(e) => updateModelConfig({ textApiKey: e.target.value })}
                 placeholder="sk-..."
                 className="w-full rounded-xl border border-neutral-200 bg-white px-3.5 py-2 text-sm text-neutral-900 outline-none transition focus:border-neutral-900"
               />
@@ -75,9 +68,7 @@ export function SettingsModal() {
                 <input
                   type="url"
                   value={modelConfig.textBaseUrl}
-                  onChange={(e) =>
-                    updateModelConfig({ textBaseUrl: e.target.value })
-                  }
+                  onChange={(e) => updateModelConfig({ textBaseUrl: e.target.value })}
                   placeholder="https://api.deepseek.com/v1"
                   className="w-full rounded-xl border border-neutral-200 bg-white px-3 py-2 text-sm text-neutral-900 outline-none transition focus:border-neutral-900"
                 />
@@ -89,9 +80,7 @@ export function SettingsModal() {
                 <input
                   type="text"
                   value={modelConfig.textModel}
-                  onChange={(e) =>
-                    updateModelConfig({ textModel: e.target.value })
-                  }
+                  onChange={(e) => updateModelConfig({ textModel: e.target.value })}
                   placeholder="deepseek-chat"
                   className="w-full rounded-xl border border-neutral-200 bg-white px-3 py-2 text-sm text-neutral-900 outline-none transition focus:border-neutral-900"
                 />
@@ -112,9 +101,7 @@ export function SettingsModal() {
               <input
                 type="password"
                 value={modelConfig.imageApiKey}
-                onChange={(e) =>
-                  updateModelConfig({ imageApiKey: e.target.value })
-                }
+                onChange={(e) => updateModelConfig({ imageApiKey: e.target.value })}
                 placeholder="输入生图端点 API Key..."
                 className="w-full rounded-xl border border-neutral-200 bg-white px-3.5 py-2 text-sm text-neutral-900 outline-none transition focus:border-neutral-900"
               />
@@ -128,9 +115,7 @@ export function SettingsModal() {
                 <input
                   type="url"
                   value={modelConfig.imageBaseUrl}
-                  onChange={(e) =>
-                    updateModelConfig({ imageBaseUrl: e.target.value })
-                  }
+                  onChange={(e) => updateModelConfig({ imageBaseUrl: e.target.value })}
                   placeholder="https://ark.cn-beijing.volces.com/api/v3"
                   className="w-full rounded-xl border border-neutral-200 bg-white px-3 py-2 text-sm text-neutral-900 outline-none transition focus:border-neutral-900"
                 />
@@ -142,25 +127,20 @@ export function SettingsModal() {
                 <input
                   type="text"
                   value={modelConfig.imageModel}
-                  onChange={(e) =>
-                    updateModelConfig({ imageModel: e.target.value })
-                  }
+                  onChange={(e) => updateModelConfig({ imageModel: e.target.value })}
                   placeholder="doubao-seedream-3-0-t2i-250415"
                   className="w-full rounded-xl border border-neutral-200 bg-white px-3 py-2 text-sm text-neutral-900 outline-none transition focus:border-neutral-900"
                 />
               </div>
             </div>
           </div>
-
         </div>
 
         <div className="mt-6 flex items-center justify-end gap-2.5">
           {hasAnyKey && (
             <button
               type="button"
-              onClick={() =>
-                updateModelConfig({ textApiKey: "", imageApiKey: "" })
-              }
+              onClick={() => updateModelConfig({ textApiKey: "", imageApiKey: "" })}
               className="rounded-xl px-3.5 py-2 text-xs font-medium text-neutral-500 transition hover:bg-neutral-100 hover:text-neutral-700"
             >
               清空密钥

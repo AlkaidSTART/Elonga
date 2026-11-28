@@ -1,12 +1,4 @@
-import {
-  AlignmentType,
-  Document,
-  HeadingLevel,
-  ImageRun,
-  Packer,
-  Paragraph,
-  TextRun,
-} from "docx";
+import { AlignmentType, Document, HeadingLevel, ImageRun, Packer, Paragraph, TextRun } from "docx";
 import type { PlatformId } from "@/lib/platforms";
 import type { DouyinTrendInsights } from "@/lib/skills/types";
 import { sanitizeImageSrc } from "@/lib/url-safety";
@@ -35,8 +27,7 @@ export interface AssembledDocument {
 }
 
 export type DocumentBlock =
-  | { type: "paragraph"; text: string }
-  | { type: "image"; image: DocumentImageItem };
+  { type: "paragraph"; text: string } | { type: "image"; image: DocumentImageItem };
 
 /**
  * Interleave body paragraphs and processed images into a balanced article flow.
@@ -62,8 +53,7 @@ export function buildDocumentBlocks(doc: AssembledDocument): DocumentBlock[] {
   paragraphs.forEach((text, idx) => {
     blocks.push({ type: "paragraph", text });
     const shouldInsertAfter =
-      imgIdx < images.length &&
-      ((idx + 1) % step === 0 || idx === paragraphs.length - 1);
+      imgIdx < images.length && ((idx + 1) % step === 0 || idx === paragraphs.length - 1);
     if (shouldInsertAfter) {
       blocks.push({ type: "image", image: images[imgIdx] });
       imgIdx += 1;
@@ -108,8 +98,8 @@ export function exportDocumentAsMarkdown(doc: AssembledDocument) {
   lines.push("");
   lines.push(
     `> 分发平台：${doc.platformName} | 创作主题：${doc.topic} | 生成时间：${new Date(
-      doc.createdAt
-    ).toLocaleString("zh-CN")}`
+      doc.createdAt,
+    ).toLocaleString("zh-CN")}`,
   );
   lines.push("");
 
@@ -143,7 +133,7 @@ export function exportDocumentAsMarkdown(doc: AssembledDocument) {
 async function imageUrlToPngBytes(
   dataUrl: string,
   fallbackW: number,
-  fallbackH: number
+  fallbackH: number,
 ): Promise<{ bytes: Uint8Array; width: number; height: number }> {
   const img = await new Promise<HTMLImageElement>((resolve, reject) => {
     const el = new Image();
@@ -163,10 +153,7 @@ async function imageUrlToPngBytes(
   ctx.drawImage(img, 0, 0, w, h);
 
   const blob = await new Promise<Blob>((resolve, reject) => {
-    canvas.toBlob(
-      (b) => (b ? resolve(b) : reject(new Error("PNG 编码失败"))),
-      "image/png"
-    );
+    canvas.toBlob((b) => (b ? resolve(b) : reject(new Error("PNG 编码失败"))), "image/png");
   });
 
   const arrayBuffer = await blob.arrayBuffer();
@@ -189,7 +176,7 @@ export async function exportDocumentAsDocx(doc: AssembledDocument) {
       text: doc.title,
       heading: HeadingLevel.HEADING_1,
       spacing: { after: 200 },
-    })
+    }),
   );
 
   children.push(
@@ -198,13 +185,13 @@ export async function exportDocumentAsDocx(doc: AssembledDocument) {
       children: [
         new TextRun({
           text: `分发平台：${doc.platformName}   |   创作主题：${doc.topic}   |   ${new Date(
-            doc.createdAt
+            doc.createdAt,
           ).toLocaleDateString("zh-CN")}`,
           color: "64748B",
           size: 20,
         }),
       ],
-    })
+    }),
   );
 
   for (const block of blocks) {
@@ -218,14 +205,14 @@ export async function exportDocumentAsDocx(doc: AssembledDocument) {
               size: 24,
             }),
           ],
-        })
+        }),
       );
     } else {
       try {
         const { bytes, width, height } = await imageUrlToPngBytes(
           block.image.dataUrl,
           block.image.width,
-          block.image.height
+          block.image.height,
         );
         const maxWidth = 520;
         const scale = Math.min(1, maxWidth / Math.max(1, width));
@@ -246,7 +233,7 @@ export async function exportDocumentAsDocx(doc: AssembledDocument) {
                 },
               }),
             ],
-          })
+          }),
         );
 
         if (block.image.caption) {
@@ -262,7 +249,7 @@ export async function exportDocumentAsDocx(doc: AssembledDocument) {
                   size: 20,
                 }),
               ],
-            })
+            }),
           );
         }
       } catch {
@@ -276,7 +263,7 @@ export async function exportDocumentAsDocx(doc: AssembledDocument) {
                 size: 20,
               }),
             ],
-          })
+          }),
         );
       }
     }
@@ -293,7 +280,7 @@ export async function exportDocumentAsDocx(doc: AssembledDocument) {
             size: 22,
           }),
         ],
-      })
+      }),
     );
   }
 
@@ -339,7 +326,7 @@ export function exportDocumentAsPdf(doc: AssembledDocument) {
         ? `<figcaption>${escapeHtml(block.image.caption)}</figcaption>`
         : "";
       return `<figure><img src="${escapeHtml(safeSrc)}" alt="${escapeHtml(
-        block.image.caption || block.image.name
+        block.image.caption || block.image.name,
       )}" />${caption}</figure>`;
     })
     .filter(Boolean)
@@ -425,8 +412,8 @@ export function exportDocumentAsPdf(doc: AssembledDocument) {
   <div class="header">
     <h1>${escapeHtml(doc.title)}</h1>
     <div class="meta">分发平台：${escapeHtml(doc.platformName)} · 主题：${escapeHtml(
-    doc.topic
-  )} · ${new Date(doc.createdAt).toLocaleString("zh-CN")}</div>
+      doc.topic,
+    )} · ${new Date(doc.createdAt).toLocaleString("zh-CN")}</div>
   </div>
   ${bodyHtml}
   ${tagsHtml}
@@ -475,8 +462,8 @@ export function exportDocumentAsPdf(doc: AssembledDocument) {
           : new Promise<void>((res) => {
               img.onload = () => res();
               img.onerror = () => res();
-            })
-      )
+            }),
+      ),
     ).then(() => setTimeout(triggerPrint, 120));
   }
 }

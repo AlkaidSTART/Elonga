@@ -13,12 +13,9 @@ interface OrganizationState {
 
   updateProfile: (partial: Partial<OrganizationProfile>) => void;
   addActivity: (
-    activity: Omit<ActivityArchive, "id" | "createdAt" | "updatedAt">
+    activity: Omit<ActivityArchive, "id" | "createdAt" | "updatedAt">,
   ) => ActivityArchive;
-  updateActivity: (
-    id: string,
-    partial: Partial<Omit<ActivityArchive, "id" | "createdAt">>
-  ) => void;
+  updateActivity: (id: string, partial: Partial<Omit<ActivityArchive, "id" | "createdAt">>) => void;
   deleteActivity: (id: string) => void;
 }
 
@@ -60,7 +57,7 @@ export const useOrganizationStore = create<OrganizationState>()(
                   ...partial,
                   updatedAt: new Date().toISOString(),
                 }
-              : item
+              : item,
           ),
         })),
 
@@ -72,6 +69,6 @@ export const useOrganizationStore = create<OrganizationState>()(
     {
       name: "elonga-organization-storage",
       storage: createJSONStorage(() => localStorage),
-    }
-  )
+    },
+  ),
 );

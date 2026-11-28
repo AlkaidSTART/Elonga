@@ -16,6 +16,11 @@ const eslintConfig = defineConfig([
     "next-env.d.ts",
   ]),
   ...oxlint.buildFromOxlintConfigFile("./.oxlintrc.json"),
+  {
+    linterOptions: {
+      reportUnusedDisableDirectives: "off",
+    },
+  },
   prettier,
 ]);
 

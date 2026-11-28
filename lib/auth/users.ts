@@ -27,10 +27,7 @@ const DEMO_USERS: UserRecord[] = [
 ];
 
 async function sha256Bytes(input: string): Promise<Uint8Array> {
-  const digest = await crypto.subtle.digest(
-    "SHA-256",
-    new TextEncoder().encode(input)
-  );
+  const digest = await crypto.subtle.digest("SHA-256", new TextEncoder().encode(input));
   return new Uint8Array(digest);
 }
 
@@ -67,23 +64,18 @@ export function updateUserProfile(
     email?: string;
     role?: string;
     orgName?: string;
-  }
+  },
 ): { ok: true; user: PublicUserInfo } | { ok: false; error: string } {
   const matched = DEMO_USERS.find((u) => u.id === id);
   if (!matched) {
     return { ok: false, error: "当前账号不存在" };
   }
 
-  const nextName =
-    typeof input.name === "string" ? input.name.trim() : matched.name;
+  const nextName = typeof input.name === "string" ? input.name.trim() : matched.name;
   const nextEmail =
-    typeof input.email === "string"
-      ? input.email.trim().toLowerCase()
-      : matched.email;
-  const nextRole =
-    typeof input.role === "string" ? input.role.trim() : matched.role;
-  const nextOrgName =
-    typeof input.orgName === "string" ? input.orgName.trim() : matched.orgName;
+    typeof input.email === "string" ? input.email.trim().toLowerCase() : matched.email;
+  const nextRole = typeof input.role === "string" ? input.role.trim() : matched.role;
+  const nextOrgName = typeof input.orgName === "string" ? input.orgName.trim() : matched.orgName;
 
   if (!nextName) {
     return { ok: false, error: "姓名不能为空" };
@@ -92,9 +84,7 @@ export function updateUserProfile(
     return { ok: false, error: "请输入有效的电子邮箱地址" };
   }
 
-  const emailTaken = DEMO_USERS.some(
-    (u) => u.id !== id && u.email.toLowerCase() === nextEmail
-  );
+  const emailTaken = DEMO_USERS.some((u) => u.id !== id && u.email.toLowerCase() === nextEmail);
   if (emailTaken) {
     return { ok: false, error: "该邮箱已被其他成员使用" };
   }
@@ -120,7 +110,7 @@ export function updateUserProfile(
 export async function changeUserPassword(
   id: string,
   currentPassword: string,
-  newPassword: string
+  newPassword: string,
 ): Promise<{ ok: true } | { ok: false; error: string; status: number }> {
   const matched = DEMO_USERS.find((u) => u.id === id);
   if (!matched) {
@@ -154,15 +144,13 @@ export async function changeUserPassword(
 
 export async function authenticateUser(
   account: string,
-  password: string
+  password: string,
 ): Promise<AuthUser | null> {
   const normalized = account.trim().toLowerCase();
   if (!normalized || !password) return null;
 
   const matched = DEMO_USERS.find(
-    (u) =>
-      u.email.toLowerCase() === normalized ||
-      u.username.toLowerCase() === normalized
+    (u) => u.email.toLowerCase() === normalized || u.username.toLowerCase() === normalized,
   );
   if (!matched) return null;
 

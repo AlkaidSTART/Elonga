@@ -93,12 +93,7 @@ export const WORKSPACE_ROUTES: readonly WorkspaceRouteConfig[] = [
   },
 ] as const;
 
-const NAV_GROUP_ORDER: readonly WorkspaceNavGroupLabel[] = [
-  "总览",
-  "创作",
-  "资产",
-  "系统",
-];
+const NAV_GROUP_ORDER: readonly WorkspaceNavGroupLabel[] = ["总览", "创作", "资产", "系统"];
 
 export const WORKSPACE_NAV_GROUPS = NAV_GROUP_ORDER.map((label) => ({
   label,
@@ -112,7 +107,7 @@ function normalizePathname(pathname: string): string {
 
 export function isWorkspaceRouteActive(
   pathname: string,
-  route: Pick<WorkspaceRouteConfig, "href" | "matchExact">
+  route: Pick<WorkspaceRouteConfig, "href" | "matchExact">,
 ): boolean {
   const normalized = normalizePathname(pathname);
   if (route.matchExact || route.href === "/") {
@@ -121,10 +116,6 @@ export function isWorkspaceRouteActive(
   return normalized === route.href || normalized.startsWith(`${route.href}/`);
 }
 
-export function resolveWorkspaceRoute(
-  pathname: string
-): WorkspaceRouteConfig | undefined {
-  return WORKSPACE_ROUTES.find((route) =>
-    isWorkspaceRouteActive(pathname, route)
-  );
+export function resolveWorkspaceRoute(pathname: string): WorkspaceRouteConfig | undefined {
+  return WORKSPACE_ROUTES.find((route) => isWorkspaceRouteActive(pathname, route));
 }

@@ -97,7 +97,7 @@ const PLATFORM_RESEARCH_PROFILE: Record<
 
 async function fetchExternalTrendsApi(
   topic: string,
-  keywords?: string
+  keywords?: string,
 ): Promise<DouyinTrendInsights | null> {
   const endpoint = process.env.DOUYIN_TRENDS_API_URL?.trim();
   if (!endpoint) return null;
@@ -122,10 +122,7 @@ async function fetchExternalTrendsApi(
 
     if (!res.ok) return null;
     const data = await res.json();
-    if (
-      !data ||
-      (!Array.isArray(data.viralHooks) && !Array.isArray(data.samples))
-    ) {
+    if (!data || (!Array.isArray(data.viralHooks) && !Array.isArray(data.samples))) {
       return null;
     }
 
@@ -136,19 +133,11 @@ async function fetchExternalTrendsApi(
       fetchedAt: new Date().toISOString(),
       source: "live-api",
       sourceLabel: "抖音外部爆款接口实时调研",
-      hotKeywords: Array.isArray(data.hotKeywords)
-        ? data.hotKeywords.slice(0, 8)
-        : [],
-      viralHooks: Array.isArray(data.viralHooks)
-        ? data.viralHooks.slice(0, 5)
-        : [],
-      titleFormulas: Array.isArray(data.titleFormulas)
-        ? data.titleFormulas.slice(0, 4)
-        : [],
+      hotKeywords: Array.isArray(data.hotKeywords) ? data.hotKeywords.slice(0, 8) : [],
+      viralHooks: Array.isArray(data.viralHooks) ? data.viralHooks.slice(0, 5) : [],
+      titleFormulas: Array.isArray(data.titleFormulas) ? data.titleFormulas.slice(0, 4) : [],
       samples: Array.isArray(data.samples) ? data.samples.slice(0, 3) : [],
-      summary: String(
-        data.summary ?? "已通过外部接口获取最新抖音爆款文案特征。"
-      ),
+      summary: String(data.summary ?? "已通过外部接口获取最新抖音爆款文案特征。"),
     };
   } catch {
     return null;
@@ -159,22 +148,17 @@ async function fetchDouyinHotBoard(): Promise<string[]> {
   try {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), 2500);
-    const res = await fetch(
-      "https://www.iesdouyin.com/web/api/v2/hotsearch/billboard/word/",
-      {
-        headers: {
-          "User-Agent":
-            "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-        },
-        signal: controller.signal,
-      }
-    );
+    const res = await fetch("https://www.iesdouyin.com/web/api/v2/hotsearch/billboard/word/", {
+      headers: {
+        "User-Agent":
+          "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+      },
+      signal: controller.signal,
+    });
     clearTimeout(timer);
     if (!res.ok) return [];
     const data = await res.json();
-    const list: DouyinHotWord[] = Array.isArray(data?.word_list)
-      ? data.word_list
-      : [];
+    const list: DouyinHotWord[] = Array.isArray(data?.word_list) ? data.word_list : [];
     return list
       .map((item) => item.word?.trim())
       .filter((w): w is string => Boolean(w))
@@ -189,7 +173,7 @@ async function researchWithLlm(
   topic: string,
   keywords: string | undefined,
   hotBoardWords: string[],
-  modelConfig?: ModelConfigPayload
+  modelConfig?: ModelConfigPayload,
 ): Promise<DouyinTrendInsights | null> {
   const apiKey =
     modelConfig?.apiKey?.trim() ||
@@ -206,10 +190,7 @@ async function researchWithLlm(
     process.env.TEXT_BASE_URL ||
     "https://api.deepseek.com/v1"
   ).replace(/\/+$/, "");
-  const model =
-    modelConfig?.textModel?.trim() ||
-    process.env.DEEPSEEK_MODEL ||
-    "deepseek-chat";
+  const model = modelConfig?.textModel?.trim() || process.env.DEEPSEEK_MODEL || "deepseek-chat";
 
   const platformMeta = PLATFORMS[platform];
   const profile = PLATFORM_RESEARCH_PROFILE[platform];
@@ -290,9 +271,7 @@ ${hotContext}
       hotKeywords: Array.isArray(parsed.hotKeywords)
         ? parsed.hotKeywords.map(String).slice(0, 6)
         : [],
-      viralHooks: Array.isArray(parsed.viralHooks)
-        ? parsed.viralHooks.map(String).slice(0, 4)
-        : [],
+      viralHooks: Array.isArray(parsed.viralHooks) ? parsed.viralHooks.map(String).slice(0, 4) : [],
       titleFormulas: Array.isArray(parsed.titleFormulas)
         ? parsed.titleFormulas.map(String).slice(0, 4)
         : [],
@@ -300,8 +279,7 @@ ${hotContext}
         ? (parsed.samples as DouyinViralSample[]).slice(0, 2)
         : [],
       summary: String(
-        parsed.summary ??
-          `已提炼当前${platformMeta.name}公益赛道高传播、高互动的表达规律。`
+        parsed.summary ?? `已提炼当前${platformMeta.name}公益赛道高传播、高互动的表达规律。`,
       ),
     };
   } catch {
@@ -313,7 +291,7 @@ function buildLocalCharityTrendInsights(
   platform: PlatformId,
   topic: string,
   keywords?: string,
-  hotBoardWords: string[] = []
+  hotBoardWords: string[] = [],
 ): DouyinTrendInsights {
   const platformMeta = PLATFORMS[platform];
   const profile = PLATFORM_RESEARCH_PROFILE[platform];
@@ -367,13 +345,7 @@ function buildLocalCharityTrendInsights(
   ];
 
   if (isAnimal) {
-    domainKeywords = [
-      "流浪动物救助",
-      "领养代替购买",
-      "科学绝育",
-      "毛孩子",
-      profile.defaultTags[0],
-    ];
+    domainKeywords = ["流浪动物救助", "领养代替购买", "科学绝育", "毛孩子", profile.defaultTags[0]];
     samples = [
       {
         title:
@@ -392,13 +364,7 @@ function buildLocalCharityTrendInsights(
       },
     ];
   } else if (isEducation) {
-    domainKeywords = [
-      "乡村助学",
-      "阅读角",
-      "一本书的力量",
-      "公益助学",
-      profile.defaultTags[0],
-    ];
+    domainKeywords = ["乡村助学", "阅读角", "一本书的力量", "公益助学", profile.defaultTags[0]];
     samples = [
       {
         title:
@@ -417,13 +383,7 @@ function buildLocalCharityTrendInsights(
       },
     ];
   } else if (isElder) {
-    domainKeywords = [
-      "关爱独居老人",
-      "社区助老",
-      "一餐热饭",
-      "银发陪伴",
-      profile.defaultTags[0],
-    ];
+    domainKeywords = ["关爱独居老人", "社区助老", "一餐热饭", "银发陪伴", profile.defaultTags[0]];
     samples = [
       {
         title: "敲开独居张奶奶家门时，她把水果留了整整一周",
@@ -439,13 +399,7 @@ function buildLocalCharityTrendInsights(
       },
     ];
   } else if (isEco) {
-    domainKeywords = [
-      "环保行动",
-      "周末净滩",
-      "随手公益",
-      "绿色生活",
-      profile.defaultTags[0],
-    ];
+    domainKeywords = ["环保行动", "周末净滩", "随手公益", "绿色生活", profile.defaultTags[0]];
     samples = [
       {
         title:
@@ -468,9 +422,7 @@ function buildLocalCharityTrendInsights(
   let hotKeywords = Array.from(new Set(domainKeywords)).slice(0, 6);
   const useHotBoard = platform === "douyin" && hotBoardWords.length > 0;
   if (useHotBoard) {
-    hotKeywords = Array.from(
-      new Set([...hotKeywords, ...hotBoardWords.slice(0, 2)])
-    ).slice(0, 6);
+    hotKeywords = Array.from(new Set([...hotKeywords, ...hotBoardWords.slice(0, 2)])).slice(0, 6);
   }
 
   return {
@@ -496,8 +448,7 @@ export const douyinTrendResearchSkill: SkillDefinition<
 > = {
   id: "douyin-trend-research",
   name: "多平台爆款趋势调研",
-  description:
-    "在撰写公益文案前，按所选平台独立调研对应平台的爆款开头、标题公式与热门话题标签。",
+  description: "在撰写公益文案前，按所选平台独立调研对应平台的爆款开头、标题公式与热门话题标签。",
   version: "2.0.0",
   async execute(input) {
     const platform: PlatformId = input.platform ?? "douyin";
@@ -517,16 +468,11 @@ export const douyinTrendResearchSkill: SkillDefinition<
       topic,
       input.keywords,
       hotBoardWords,
-      input.modelConfig
+      input.modelConfig,
     );
     if (llmInsights) return llmInsights;
 
     // 3. 本地对应平台的公益爆款模式库兜底，保证工作流随时可用且平台一致
-    return buildLocalCharityTrendInsights(
-      platform,
-      topic,
-      input.keywords,
-      hotBoardWords
-    );
+    return buildLocalCharityTrendInsights(platform, topic, input.keywords, hotBoardWords);
   },
 };

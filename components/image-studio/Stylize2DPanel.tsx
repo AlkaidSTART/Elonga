@@ -3,10 +3,7 @@
 import Link from "next/link";
 import { Download, Loader2 } from "lucide-react";
 import { stylizeImage2DLocal } from "@/lib/stylize-2d-canvas";
-import {
-  useImageStudioStore,
-  type Style2DPreset,
-} from "@/store/useImageStudioStore";
+import { useImageStudioStore, type Style2DPreset } from "@/store/useImageStudioStore";
 import { useWorkbenchStore } from "@/store/useWorkbenchStore";
 
 const PRESETS: { id: Style2DPreset; label: string; desc: string }[] = [
@@ -64,11 +61,7 @@ export function Stylize2DPanel() {
       }
 
       if (data.fallback) {
-        const localUrl = await stylizeImage2DLocal(
-          originalImage,
-          stylePreset,
-          stylizeStrength
-        );
+        const localUrl = await stylizeImage2DLocal(originalImage, stylePreset, stylizeStrength);
         setStylizeResult(localUrl, "local", null);
       } else if (data.imageUrl) {
         setStylizeResult(data.imageUrl, "ai", null);
@@ -76,11 +69,7 @@ export function Stylize2DPanel() {
         throw new Error("未获取到有效的二维风格图片");
       }
     } catch (err) {
-      setStylizeResult(
-        null,
-        null,
-        err instanceof Error ? err.message : "处理失败，请重试"
-      );
+      setStylizeResult(null, null, err instanceof Error ? err.message : "处理失败，请重试");
     } finally {
       setIsStylizing(false);
     }
@@ -101,9 +90,7 @@ export function Stylize2DPanel() {
       <div className="flex flex-col bg-[#F2EFE8] p-5 studio-grid-light lg:col-span-8">
         <div className="mb-3.5 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <span className="font-editorial text-sm font-semibold text-[#181816]">
-              效果对比
-            </span>
+            <span className="font-editorial text-sm font-semibold text-[#181816]">效果对比</span>
             {stylizeMode && (
               <span className="rounded border border-[#E2DDD3] bg-[#FCFBF8] px-2 py-0.5 font-mono text-[10px] font-medium text-[#57534E]">
                 {stylizeMode === "ai" ? "AI 重绘" : "本地预览"}
@@ -125,9 +112,7 @@ export function Stylize2DPanel() {
 
         <div className="grid flex-1 grid-cols-1 gap-4 md:grid-cols-2">
           <div className="flex flex-col rounded-md border border-[#E2DDD3] bg-[#FCFBF8] p-3">
-            <span className="mb-2 text-xs font-medium text-[#57534E]">
-              原图
-            </span>
+            <span className="mb-2 text-xs font-medium text-[#57534E]">原图</span>
             <div className="flex flex-1 items-center justify-center overflow-hidden rounded border border-[#E2DDD3] bg-[#EAE5DC]/55 p-2.5">
               {originalImage && (
                 // eslint-disable-next-line @next/next/no-img-element
@@ -141,9 +126,7 @@ export function Stylize2DPanel() {
           </div>
 
           <div className="flex flex-col rounded-md border border-[#E2DDD3] bg-[#FCFBF8] p-3">
-            <span className="mb-2 text-xs font-medium text-[#57534E]">
-              风格化结果
-            </span>
+            <span className="mb-2 text-xs font-medium text-[#57534E]">风格化结果</span>
             <div className="flex min-h-[300px] flex-1 items-center justify-center overflow-hidden rounded border border-[#E2DDD3] bg-[#EAE5DC]/55 p-2.5">
               {isStylizing ? (
                 <div className="flex flex-col items-center gap-2 text-[#57534E]">
@@ -168,9 +151,7 @@ export function Stylize2DPanel() {
       {/* Right Docked Editorial Paper Inspector */}
       <aside className="flex flex-col divide-y divide-[#E2DDD3] border-t border-[#E2DDD3] bg-[#FCFBF8] lg:col-span-4 lg:border-l lg:border-t-0">
         <div className="p-5">
-          <h3 className="mb-3 font-editorial text-sm font-semibold text-[#181816]">
-            风格预设
-          </h3>
+          <h3 className="mb-3 font-editorial text-sm font-semibold text-[#181816]">风格预设</h3>
           <div className="grid grid-cols-2 gap-2">
             {PRESETS.map((preset) => {
               const active = stylePreset === preset.id;
@@ -219,9 +200,7 @@ export function Stylize2DPanel() {
           </div>
 
           <div>
-            <label className="mb-1.5 block text-xs text-[#57534E]">
-              补充画面描述（选填）
-            </label>
+            <label className="mb-1.5 block text-xs text-[#57534E]">补充画面描述（选填）</label>
             <textarea
               rows={3}
               value={stylePrompt}
@@ -234,10 +213,7 @@ export function Stylize2DPanel() {
           {!modelConfig.imageApiKey.trim() && (
             <div className="flex items-center justify-between rounded border border-[#E2DDD3] bg-[#F6F4EF] px-3 py-2 text-[11px] text-[#57534E]">
               <span>当前为本地预览模式</span>
-              <Link
-                href="/settings"
-                className="font-medium text-[#1B4D3E] hover:underline"
-              >
+              <Link href="/settings" className="font-medium text-[#1B4D3E] hover:underline">
                 配置密钥
               </Link>
             </div>

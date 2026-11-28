@@ -90,14 +90,8 @@ function createSampleImageDataUrl(): string {
 }
 
 export function ImageStudioWorkspace() {
-  const {
-    activeMode,
-    originalImage,
-    imageMeta,
-    setActiveMode,
-    setImage,
-    clearImage,
-  } = useImageStudioStore();
+  const { activeMode, originalImage, imageMeta, setActiveMode, setImage, clearImage } =
+    useImageStudioStore();
 
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const [isDragging, setIsDragging] = useState(false);
@@ -246,9 +240,7 @@ export function ImageStudioWorkspace() {
             </h1>
             {imageMeta && (
               <div className="flex items-center gap-2 font-mono text-[11px] text-[#8C857B] tabular-nums">
-                <span className="max-w-[200px] truncate text-[#57534E]">
-                  {imageMeta.name}
-                </span>
+                <span className="max-w-[200px] truncate text-[#57534E]">{imageMeta.name}</span>
                 <span aria-hidden="true">·</span>
                 <span>
                   {imageMeta.width}×{imageMeta.height}
@@ -279,9 +271,7 @@ export function ImageStudioWorkspace() {
                   type="button"
                   onClick={() => setActiveMode(tab.id)}
                   className={`relative rounded-[4px] px-3 py-1 text-xs font-medium transition-colors ${
-                    isSelected
-                      ? "text-[#1B4D3E]"
-                      : "text-[#78716C] hover:text-[#181816]"
+                    isSelected ? "text-[#1B4D3E]" : "text-[#78716C] hover:text-[#181816]"
                   }`}
                 >
                   {isSelected && (

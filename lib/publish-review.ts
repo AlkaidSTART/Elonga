@@ -47,10 +47,7 @@ export interface PublishReviewReport {
   isEligible: boolean;
 }
 
-export const FACT_CATEGORY_META: Record<
-  FactCategory,
-  { label: string; badgeClass: string }
-> = {
+export const FACT_CATEGORY_META: Record<FactCategory, { label: string; badgeClass: string }> = {
   amount: {
     label: "金额",
     badgeClass: "bg-amber-50 text-amber-800 border-amber-200",
@@ -99,11 +96,7 @@ const BUILTIN_COMPLIANCE_RULES: Array<{
   },
 ];
 
-export function computeContentFingerprint(
-  title: string,
-  hook: string,
-  body: string
-): string {
+export function computeContentFingerprint(title: string, hook: string, body: string): string {
   const raw = `${title}\n---\n${hook}\n---\n${body}`;
   let hash = 5381;
   for (let i = 0; i < raw.length; i += 1) {
@@ -139,8 +132,7 @@ export function extractFactItems(text: string): ReviewFactItem[] {
   };
 
   // 1. Amounts (元 / 万元 / 块 / ￥)
-  const amountRegex =
-    /(?:￥|¥)?\d[\d,]*(?:\.\d+)?\s*(?:万元|千元|亿元|元|块钱|块)/g;
+  const amountRegex = /(?:￥|¥)?\d[\d,]*(?:\.\d+)?\s*(?:万元|千元|亿元|元|块钱|块)/g;
   for (const m of text.matchAll(amountRegex)) {
     register("amount", m[0], m.index ?? 0);
   }
@@ -162,8 +154,7 @@ export function extractFactItems(text: string): ReviewFactItem[] {
   }
 
   // 4. Dates
-  const dateRegex =
-    /(?:20\d{2}[年/-]\d{1,2}[月/-]\d{1,2}日?|\d{1,2}月\d{1,2}[日号])/g;
+  const dateRegex = /(?:20\d{2}[年/-]\d{1,2}[月/-]\d{1,2}日?|\d{1,2}月\d{1,2}[日号])/g;
   for (const m of text.matchAll(dateRegex)) {
     register("date", m[0], m.index ?? 0);
   }
@@ -180,14 +171,7 @@ export function evaluatePublishReview(params: {
   redactionRecords?: TextRedactionRecord[];
   reviewState?: PublishReviewState;
 }): PublishReviewReport {
-  const {
-    title,
-    hook,
-    body,
-    orgRedlines,
-    unredactedImageCount = 0,
-    reviewState,
-  } = params;
+  const { title, hook, body, orgRedlines, unredactedImageCount = 0, reviewState } = params;
 
   const combined = [title, hook, body].filter(Boolean).join("\n");
   const fingerprint = computeContentFingerprint(title, hook, body);
@@ -250,7 +234,8 @@ export function evaluatePublishReview(params: {
       category: "image",
       severity: "medium",
       title: `有 ${unredactedImageCount} 张配图未开启自动打码`,
-      detail: "若配图包含未成年人、受助人正脸或门牌车牌，请先在配图条开启「打码」并重新处理；若确认无隐私信息，可人工确认豁免。",
+      detail:
+        "若配图包含未成年人、受助人正脸或门牌车牌，请先在配图条开启「打码」并重新处理；若确认无隐私信息，可人工确认豁免。",
       canWaive: true,
     });
   }
@@ -261,22 +246,14 @@ export function evaluatePublishReview(params: {
   const waivedSet = new Set(reviewState?.waivedRiskIds ?? []);
   const confirmedSet = new Set(reviewState?.confirmedFactKeys ?? []);
 
-  const unresolvedRiskCount = riskItems.filter(
-    (r) => !(r.canWaive && waivedSet.has(r.id))
-  ).length;
-  const unconfirmedFactCount = factItems.filter(
-    (f) => !confirmedSet.has(f.key)
-  ).length;
+  const unresolvedRiskCount = riskItems.filter((r) => !(r.canWaive && waivedSet.has(r.id))).length;
+  const unconfirmedFactCount = factItems.filter((f) => !confirmedSet.has(f.key)).length;
 
   const hasChecked = Boolean(reviewState?.checkedAt);
-  const isStale =
-    hasChecked && reviewState?.checkedFingerprint !== fingerprint;
+  const isStale = hasChecked && reviewState?.checkedFingerprint !== fingerprint;
 
   const isEligible =
-    hasChecked &&
-    !isStale &&
-    unresolvedRiskCount === 0 &&
-    unconfirmedFactCount === 0;
+    hasChecked && !isStale && unresolvedRiskCount === 0 && unconfirmedFactCount === 0;
 
   return {
     fingerprint,
