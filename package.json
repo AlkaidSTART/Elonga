@@ -10,7 +10,9 @@
     "lint:oxlint": "oxlint",
     "lint:eslint": "eslint",
     "format": "prettier --write .",
-    "format:check": "prettier --check ."
+    "format:check": "prettier --check .",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "dependencies": {
     "docx": "^9.16.0",
