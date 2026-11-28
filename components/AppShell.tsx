@@ -19,6 +19,7 @@ import {
   getAvatarAccentMeta,
   useProfileStore,
 } from "@/store/useProfileStore";
+import { useImageLibraryStore } from "@/store/useImageLibraryStore";
 import { useWorkbenchStore } from "@/store/useWorkbenchStore";
 
 const ACTIVE_PILL_SPRING = {
@@ -62,6 +63,7 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
   } | null>(null);
   const [currentUser, setCurrentUser] = useState<AuthUser | null>(null);
   const historyCount = useWorkbenchStore((s) => s.history.length);
+  const imageLibraryCount = useImageLibraryStore((s) => s.items.length);
   const profilesByUserId = useProfileStore((s) => s.profilesByUserId);
 
   const routeIndex = WORKSPACE_ROUTES.findIndex((route) => isWorkspaceRouteActive(pathname, route));
@@ -283,6 +285,11 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
                               {item.href === "/history" && historyCount > 0 && (
                                 <span className="font-mono text-[11px] text-[#8C857B] tabular-nums">
                                   {historyCount}
+                                </span>
+                              )}
+                              {item.href === "/image-library" && imageLibraryCount > 0 && (
+                                <span className="font-mono text-[11px] text-[#8C857B] tabular-nums">
+                                  {imageLibraryCount}
                                 </span>
                               )}
                             </span>
