@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
 import {
   ArrowUpRight,
   Building2,
@@ -25,6 +24,7 @@ import {
   Trash2,
   UserRound,
 } from "lucide-react";
+import { performHardAuthNavigation } from "@/lib/auth/client-navigation";
 import { PLATFORMS, TONES, type PlatformId, type ToneId } from "@/lib/platforms";
 import { isAllowedRasterImageType, sanitizeImageSrc } from "@/lib/url-safety";
 import { useOrganizationStore } from "@/store/useOrganizationStore";
@@ -70,7 +70,6 @@ function formatUnixTime(seconds?: number): string {
 }
 
 export function ProfileWorkspace() {
-  const router = useRouter();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
 
   const history = useWorkbenchStore((s) => s.history);
@@ -129,7 +128,7 @@ export function ProfileWorkspace() {
   // Load current user session
   useEffect(() => {
     let cancelled = false;
-    fetch("/api/auth/me", { credentials: "same-origin" })
+    fetch("/api/auth/me", { credentials: "same-origin", cache: "no-store" })
       .then((res) => (res.ok ? res.json() : null))
       .then(
         (
@@ -367,11 +366,15 @@ export function ProfileWorkspace() {
     if (loggingOut) return;
     setLoggingOut(true);
     try {
-      await fetch("/api/auth/logout", { method: "POST" });
+      await fetch("/api/auth/logout", {
+        method: "POST",
+        credentials: "same-origin",
+        cache: "no-store",
+      });
     } finally {
-      setLoggingOut(false);
-      router.replace("/login");
-      router.refresh();
+      setUser(null);
+      setSessionMeta({});
+      performHardAuthNavigation("/login");
     }
   };
 

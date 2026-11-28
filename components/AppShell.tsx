@@ -118,7 +118,7 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
   useEffect(() => {
     let cancelled = false;
     const loadMe = () => {
-      fetch("/api/auth/me", { credentials: "same-origin" })
+      fetch("/api/auth/me", { credentials: "same-origin", cache: "no-store" })
         .then((res) => (res.ok ? res.json() : null))
         .then((data: { authenticated?: boolean; user?: AuthUser } | null) => {
           if (!cancelled) {

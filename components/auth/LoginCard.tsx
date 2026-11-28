@@ -1,7 +1,7 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useState, type FormEvent } from "react";
+import { useSearchParams } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   AlertCircle,
@@ -15,6 +15,7 @@ import {
   Sparkles,
 } from "lucide-react";
 import { BrandLogo } from "@/components/BrandLogo";
+import { getSafeRedirectPath, performHardAuthNavigation } from "@/lib/auth/client-navigation";
 
 const DEMO_ACCOUNTS = [
   {
@@ -29,15 +30,7 @@ const DEMO_ACCOUNTS = [
   },
 ] as const;
 
-function getSafeRedirect(raw: string | null): string {
-  if (!raw || !raw.startsWith("/") || raw.startsWith("//") || raw.startsWith("/login")) {
-    return "/";
-  }
-  return raw;
-}
-
 export function LoginCard() {
-  const router = useRouter();
   const searchParams = useSearchParams();
 
   const [account, setAccount] = useState("");
@@ -46,6 +39,14 @@ export function LoginCard() {
   const [showPassword, setShowPassword] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const resetSubmitting = () => setSubmitting(false);
+    window.addEventListener("pageshow", resetSubmitting);
+    return () => {
+      window.removeEventListener("pageshow", resetSubmitting);
+    };
+  }, []);
 
   const handleSubmit = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
@@ -64,6 +65,8 @@ export function LoginCard() {
       const response = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
+        credentials: "same-origin",
+        cache: "no-store",
         body: JSON.stringify({
           account: trimmedAccount,
           password,
@@ -82,9 +85,8 @@ export function LoginCard() {
         return;
       }
 
-      const redirectTarget = getSafeRedirect(searchParams.get("redirect"));
-      router.replace(redirectTarget);
-      router.refresh();
+      const redirectTarget = getSafeRedirectPath(searchParams.get("redirect"));
+      performHardAuthNavigation(redirectTarget);
     } catch {
       setError("网络请求异常，请检查服务是否正常运行");
       setSubmitting(false);
