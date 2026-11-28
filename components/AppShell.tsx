@@ -583,12 +583,19 @@ export function AppShell({ children }: { children?: React.ReactNode }) {
           </AnimatePresence>
 
           {/* Main Route Viewport: unified business view dispatch by route */}
-          <main className="mx-auto w-full max-w-[1280px] flex-1 px-6 py-7 sm:px-9 lg:px-12 lg:py-9">
+          <main
+            className={
+              activeRoute?.fullBleed
+                ? "flex min-w-0 flex-1 flex-col"
+                : "mx-auto w-full max-w-[1280px] flex-1 px-6 py-7 sm:px-9 lg:px-12 lg:py-9"
+            }
+          >
             <motion.div
               key={pathname}
               initial={navMotion.hasNavigated ? { opacity: 0, y: navMotion.direction * 10 } : false}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.22, ease: ROUTE_VIEW_EASE }}
+              className={activeRoute?.fullBleed ? "flex min-h-0 flex-1 flex-col" : undefined}
             >
               {ActiveView && <ActiveView />}
               {children}

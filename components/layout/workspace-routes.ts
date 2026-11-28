@@ -10,11 +10,17 @@ import {
   LayoutDashboard,
   PenTool,
   SlidersHorizontal,
+  TrendingUp,
   UserRound,
   type LucideIcon,
 } from "lucide-react";
 import { WorkspaceViewFallback } from "@/components/layout/WorkspaceViewFallback";
 import { OverviewWorkspace } from "@/components/overview/OverviewWorkspace";
+
+const AnalyticsWorkspace = dynamic(
+  () => import("@/components/analytics/AnalyticsWorkspace").then((mod) => mod.AnalyticsWorkspace),
+  { loading: WorkspaceViewFallback },
+);
 
 const ReportsWorkspace = dynamic(
   () => import("@/components/reports/ReportsWorkspace").then((mod) => mod.ReportsWorkspace),
@@ -71,6 +77,8 @@ export interface WorkspaceRouteConfig {
   group?: WorkspaceNavGroupLabel;
   /** Whether the route must match pathname exactly (default: false, prefix match). */
   matchExact?: boolean;
+  /** Whether the route renders edge-to-edge without outer max-width padding (e.g. split conversation workbench). */
+  fullBleed?: boolean;
 }
 
 export const WORKSPACE_ROUTES: readonly WorkspaceRouteConfig[] = [
@@ -81,6 +89,14 @@ export const WORKSPACE_ROUTES: readonly WorkspaceRouteConfig[] = [
     icon: LayoutDashboard,
     component: OverviewWorkspace,
     matchExact: true,
+  },
+  {
+    href: "/analytics",
+    label: "流量分析",
+    group: "总览",
+    icon: TrendingUp,
+    component: AnalyticsWorkspace,
+    fullBleed: true,
   },
   {
     href: "/reports",
