@@ -11,7 +11,7 @@ import {
   Database,
   FileSpreadsheet,
   Loader2,
-  PanelLeft,
+  PanelRight,
   Plus,
   SlidersHorizontal,
   Sparkles,
@@ -375,39 +375,11 @@ export function AnalyticsWorkspace() {
 
   return (
     <div className="relative flex h-[calc(100vh-3.5rem)] min-h-[560px] w-full bg-[#F6F4EF] lg:h-screen">
-      {/* Flush Desktop Session Rail (hairline divider only, zero outer box) */}
-      <aside className="hidden w-60 shrink-0 border-r border-[#E2DDD3] md:block">
-        {renderSessionRail()}
-      </aside>
-
-      {/* Mobile Sessions Drawer */}
-      {mobileSidebarOpen && (
-        <div className="fixed inset-0 z-40 flex md:hidden">
-          <div
-            className="fixed inset-0 bg-[#181816]/35"
-            onClick={() => setMobileSidebarOpen(false)}
-            aria-hidden="true"
-          />
-          <aside className="relative z-10 h-full w-64 border-r border-[#E2DDD3] bg-[#F6F4EF]">
-            {renderSessionRail()}
-          </aside>
-        </div>
-      )}
-
       {/* Main Seamless Conversation Canvas */}
       <div className="flex min-w-0 flex-1 flex-col">
         {/* Flush Top Header */}
         <header className="flex h-14 shrink-0 items-center justify-between gap-3 border-b border-[#E2DDD3] px-5 sm:px-8">
           <div className="flex min-w-0 items-center gap-2.5">
-            <button
-              type="button"
-              onClick={() => setMobileSidebarOpen(true)}
-              aria-label="打开会话列表"
-              className="rounded p-1.5 text-[#57534E] hover:bg-[#EFECE4] md:hidden"
-            >
-              <PanelLeft className="h-4 w-4" />
-            </button>
-
             <h1 className="truncate font-editorial text-base font-semibold text-[#181816]">
               {activeSession?.title ?? "流量分析"}
             </h1>
@@ -446,6 +418,15 @@ export function AnalyticsWorkspace() {
             >
               <FileSpreadsheet className="h-3.5 w-3.5" />
               <span>导入报表</span>
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setMobileSidebarOpen(true)}
+              aria-label="打开历史会话栏"
+              className="rounded p-1.5 text-[#57534E] hover:bg-[#EFECE4] md:hidden"
+            >
+              <PanelRight className="h-4 w-4" />
             </button>
           </div>
         </header>
@@ -674,6 +655,25 @@ export function AnalyticsWorkspace() {
           </div>
         </div>
       </div>
+
+      {/* Flush Right-Side History Sessions Rail (no outer box) */}
+      <aside className="hidden w-64 shrink-0 border-l border-[#E2DDD3] md:block">
+        {renderSessionRail()}
+      </aside>
+
+      {/* Mobile Right-Side Sessions Drawer */}
+      {mobileSidebarOpen && (
+        <div className="fixed inset-0 z-40 flex justify-end md:hidden">
+          <div
+            className="fixed inset-0 bg-[#181816]/35"
+            onClick={() => setMobileSidebarOpen(false)}
+            aria-hidden="true"
+          />
+          <aside className="relative z-10 h-full w-64 border-l border-[#E2DDD3] bg-[#F6F4EF]">
+            {renderSessionRail()}
+          </aside>
+        </div>
+      )}
 
       {/* On-demand Modals / Drawers */}
       <AnimatePresence>
