@@ -93,3 +93,57 @@ export function getWorkflowOptionsSummary(params: {
     summaryText: parts.join(" · "),
   };
 }
+
+/**
+ * Assemble opening hook, body, and closing CTA into one complete,
+ * ready-to-publish copy without duplicating already-included segments.
+ */
+export function buildPublishableBody(params: {
+  hook?: string | null;
+  body: string;
+  cta?: string | null;
+}): string {
+  const cleanBody = params.body.trim();
+  const cleanHook = params.hook?.trim() ?? "";
+  const cleanCta = params.cta?.trim() ?? "";
+
+  const segments: string[] = [];
+
+  if (cleanHook && !cleanBody.startsWith(cleanHook)) {
+    segments.push(cleanHook);
+  }
+  if (cleanBody) {
+    segments.push(cleanBody);
+  }
+  if (cleanCta && !cleanBody.endsWith(cleanCta)) {
+    segments.push(cleanCta);
+  }
+
+  return segments.join("\n\n");
+}
+
+/**
+ * Build the complete ready-to-publish post text (title + unified body + tags)
+ * for direct one-click copy and publishing.
+ */
+export function buildPublishableFullText(params: {
+  title: string;
+  hook?: string | null;
+  body: string;
+  cta?: string | null;
+  tags?: string[];
+}): string {
+  const cleanTitle = params.title.trim();
+  const publishableBody = buildPublishableBody({
+    hook: params.hook,
+    body: params.body,
+    cta: params.cta,
+  });
+  const tagLine = (params.tags ?? [])
+    .map((tag) => tag.trim().replace(/^#+/, ""))
+    .filter(Boolean)
+    .map((tag) => `#${tag}`)
+    .join(" ");
+
+  return [cleanTitle, publishableBody, tagLine].filter(Boolean).join("\n\n");
+}

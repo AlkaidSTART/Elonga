@@ -1,5 +1,7 @@
 import { describe, expect, it } from "vitest";
 import {
+  buildPublishableBody,
+  buildPublishableFullText,
   getPlatformOptionList,
   getPlatformTriggerMeta,
   getWorkflowOptionsSummary,
@@ -72,5 +74,38 @@ describe("workflow-view helpers", () => {
     });
     expect(customized.activeCount).toBe(3);
     expect(customized.summaryText).toContain("档案：周末净滩行动");
+  });
+
+  it("assembles hook, body, and cta into one complete publishable body without duplication", () => {
+    expect(
+      buildPublishableBody({
+        hook: "你知道一本书能改变多少孩子吗？",
+        body: "这周末我们在乡村小学建起了一座图书角。",
+        cta: "欢迎在评论区留言一起参与。",
+      }),
+    ).toBe(
+      "你知道一本书能改变多少孩子吗？\n\n这周末我们在乡村小学建起了一座图书角。\n\n欢迎在评论区留言一起参与。",
+    );
+
+    // Avoid duplicating hook/cta if already merged into body
+    expect(
+      buildPublishableBody({
+        hook: "开头第一句",
+        body: "开头第一句\n\n正文内容\n\n结尾互动",
+        cta: "结尾互动",
+      }),
+    ).toBe("开头第一句\n\n正文内容\n\n结尾互动");
+  });
+
+  it("formats full publishable post text with title, body, and normalized hashtags", () => {
+    expect(
+      buildPublishableFullText({
+        title: "一本书点亮乡村图书角",
+        hook: "开场钩子",
+        body: "正文内容",
+        cta: "欢迎点赞转发",
+        tags: ["#乡村阅读", "公益助学"],
+      }),
+    ).toBe("一本书点亮乡村图书角\n\n开场钩子\n\n正文内容\n\n欢迎点赞转发\n\n#乡村阅读 #公益助学");
   });
 });
