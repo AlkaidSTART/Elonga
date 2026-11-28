@@ -1,5 +1,6 @@
 export const WORKSPACE_BOOT_STORAGE_KEY = "elonga:workspace-boot-entering";
 export const WORKSPACE_BOOT_OVERLAY_ID = "elonga-workspace-boot-overlay";
+export const WORKSPACE_BOOT_HTML_ATTR = "data-elonga-boot";
 export const WORKSPACE_BOOT_TTL_MS = 30_000;
 export const WORKSPACE_BOOT_FAILSAFE_MS = 8_000;
 
@@ -75,8 +76,9 @@ export function clearWorkspaceBootPending(storage?: StorageRemover | null): void
 
 /**
  * Inline script executed before React hydration in the workspace layout.
- * Synchronously reveals the SSR boot overlay only when arriving from login.
+ * Synchronously sets an attribute on <html> to reveal the SSR boot overlay
+ * only when arriving from login, avoiding any mutation of React-managed child nodes.
  */
 export function buildWorkspaceBootRevealScript(): string {
-  return `(function(){try{var k=${JSON.stringify(WORKSPACE_BOOT_STORAGE_KEY)};var raw=window.sessionStorage.getItem(k);if(!raw)return;var ts=Number(raw);var age=Date.now()-ts;if(!isFinite(ts)||age<0||age>${WORKSPACE_BOOT_TTL_MS}){window.sessionStorage.removeItem(k);return;}var el=document.getElementById(${JSON.stringify(WORKSPACE_BOOT_OVERLAY_ID)});if(!el)return;el.setAttribute("data-boot-state","active");window.setTimeout(function(){if(el.getAttribute("data-boot-state")==="active"){el.setAttribute("data-boot-state","done");try{window.sessionStorage.removeItem(k);}catch(e){}}},${WORKSPACE_BOOT_FAILSAFE_MS});}catch(e){}})();`;
+  return `(function(){try{var k=${JSON.stringify(WORKSPACE_BOOT_STORAGE_KEY)};var attr=${JSON.stringify(WORKSPACE_BOOT_HTML_ATTR)};var raw=window.sessionStorage.getItem(k);if(!raw)return;var ts=Number(raw);var age=Date.now()-ts;if(!isFinite(ts)||age<0||age>${WORKSPACE_BOOT_TTL_MS}){window.sessionStorage.removeItem(k);return;}var root=document.documentElement;if(!root)return;root.setAttribute(attr,"active");window.setTimeout(function(){if(root.getAttribute(attr)==="active"){root.removeAttribute(attr);try{window.sessionStorage.removeItem(k);}catch(e){}}},${WORKSPACE_BOOT_FAILSAFE_MS});}catch(e){}})();`;
 }

@@ -1,4 +1,5 @@
 import {
+  WORKSPACE_BOOT_HTML_ATTR,
   WORKSPACE_BOOT_OVERLAY_ID,
   buildWorkspaceBootRevealScript,
 } from "@/lib/auth/workspace-boot";
@@ -18,17 +19,14 @@ const BOOT_OVERLAY_CSS = `
   transition: opacity 240ms cubic-bezier(0.22, 1, 0.36, 1);
   pointer-events: auto;
 }
-#${WORKSPACE_BOOT_OVERLAY_ID}[data-boot-state="active"] {
+html[${WORKSPACE_BOOT_HTML_ATTR}="active"] #${WORKSPACE_BOOT_OVERLAY_ID} {
   display: flex;
   opacity: 1;
 }
-#${WORKSPACE_BOOT_OVERLAY_ID}[data-boot-state="exiting"] {
+html[${WORKSPACE_BOOT_HTML_ATTR}="exiting"] #${WORKSPACE_BOOT_OVERLAY_ID} {
   display: flex;
   opacity: 0;
   pointer-events: none;
-}
-#${WORKSPACE_BOOT_OVERLAY_ID}[data-boot-state="done"] {
-  display: none;
 }
 .elonga-boot-bar-track {
   position: relative;
@@ -75,7 +73,6 @@ export function WorkspaceBootOverlay() {
       <style dangerouslySetInnerHTML={{ __html: BOOT_OVERLAY_CSS }} />
       <div
         id={WORKSPACE_BOOT_OVERLAY_ID}
-        data-boot-state="idle"
         role="status"
         aria-live="polite"
         aria-label="正在加载工作台"

@@ -2,7 +2,7 @@
 
 import { useEffect } from "react";
 import {
-  WORKSPACE_BOOT_OVERLAY_ID,
+  WORKSPACE_BOOT_HTML_ATTR,
   clearWorkspaceBootPending,
 } from "@/lib/auth/workspace-boot";
 
@@ -15,16 +15,16 @@ export function WorkspaceBootDismiss() {
   useEffect(() => {
     clearWorkspaceBootPending();
 
-    const overlay = document.getElementById(WORKSPACE_BOOT_OVERLAY_ID);
-    if (!overlay || overlay.getAttribute("data-boot-state") !== "active") {
+    const root = document.documentElement;
+    if (root.getAttribute(WORKSPACE_BOOT_HTML_ATTR) !== "active") {
       return;
     }
 
     let timerId: number | undefined;
     const rafId = window.requestAnimationFrame(() => {
-      overlay.setAttribute("data-boot-state", "exiting");
+      root.setAttribute(WORKSPACE_BOOT_HTML_ATTR, "exiting");
       timerId = window.setTimeout(() => {
-        overlay.setAttribute("data-boot-state", "done");
+        root.removeAttribute(WORKSPACE_BOOT_HTML_ATTR);
       }, FADE_OUT_MS);
     });
 
