@@ -7,7 +7,8 @@ import {
   type ToneId,
   type WordCountId,
 } from "./platforms";
-import type { DouyinTrendInsights } from "./skills/types";
+import type { DouyinTrendInsights, PlatformWritingGuidance } from "./skills/types";
+import { getPlatformWritingSkill } from "./skills/platform-writing-skills";
 import type { ActivityContextPayload } from "./organization";
 
 export interface CopywritingRequest {
@@ -20,6 +21,7 @@ export interface CopywritingRequest {
   targetAudience?: string;
   activityContext?: ActivityContextPayload;
   trendInsights?: DouyinTrendInsights;
+  platformWritingGuidance?: PlatformWritingGuidance;
 }
 
 function parseKeywords(raw?: string): string[] {
@@ -49,6 +51,13 @@ export function generateLocalCopywriting(req: CopywritingRequest): CopywritingRe
     : buildCharityCta(req.platform, topic);
   const tags = buildCharityTags(req.platform, topic, kwList, scenarioLabel, req.trendInsights);
 
+  const platformSkill = getPlatformWritingSkill(req.platform);
+  const tips = req.platformWritingGuidance?.quickHighlights?.length
+    ? req.platformWritingGuidance.quickHighlights
+    : platformSkill.quickHighlights.length
+      ? platformSkill.quickHighlights
+      : platformMeta.algorithmTips;
+
   return {
     id: `draft_${Date.now()}_${Math.random().toString(36).slice(2, 7)}`,
     platform: req.platform,
@@ -60,7 +69,7 @@ export function generateLocalCopywriting(req: CopywritingRequest): CopywritingRe
     body,
     tags,
     cta,
-    tips: platformMeta.algorithmTips,
+    tips,
     mode: "local",
     createdAt: new Date().toISOString(),
     activityId: req.activityContext?.activityId,

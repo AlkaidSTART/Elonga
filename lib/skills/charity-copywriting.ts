@@ -9,6 +9,7 @@ import {
   type ToneId,
 } from "@/lib/platforms";
 import type { CharityCopywritingInput, SkillDefinition } from "./types";
+import { getPlatformWritingSkill } from "./platform-writing-skills";
 
 function formatTrendPromptSection(input: CharityCopywritingInput): string {
   const platformName = PLATFORMS[input.platform].name;
@@ -48,6 +49,14 @@ export const charityCopywritingSkill: SkillDefinition<CharityCopywritingInput, C
     version: "1.0.0",
     async execute(input) {
       const tone: ToneId = input.tone ?? "warm";
+      const platformWritingGuidance =
+        input.platformWritingGuidance?.platform === input.platform
+          ? input.platformWritingGuidance
+          : await getPlatformWritingSkill(input.platform).execute({
+              topic: input.topic,
+              contentType: input.contentType,
+              wordCount: input.wordCount,
+            });
       const apiKey =
         input.modelConfig?.apiKey?.trim() ||
         process.env.DEEPSEEK_API_KEY ||
@@ -66,6 +75,7 @@ export const charityCopywritingSkill: SkillDefinition<CharityCopywritingInput, C
           targetAudience: input.targetAudience,
           activityContext: input.activityContext,
           trendInsights: input.trendInsights,
+          platformWritingGuidance,
         });
       }
 
@@ -82,24 +92,25 @@ export const charityCopywritingSkill: SkillDefinition<CharityCopywritingInput, C
       const scenarioLabel = LEGACY_CONTENT_TYPE_LABELS[input.contentType] ?? "公益故事";
       const lengthMeta = WORD_COUNTS.find((w) => w.id === input.wordCount);
 
-      const systemPrompt = `你是一位长期服务公益机构的新媒体内容主理人，擅长将真实的公益一线故事与活动转化为“普通人看得懂、愿意停下来看完、愿意顺手点赞转发”的高推流文案。
+      const systemPrompt = `你是一位长期服务公益机构的新媒体内容主理人，擅长将真实的公益一线故事与活动转化为“普通人看得懂、愿意停下来看完、愿意顺手点赞转发”的高推流图文文案。
 请严格遵守以下规则：
 1. 这是给公益机构工作人员日常使用的平台，语言要真诚、平实、有温度，不要使用生硬的商业营销黑话或过度专业的术语，不要居高临下说教，也不要过度卖惨。
-2. 充分吸收前置【${platformMeta.name}爆款文案调研】中的开头钩子结构、标题公式和热词，自然融入【${platformMeta.name}】的表达节奏中。
-3. 全文绝对不能包含任何 emoji 表情符号（如各种笑脸、火焰、手指、对勾符号等）。
-4. 输出必须为合法 JSON 对象，字段如下：
+2. 必须严格遵循本次加载的【${platformWritingGuidance.skillName}】中的所有标题规范、开头钩子、正文结构排版、结尾互动与标签策略，确保成稿完全贴合【${platformMeta.name}】的原生图文表达习惯。
+3. 充分吸收前置【${platformMeta.name}爆款文案调研】中的开头钩子结构、标题公式和热词，自然融入【${platformMeta.name}】的表达节奏中。
+4. 全文绝对不能包含任何 emoji 表情符号（如各种笑脸、火焰、手指、对勾符号等）。
+5. 输出必须为合法 JSON 对象，字段如下：
 {
   "titles": ["标题1", "标题2", "标题3"],
   "hook": "黄金开头/前3秒钩子",
-  "body": "正文内容（合理分段，口语化或易读排版）",
+  "body": "正文内容（严格按该平台图文结构合理分段，口语化或易读排版）",
   "tags": ["标签1", "标签2", "标签3", "标签4", "标签5"],
-  "cta": "结尾互动引导语（自然引导点赞、评论或转发助力推流）"
+  "cta": "结尾互动引导语（自然引导点赞、收藏、评论或转发助力推流）"
 }
-5. 不要输出 Markdown 代码块标记，只返回纯 JSON 字符串。`;
+6. 不要输出 Markdown 代码块标记，只返回纯 JSON 字符串。`;
 
       const activityContextSection = formatActivityContextForPrompt(input.activityContext);
 
-      const userPrompt = `请为【${platformMeta.name}】平台创作一篇公益机构推流文案：
+      const userPrompt = `请为【${platformMeta.name}】平台创作一篇公益机构推流图文文案：
 - 平台特征：${platformMeta.tagline}（${platformMeta.description}）
 - 公益场景：${scenarioLabel}
 - 推荐篇幅：${lengthMeta?.label}（${lengthMeta?.desc}），参考平台建议：${platformMeta.recommendedLength}
@@ -107,9 +118,11 @@ export const charityCopywritingSkill: SkillDefinition<CharityCopywritingInput, C
 - 补充关键词：${input.keywords || "无特定限制"}
 - 面向人群：${input.targetAudience || "热心公益的普通大众"}
 ${activityContextSection ? `\n${activityContextSection}\n` : ""}
+${platformWritingGuidance.promptInstructions}
+
 ${formatTrendPromptSection(input)}
 
-请直接产出可直接用于公益机构发布与推流的完整文案。`;
+请严格按照上述【${platformWritingGuidance.skillName}】的写作规范，直接产出可直接用于公益机构在【${platformMeta.name}】发布与推流的完整图文文案。`;
 
       const { text: rawContent } = await callTextModel({
         apiKey,
@@ -141,7 +154,9 @@ ${formatTrendPromptSection(input)}
         body: String(parsed.body ?? ""),
         tags: Array.isArray(parsed.tags) ? parsed.tags.slice(0, 6) : [],
         cta: String(parsed.cta ?? ""),
-        tips: platformMeta.algorithmTips,
+        tips: platformWritingGuidance.quickHighlights.length
+          ? platformWritingGuidance.quickHighlights
+          : platformMeta.algorithmTips,
         mode: "ai",
         createdAt: new Date().toISOString(),
         activityId: input.activityContext?.activityId,

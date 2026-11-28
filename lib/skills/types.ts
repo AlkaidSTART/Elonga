@@ -56,6 +56,41 @@ export interface SkillDefinition<TInput, TOutput> {
   execute: (input: TInput) => Promise<TOutput>;
 }
 
+export interface PlatformWritingSkillInput {
+  topic?: string;
+  contentType?: ContentTypeId;
+  wordCount?: WordCountId;
+}
+
+export interface PlatformWritingGuidance {
+  skillId: string;
+  skillName: string;
+  shortName: string;
+  platform: PlatformId;
+  version: string;
+  positioning: string;
+  titleRules: string[];
+  coverAndVisualRules: string[];
+  hookRules: string[];
+  bodyStructureRules: string[];
+  ctaRules: string[];
+  hashtagRules: string[];
+  complianceAndPitfalls: string[];
+  quickHighlights: string[];
+  promptInstructions: string;
+}
+
+export interface PlatformWritingSkillDefinition extends Omit<
+  SkillDefinition<PlatformWritingSkillInput | undefined, PlatformWritingGuidance>,
+  "execute"
+> {
+  platform: PlatformId;
+  shortName: string;
+  positioning: string;
+  quickHighlights: string[];
+  execute: (input?: PlatformWritingSkillInput) => Promise<PlatformWritingGuidance>;
+}
+
 export interface CharityCopywritingInput {
   platform: PlatformId;
   contentType: ContentTypeId;
@@ -66,6 +101,7 @@ export interface CharityCopywritingInput {
   targetAudience?: string;
   activityContext?: ActivityContextPayload;
   trendInsights?: DouyinTrendInsights;
+  platformWritingGuidance?: PlatformWritingGuidance;
   modelConfig?: ModelConfigPayload;
 }
 
