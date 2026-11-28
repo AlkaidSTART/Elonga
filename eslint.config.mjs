@@ -1,6 +1,8 @@
 import { defineConfig, globalIgnores } from "eslint/config";
 import nextVitals from "eslint-config-next/core-web-vitals";
 import nextTs from "eslint-config-next/typescript";
+import prettier from "eslint-config-prettier/flat";
+import oxlint from "eslint-plugin-oxlint";
 
 const eslintConfig = defineConfig([
   ...nextVitals,
@@ -13,6 +15,8 @@ const eslintConfig = defineConfig([
     "build/**",
     "next-env.d.ts",
   ]),
+  ...oxlint.buildFromOxlintConfigFile("./.oxlintrc.json"),
+  prettier,
 ]);
 
 export default eslintConfig;
