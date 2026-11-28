@@ -4,9 +4,11 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import {
   Brush,
+  Check,
   Download,
   Eye,
   EyeOff,
+  Images,
   Lasso,
   Loader2,
   Redo2,
@@ -22,7 +24,12 @@ import {
   type AutoRedactCategory,
   type DetectedRegion,
 } from "@/lib/auto-redact";
+import {
+  buildLibraryImageCaption,
+  buildLibraryImageName,
+} from "@/lib/image-library";
 import { renderRedactedCanvas } from "@/lib/mosaic-canvas";
+import { useImageLibraryStore } from "@/store/useImageLibraryStore";
 import {
   useImageStudioStore,
   type MosaicType,
@@ -113,6 +120,7 @@ export function MosaicEditor() {
   } = useImageStudioStore();
 
   const { modelConfig } = useWorkbenchStore();
+  const saveImageToLibrary = useImageLibraryStore((s) => s.saveImage);
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const overlayRef = useRef<HTMLCanvasElement | null>(null);
@@ -125,6 +133,8 @@ export function MosaicEditor() {
   const [hoveredActionId, setHoveredActionId] = useState<string | null>(null);
   const [selectedActionId, setSelectedActionId] = useState<string | null>(null);
   const [activePopover, setActivePopover] = useState<"auto" | "style" | "brush" | null>(null);
+  const [librarySaveNotice, setLibrarySaveNotice] = useState<"saved" | "exists" | null>(null);
+  const saveNoticeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const dockRef = useRef<HTMLDivElement | null>(null);
   const draftPointsRef = useRef<Point[]>([]);
   const draftRectRef = useRef<{ x: number; y: number; w: number; h: number } | null>(null);
@@ -572,13 +582,49 @@ export function MosaicEditor() {
     }
   };
 
-  const handleDownload = () => {
+  useEffect(() => {
+    return () => {
+      if (saveNoticeTimerRef.current) {
+        clearTimeout(saveNoticeTimerRef.current);
+      }
+    };
+  }, []);
+
+  const saveCurrentCanvasToLibrary = (): string | null => {
     const canvas = canvasRef.current;
-    if (!canvas) return;
+    if (!canvas) return null;
+    const dataUrl = canvas.toDataURL("image/png");
+    const { created } = saveImageToLibrary({
+      name: buildLibraryImageName(imageMeta?.name, "mosaic"),
+      caption: buildLibraryImageCaption(imageMeta?.name, "mosaic"),
+      dataUrl,
+      width: canvas.width,
+      height: canvas.height,
+      source: "mosaic",
+      processMode: autoDetectMode,
+      redactionCount: actions.length,
+    });
+    setLibrarySaveNotice(created ? "saved" : "exists");
+    if (saveNoticeTimerRef.current) {
+      clearTimeout(saveNoticeTimerRef.current);
+    }
+    saveNoticeTimerRef.current = setTimeout(() => {
+      setLibrarySaveNotice(null);
+    }, 2200);
+    return dataUrl;
+  };
+
+  const handleSaveToLibrary = () => {
+    saveCurrentCanvasToLibrary();
+  };
+
+  const handleDownload = () => {
+    const dataUrl = saveCurrentCanvasToLibrary();
+    if (!dataUrl) return;
     const link = document.createElement("a");
     const baseName = imageMeta?.name?.replace(/\.[^.]+$/, "") || "image";
     link.download = `${baseName}_打码.png`;
-    link.href = canvas.toDataURL("image/png");
+    link.href = dataUrl;
     link.click();
   };
 
@@ -657,6 +703,28 @@ export function MosaicEditor() {
             }`}
           >
             {showOriginal ? "原图预览" : "按住对比"}
+          </button>
+
+          <button
+            type="button"
+            onClick={handleSaveToLibrary}
+            className={`inline-flex items-center gap-1.5 rounded border px-3 py-1.5 text-xs font-medium transition ${
+              librarySaveNotice
+                ? "border-[#1B4D3E]/35 bg-[#E9F0ED] text-[#1B4D3E]"
+                : "border-[#D5CFC3] bg-[#FCFBF8] text-[#181816] hover:border-[#181816]"
+            }`}
+          >
+            {librarySaveNotice ? (
+              <>
+                <Check className="h-3.5 w-3.5" />
+                <span>{librarySaveNotice === "saved" ? "已存入图片库" : "已在图片库中"}</span>
+              </>
+            ) : (
+              <>
+                <Images className="h-3.5 w-3.5 text-[#78716C]" />
+                <span>保存到图片库</span>
+              </>
+            )}
           </button>
 
           <button

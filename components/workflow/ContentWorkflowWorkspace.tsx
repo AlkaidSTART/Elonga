@@ -10,6 +10,7 @@ import {
   Eye,
   FileImage,
   ImagePlus,
+  Images,
   Loader2,
   Lock,
   PanelRightClose,
@@ -50,7 +51,10 @@ import {
   type AssembledDocument,
 } from "@/lib/document-exporter";
 import type { AutoRedactCategory } from "@/lib/auto-redact";
+import type { ImageLibraryItem, ImageLibrarySource } from "@/lib/image-library";
 import { RedactionAndReviewPanel } from "@/components/compliance/RedactionAndReviewPanel";
+import { ImageLibraryPickerModal } from "@/components/image-library/ImageLibraryPickerModal";
+import { useImageLibraryStore } from "@/store/useImageLibraryStore";
 import type { Style2DPreset } from "@/store/useImageStudioStore";
 import { useOrganizationStore } from "@/store/useOrganizationStore";
 import { useWorkbenchStore } from "@/store/useWorkbenchStore";
@@ -69,6 +73,28 @@ interface WorkflowImageItem {
   stylePreset: Style2DPreset;
   status: "idle" | "processing" | "done" | "error";
   processNote?: string;
+  libraryImageId?: string;
+  fromLibrarySource?: ImageLibrarySource;
+}
+
+function createWorkflowImageFromLibraryItem(item: ImageLibraryItem): WorkflowImageItem {
+  return {
+    id: `wf_lib_${item.id}_${Date.now()}_${Math.random().toString(36).slice(2, 5)}`,
+    name: item.name,
+    originalUrl: item.dataUrl,
+    processedUrl: item.dataUrl,
+    width: item.width,
+    height: item.height,
+    caption: item.caption || item.name,
+    enableRedact: false,
+    redactCategories: ["text"],
+    enableStylize: false,
+    stylePreset: item.stylePreset ?? "anime",
+    status: "done",
+    processNote: item.source === "mosaic" ? "图片库 · 已打码" : "图片库 · 二维风格化",
+    libraryImageId: item.id,
+    fromLibrarySource: item.source,
+  };
 }
 
 const STYLE_PRESETS: { id: Style2DPreset; label: string }[] = [
@@ -262,6 +288,11 @@ export function ContentWorkflowWorkspace() {
   } = useWorkbenchStore();
 
   const { profile: orgProfile, activities } = useOrganizationStore();
+  const {
+    items: libraryItems,
+    pendingImportIds,
+    consumePendingImportIds,
+  } = useImageLibraryStore();
 
   const selectedActivity = useMemo(
     () => activities.find((a) => a.id === selectedActivityId) ?? null,
@@ -278,7 +309,14 @@ export function ContentWorkflowWorkspace() {
   const platformMenuRef = useRef<HTMLDivElement | null>(null);
   const [isDragging, setIsDragging] = useState(false);
 
-  const [images, setImages] = useState<WorkflowImageItem[]>([]);
+  const [images, setImages] = useState<WorkflowImageItem[]>(() => {
+    const { items: libItems, pendingImportIds: queuedIds } = useImageLibraryStore.getState();
+    if (queuedIds.length === 0) return [];
+    const idSet = new Set(queuedIds);
+    return libItems
+      .filter((item) => idSet.has(item.id))
+      .map(createWorkflowImageFromLibraryItem);
+  });
   const [stage, setStage] = useState<WorkflowStage>("idle");
   const [errorMsg, setErrorMsg] = useState<string | null>(null);
   const [docViewMode, setDocViewMode] = useState<"preview" | "edit">("preview");
@@ -286,6 +324,7 @@ export function ContentWorkflowWorkspace() {
   const [copiedKey, setCopiedKey] = useState<string | null>(null);
 
   const [platformMenuOpen, setPlatformMenuOpen] = useState(false);
+  const [libraryPickerOpen, setLibraryPickerOpen] = useState(false);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
   const [optionsExpanded, setOptionsExpanded] = useState(false);
   const [titlesExpanded, setTitlesExpanded] = useState(false);
@@ -310,6 +349,30 @@ export function ContentWorkflowWorkspace() {
       document.removeEventListener("keydown", handleKeyDown);
     };
   }, [platformMenuOpen]);
+
+  useEffect(() => {
+    if (pendingImportIds.length > 0) {
+      consumePendingImportIds();
+    }
+  }, [pendingImportIds.length, consumePendingImportIds]);
+
+  const handleImportFromLibrary = (selectedItems: ImageLibraryItem[]) => {
+    if (selectedItems.length === 0) return;
+    setImages((prev) => {
+      const existingLibIds = new Set(
+        prev.map((img) => img.libraryImageId).filter((id): id is string => Boolean(id)),
+      );
+      const nextItems = selectedItems
+        .filter((item) => !existingLibIds.has(item.id))
+        .map(createWorkflowImageFromLibraryItem);
+      return nextItems.length > 0 ? [...prev, ...nextItems] : prev;
+    });
+  };
+
+  const importedLibraryIds = useMemo(
+    () => images.map((img) => img.libraryImageId).filter((id): id is string => Boolean(id)),
+    [images],
+  );
 
   const candidateTitles = useMemo(() => currentResult?.titles ?? [], [currentResult]);
 
@@ -415,6 +478,10 @@ export function ContentWorkflowWorkspace() {
     const updatedList: WorkflowImageItem[] = [];
 
     for (const item of images) {
+      if (item.fromLibrarySource && !item.enableRedact && !item.enableStylize) {
+        updatedList.push(item);
+        continue;
+      }
       updateImageItem(item.id, { status: "processing", processNote: "处理中" });
       try {
         const res = await processWorkflowImage(
@@ -571,7 +638,7 @@ export function ContentWorkflowWorkspace() {
   };
 
   const unredactedImageCount = useMemo(
-    () => images.filter((img) => !img.enableRedact).length,
+    () => images.filter((img) => !img.enableRedact && !img.fromLibrarySource).length,
     [images],
   );
 
@@ -861,6 +928,11 @@ export function ContentWorkflowWorkspace() {
                         className="w-full truncate bg-transparent text-xs font-medium text-[#181816] outline-none"
                       />
                       <div className="flex flex-wrap items-center gap-1">
+                        {item.fromLibrarySource && (
+                          <span className="rounded bg-[#E9F0ED] px-1.5 py-0.5 text-[10px] font-medium text-[#1B4D3E]">
+                            {item.fromLibrarySource === "mosaic" ? "图片库·已打码" : "图片库·2D"}
+                          </span>
+                        )}
                         <button
                           type="button"
                           onClick={() =>
@@ -1030,6 +1102,21 @@ export function ContentWorkflowWorkspace() {
                   <span className="font-mono tabular-nums">
                     {images.length > 0 ? `配图 (${images.length})` : "配图"}
                   </span>
+                </button>
+
+                {/* Import From Image Library Button */}
+                <button
+                  type="button"
+                  onClick={() => setLibraryPickerOpen(true)}
+                  className="inline-flex items-center gap-1.5 rounded border border-transparent px-2.5 py-1.5 text-xs font-medium text-[#57534E] transition hover:bg-[#EFECE4] hover:text-[#181816]"
+                >
+                  <Images className="h-3.5 w-3.5" />
+                  <span>从图片库导入</span>
+                  {libraryItems.length > 0 && (
+                    <span className="rounded bg-[#E9F0ED] px-1.5 py-0.2 font-mono text-[10px] font-medium text-[#1B4D3E] tabular-nums">
+                      {libraryItems.length}
+                    </span>
+                  )}
                 </button>
 
                 {/* Collapsible Archive & Advanced Options Trigger */}
@@ -1623,6 +1710,13 @@ export function ContentWorkflowWorkspace() {
           )}
         </AnimatePresence>
       </div>
+
+      <ImageLibraryPickerModal
+        open={libraryPickerOpen}
+        importedIds={importedLibraryIds}
+        onClose={() => setLibraryPickerOpen(false)}
+        onConfirm={handleImportFromLibrary}
+      />
     </div>
   );
 }

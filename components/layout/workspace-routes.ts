@@ -8,6 +8,7 @@ import {
   FileBarChart2,
   History,
   Image as ImageIcon,
+  Images,
   LayoutDashboard,
   PenTool,
   SlidersHorizontal,
@@ -45,6 +46,14 @@ const ImageStudioWorkspace = dynamic(
   () =>
     import("@/components/image-studio/ImageStudioWorkspace").then(
       (mod) => mod.ImageStudioWorkspace,
+    ),
+  { loading: WorkspaceViewFallback },
+);
+
+const ImageLibraryWorkspace = dynamic(
+  () =>
+    import("@/components/image-library/ImageLibraryWorkspace").then(
+      (mod) => mod.ImageLibraryWorkspace,
     ),
   { loading: WorkspaceViewFallback },
 );
@@ -138,6 +147,13 @@ export const WORKSPACE_ROUTES: readonly WorkspaceRouteConfig[] = [
     group: "资产",
     icon: Building2,
     component: OrganizationWorkspace,
+  },
+  {
+    href: "/image-library",
+    label: "图片库",
+    group: "资产",
+    icon: Images,
+    component: ImageLibraryWorkspace,
   },
   {
     href: "/history",

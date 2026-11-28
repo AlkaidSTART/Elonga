@@ -1,8 +1,14 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { Download, Loader2 } from "lucide-react";
+import { Check, Download, Images, Loader2 } from "lucide-react";
+import {
+  buildLibraryImageCaption,
+  buildLibraryImageName,
+} from "@/lib/image-library";
 import { stylizeImage2DLocal } from "@/lib/stylize-2d-canvas";
+import { useImageLibraryStore } from "@/store/useImageLibraryStore";
 import { useImageStudioStore, type Style2DPreset } from "@/store/useImageStudioStore";
 import { useWorkbenchStore } from "@/store/useWorkbenchStore";
 
@@ -32,6 +38,41 @@ export function Stylize2DPanel() {
   } = useImageStudioStore();
 
   const modelConfig = useWorkbenchStore((s) => s.modelConfig);
+  const saveImageToLibrary = useImageLibraryStore((s) => s.saveImage);
+  const [librarySaveNotice, setLibrarySaveNotice] = useState<"saved" | "exists" | null>(null);
+  const saveNoticeTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(() => {
+    return () => {
+      if (saveNoticeTimerRef.current) {
+        clearTimeout(saveNoticeTimerRef.current);
+      }
+    };
+  }, []);
+
+  const persistStylizedToLibrary = (
+    dataUrl: string,
+    mode: "ai" | "local" | null,
+    preset: Style2DPreset,
+  ) => {
+    const { created } = saveImageToLibrary({
+      name: buildLibraryImageName(imageMeta?.name, "stylize", preset),
+      caption: buildLibraryImageCaption(imageMeta?.name, "stylize"),
+      dataUrl,
+      width: imageMeta?.width || 960,
+      height: imageMeta?.height || 640,
+      source: "stylize",
+      stylePreset: preset,
+      processMode: mode,
+    });
+    setLibrarySaveNotice(created ? "saved" : "exists");
+    if (saveNoticeTimerRef.current) {
+      clearTimeout(saveNoticeTimerRef.current);
+    }
+    saveNoticeTimerRef.current = setTimeout(() => {
+      setLibrarySaveNotice(null);
+    }, 2400);
+  };
 
   const handleStylize = async () => {
     if (!originalImage) return;
@@ -65,8 +106,10 @@ export function Stylize2DPanel() {
       if (data.fallback) {
         const localUrl = await stylizeImage2DLocal(originalImage, stylePreset, stylizeStrength);
         setStylizeResult(localUrl, "local", null);
+        persistStylizedToLibrary(localUrl, "local", stylePreset);
       } else if (data.imageUrl) {
         setStylizeResult(data.imageUrl, "ai", null);
+        persistStylizedToLibrary(data.imageUrl, "ai", stylePreset);
       } else {
         throw new Error("未获取到有效的二维风格图片");
       }
@@ -101,14 +144,37 @@ export function Stylize2DPanel() {
           </div>
 
           {stylizedImage && (
-            <button
-              type="button"
-              onClick={handleDownload}
-              className="inline-flex items-center gap-1.5 rounded bg-[#1B4D3E] px-3 py-1.5 text-xs font-medium text-[#FCFBF8] transition hover:bg-[#143A2F]"
-            >
-              <Download className="h-3.5 w-3.5" />
-              <span>下载成品</span>
-            </button>
+            <div className="flex items-center gap-2">
+              <button
+                type="button"
+                onClick={() => persistStylizedToLibrary(stylizedImage, stylizeMode, stylePreset)}
+                className={`inline-flex items-center gap-1.5 rounded border px-3 py-1.5 text-xs font-medium transition ${
+                  librarySaveNotice
+                    ? "border-[#1B4D3E]/35 bg-[#E9F0ED] text-[#1B4D3E]"
+                    : "border-[#D5CFC3] bg-[#FCFBF8] text-[#181816] hover:border-[#181816]"
+                }`}
+              >
+                {librarySaveNotice ? (
+                  <>
+                    <Check className="h-3.5 w-3.5" />
+                    <span>{librarySaveNotice === "saved" ? "已自动存入图片库" : "已在图片库中"}</span>
+                  </>
+                ) : (
+                  <>
+                    <Images className="h-3.5 w-3.5 text-[#78716C]" />
+                    <span>保存到图片库</span>
+                  </>
+                )}
+              </button>
+              <button
+                type="button"
+                onClick={handleDownload}
+                className="inline-flex items-center gap-1.5 rounded bg-[#1B4D3E] px-3 py-1.5 text-xs font-medium text-[#FCFBF8] transition hover:bg-[#143A2F]"
+              >
+                <Download className="h-3.5 w-3.5" />
+                <span>下载成品</span>
+              </button>
+            </div>
           )}
         </div>
 
