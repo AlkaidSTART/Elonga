@@ -1,21 +1,23 @@
 import { describe, expect, it } from "vitest";
 import {
+  clearLegacyLocalStorageData,
   createIndexedDBStateStorage,
   IDB_STORE_NAME,
-  type StorageLike,
+  LEGACY_LOCAL_STORAGE_KEYS,
 } from "./indexeddb-storage";
 
-function createMemoryStorage(initial: Record<string, string> = {}): StorageLike {
+function createMemoryLegacyStorage(initial: Record<string, string> = {}) {
   const map = new Map<string, string>(Object.entries(initial));
+  const removedKeys: string[] = [];
+
   return {
-    getItem(key: string) {
-      return map.has(key) ? (map.get(key) ?? null) : null;
-    },
-    setItem(key: string, value: string) {
-      map.set(key, value);
-    },
-    removeItem(key: string) {
-      map.delete(key);
+    map,
+    removedKeys,
+    storage: {
+      removeItem(key: string) {
+        removedKeys.push(key);
+        map.delete(key);
+      },
     },
   };
 }
@@ -111,10 +113,10 @@ function createMockIndexedDBFactory() {
 describe("createIndexedDBStateStorage", () => {
   it("writes, reads, and removes values in IndexedDB", async () => {
     const { factory, backing } = createMockIndexedDBFactory();
-    const fallback = createMemoryStorage();
+    const legacy = createMemoryLegacyStorage();
     const storage = createIndexedDBStateStorage({
       indexedDBFactory: factory,
-      fallbackStorage: fallback,
+      legacyStorage: legacy.storage,
     });
 
     await storage.setItem("elonga-test", JSON.stringify({ count: 42 }));
@@ -128,48 +130,57 @@ describe("createIndexedDBStateStorage", () => {
     expect(await storage.getItem("elonga-test")).toBeNull();
   });
 
-  it("migrates legacy localStorage data into IndexedDB on first read", async () => {
+  it("purges legacy localStorage keys without reading or migrating old data", async () => {
     const { factory, backing } = createMockIndexedDBFactory();
-    const fallback = createMemoryStorage({
+    const legacy = createMemoryLegacyStorage({
       "jianyue-workbench-storage": '{"state":{"platform":"douyin"}}',
+      "elonga-organization-storage": '{"state":{"name":"legacy"}}',
+      "unrelated-app-key": "keep-me",
     });
     const storage = createIndexedDBStateStorage({
       indexedDBFactory: factory,
-      fallbackStorage: fallback,
+      legacyStorage: legacy.storage,
     });
 
-    const migrated = await storage.getItem("jianyue-workbench-storage");
-    expect(migrated).toBe('{"state":{"platform":"douyin"}}');
-    expect(backing.get("jianyue-workbench-storage")).toBe('{"state":{"platform":"douyin"}}');
+    const value = await storage.getItem("jianyue-workbench-storage");
+    expect(value).toBeNull();
+    expect(backing.has("jianyue-workbench-storage")).toBe(false);
+    expect(legacy.map.has("jianyue-workbench-storage")).toBe(false);
+    expect(legacy.map.has("elonga-organization-storage")).toBe(false);
+    expect(legacy.map.get("unrelated-app-key")).toBe("keep-me");
   });
 
-  it("removes keys from both IndexedDB and fallback localStorage", async () => {
-    const { factory, backing } = createMockIndexedDBFactory();
-    const fallback = createMemoryStorage({
-      "legacy-key": "old-value",
+  it("falls back to in-memory storage when IndexedDB is unavailable", async () => {
+    const legacy = createMemoryLegacyStorage({
+      "jianyue-workbench-storage": "stale",
     });
-    const storage = createIndexedDBStateStorage({
-      indexedDBFactory: factory,
-      fallbackStorage: fallback,
-    });
-
-    await storage.getItem("legacy-key");
-    expect(backing.get("legacy-key")).toBe("old-value");
-
-    await storage.removeItem("legacy-key");
-    expect(backing.has("legacy-key")).toBe(false);
-    expect(fallback.getItem("legacy-key")).toBeNull();
-  });
-
-  it("falls back to localStorage when IndexedDB is unavailable", async () => {
-    const fallback = createMemoryStorage();
     const storage = createIndexedDBStateStorage({
       indexedDBFactory: null,
-      fallbackStorage: fallback,
+      legacyStorage: legacy.storage,
     });
 
-    await storage.setItem("fallback-key", "hello");
-    expect(fallback.getItem("fallback-key")).toBe("hello");
-    expect(await storage.getItem("fallback-key")).toBe("hello");
+    expect(await storage.getItem("jianyue-workbench-storage")).toBeNull();
+    expect(legacy.map.has("jianyue-workbench-storage")).toBe(false);
+
+    await storage.setItem("memory-key", "hello");
+    expect(await storage.getItem("memory-key")).toBe("hello");
+
+    await storage.removeItem("memory-key");
+    expect(await storage.getItem("memory-key")).toBeNull();
+  });
+
+  it("clearLegacyLocalStorageData removes all known legacy keys safely", () => {
+    const initial: Record<string, string> = { "other-key": "preserved" };
+    for (const key of LEGACY_LOCAL_STORAGE_KEYS) {
+      initial[key] = "legacy";
+    }
+    const legacy = createMemoryLegacyStorage(initial);
+
+    clearLegacyLocalStorageData(LEGACY_LOCAL_STORAGE_KEYS, legacy.storage);
+
+    for (const key of LEGACY_LOCAL_STORAGE_KEYS) {
+      expect(legacy.map.has(key)).toBe(false);
+    }
+    expect(legacy.map.get("other-key")).toBe("preserved");
   });
 });
