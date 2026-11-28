@@ -77,6 +77,8 @@ export interface WorkspaceRouteConfig {
   group?: WorkspaceNavGroupLabel;
   /** Whether the route must match pathname exactly (default: false, prefix match). */
   matchExact?: boolean;
+  /** Whether the route renders edge-to-edge without outer max-width padding (e.g. split conversation workbench). */
+  fullBleed?: boolean;
 }
 
 export const WORKSPACE_ROUTES: readonly WorkspaceRouteConfig[] = [
@@ -94,6 +96,7 @@ export const WORKSPACE_ROUTES: readonly WorkspaceRouteConfig[] = [
     group: "总览",
     icon: TrendingUp,
     component: AnalyticsWorkspace,
+    fullBleed: true,
   },
   {
     href: "/reports",
