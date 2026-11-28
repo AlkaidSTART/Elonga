@@ -4,6 +4,7 @@ import type { ComponentType } from "react";
 import dynamic from "next/dynamic";
 import {
   Building2,
+  CalendarDays,
   FileBarChart2,
   History,
   Image as ImageIcon,
@@ -16,6 +17,11 @@ import {
 } from "lucide-react";
 import { WorkspaceViewFallback } from "@/components/layout/WorkspaceViewFallback";
 import { OverviewWorkspace } from "@/components/overview/OverviewWorkspace";
+
+const ActivityWorkspace = dynamic(
+  () => import("@/components/activity/ActivityWorkspace").then((mod) => mod.ActivityWorkspace),
+  { loading: WorkspaceViewFallback },
+);
 
 const AnalyticsWorkspace = dynamic(
   () => import("@/components/analytics/AnalyticsWorkspace").then((mod) => mod.AnalyticsWorkspace),
@@ -89,6 +95,13 @@ export const WORKSPACE_ROUTES: readonly WorkspaceRouteConfig[] = [
     icon: LayoutDashboard,
     component: OverviewWorkspace,
     matchExact: true,
+  },
+  {
+    href: "/activity",
+    label: "发布活跃度",
+    group: "总览",
+    icon: CalendarDays,
+    component: ActivityWorkspace,
   },
   {
     href: "/analytics",
