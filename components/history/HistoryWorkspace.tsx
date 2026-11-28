@@ -10,14 +10,17 @@ import {
   Check,
   Copy,
   ExternalLink,
+  FileSpreadsheet,
   Search,
   ShieldCheck,
   Trash2,
   X,
 } from "lucide-react";
 import { PLATFORM_CREATOR_URLS, PLATFORMS, type CopywritingResult } from "@/lib/platforms";
+import type { BatchSyncPublishItem } from "@/lib/metrics-import";
 import { sanitizeExternalUrl } from "@/lib/url-safety";
 import { useWorkbenchStore } from "@/store/useWorkbenchStore";
+import { MetricsImportModal } from "./MetricsImportModal";
 
 type FilterMode = "all" | "eligible" | "published" | "archived" | "viral";
 
@@ -54,11 +57,14 @@ export function HistoryWorkspace() {
     togglePublished,
     toggleViral,
     updatePublishArchive,
+    batchSyncPublishMetrics,
   } = useWorkbenchStore();
 
   const [query, setQuery] = useState("");
   const [filterMode, setFilterMode] = useState<FilterMode>("all");
   const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [importModalOpen, setImportModalOpen] = useState(false);
+  const [syncNotice, setSyncNotice] = useState<string | null>(null);
 
   const [backfillTarget, setBackfillTarget] = useState<CopywritingResult | null>(null);
   const [backfillError, setBackfillError] = useState<string | null>(null);
@@ -158,6 +164,15 @@ export function HistoryWorkspace() {
     setBackfillTarget(null);
   };
 
+  const handleConfirmBatchSync = (items: BatchSyncPublishItem[]) => {
+    const result = batchSyncPublishMetrics(items);
+    setImportModalOpen(false);
+    const parts: string[] = [];
+    if (result.updated > 0) parts.push(`更新 ${result.updated} 篇已有稿件`);
+    if (result.created > 0) parts.push(`新建 ${result.created} 条外部已发布作品归档`);
+    setSyncNotice(`报表数据同步完成：${parts.join("，")}，已自动汇总至概览与月报。`);
+  };
+
   return (
     <div className="space-y-7">
       {/* Header & Filter Strip */}
@@ -199,18 +214,43 @@ export function HistoryWorkspace() {
           </div>
         </div>
 
-        {/* Crisp Search Input (widened so placeholder never clips) */}
-        <div className="relative w-full sm:w-72">
-          <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-[#8C857B]" />
-          <input
-            type="text"
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="检索标题、活动档案或平台..."
-            className="w-full rounded border border-[#D5CFC3] bg-[#FCFBF8] py-1.5 pl-8 pr-3 text-xs text-[#181816] outline-none transition placeholder:text-[#A8A29E] focus:border-[#1B4D3E]"
-          />
+        {/* Search & Batch CSV Import */}
+        <div className="flex w-full flex-col gap-2.5 sm:w-auto sm:flex-row sm:items-center">
+          <div className="relative w-full sm:w-64">
+            <Search className="pointer-events-none absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-[#8C857B]" />
+            <input
+              type="text"
+              value={query}
+              onChange={(e) => setQuery(e.target.value)}
+              placeholder="检索标题、活动档案或平台..."
+              className="w-full rounded border border-[#D5CFC3] bg-[#FCFBF8] py-1.5 pl-8 pr-3 text-xs text-[#181816] outline-none transition placeholder:text-[#A8A29E] focus:border-[#1B4D3E]"
+            />
+          </div>
+
+          <button
+            type="button"
+            onClick={() => setImportModalOpen(true)}
+            className="inline-flex shrink-0 items-center justify-center gap-1.5 rounded border border-[#1B4D3E]/35 bg-[#E9F0ED] px-3.5 py-1.5 text-xs font-medium text-[#1B4D3E] transition hover:bg-[#1B4D3E] hover:text-[#FCFBF8]"
+          >
+            <FileSpreadsheet className="h-3.5 w-3.5" />
+            <span>导入报表同步</span>
+          </button>
         </div>
       </header>
+
+      {syncNotice && (
+        <div className="flex items-center justify-between gap-3 border-l-2 border-[#1B4D3E] bg-[#E9F0ED] px-3.5 py-2 text-xs text-[#1B4D3E]">
+          <span>{syncNotice}</span>
+          <button
+            type="button"
+            onClick={() => setSyncNotice(null)}
+            aria-label="关闭提示"
+            className="rounded p-0.5 text-[#1B4D3E]/70 transition hover:text-[#1B4D3E]"
+          >
+            <X className="h-3.5 w-3.5" />
+          </button>
+        </div>
+      )}
 
       {/* Flush Structured Editorial Ledger */}
       {filtered.length === 0 ? (
@@ -451,6 +491,17 @@ export function HistoryWorkspace() {
           </AnimatePresence>
         </div>
       )}
+
+      {/* Batch Creator-Portal Metrics CSV Import Modal */}
+      <AnimatePresence>
+        {importModalOpen && (
+          <MetricsImportModal
+            history={history}
+            onClose={() => setImportModalOpen(false)}
+            onConfirmSync={handleConfirmBatchSync}
+          />
+        )}
+      </AnimatePresence>
 
       {/* Publish Backfill & Archive Modal */}
       <AnimatePresence>

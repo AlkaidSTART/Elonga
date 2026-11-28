@@ -11,6 +11,10 @@ import type {
 import type { TextRedactionRecord } from "@/lib/text-redaction";
 import type { PublishReviewState } from "@/lib/publish-review";
 import { isTextApiFormat, type TextApiFormat } from "@/lib/ai/model-client";
+import {
+  mergePublishArchiveRecord,
+  type BatchSyncPublishItem,
+} from "@/lib/metrics-import";
 import { indexedDBStorage } from "@/lib/storage/indexeddb-storage";
 
 export type WorkbenchTab = "copywriting" | "image-studio";
@@ -87,6 +91,7 @@ interface WorkbenchState {
   togglePublished: (id: string) => void;
   toggleViral: (id: string) => void;
   updatePublishArchive: (id: string, archive: PublishArchiveRecord) => void;
+  batchSyncPublishMetrics: (items: BatchSyncPublishItem[]) => { updated: number; created: number };
   toggleArchived: (id: string) => void;
 }
 
@@ -244,6 +249,76 @@ export const useWorkbenchStore = create<WorkbenchState>()(
             currentResult: state.currentResult ? updateItem(state.currentResult) : null,
           };
         }),
+      batchSyncPublishMetrics: (items) => {
+        if (items.length === 0) return { updated: 0, created: 0 };
+
+        const nowIso = new Date().toISOString();
+        let updated = 0;
+        let created = 0;
+
+        set((state) => {
+          const nextHistory = [...state.history];
+          let nextCurrent = state.currentResult;
+          const newlyCreated: CopywritingResult[] = [];
+
+          items.forEach((incoming, index) => {
+            if (incoming.targetHistoryId) {
+              const idx = nextHistory.findIndex((item) => item.id === incoming.targetHistoryId);
+              if (idx !== -1) {
+                const existing = nextHistory[idx];
+                const mergedArchive = mergePublishArchiveRecord(
+                  existing.publishArchive,
+                  incoming,
+                  nowIso,
+                );
+                const updatedItem: CopywritingResult = {
+                  ...existing,
+                  isPublished: true,
+                  publishedAt: mergedArchive.publishedAt ?? existing.publishedAt ?? nowIso,
+                  publishArchive: mergedArchive,
+                };
+                nextHistory[idx] = updatedItem;
+                if (nextCurrent?.id === updatedItem.id) {
+                  nextCurrent = updatedItem;
+                }
+                updated += 1;
+                return;
+              }
+            }
+
+            const archive = mergePublishArchiveRecord(undefined, incoming, nowIso);
+            const createdItem: CopywritingResult = {
+              id: `import-${Date.now()}-${index}-${Math.random().toString(36).slice(2, 7)}`,
+              platform: incoming.platform,
+              contentType: "story",
+              tone: "warm",
+              topic: incoming.title,
+              titles: [incoming.title],
+              hook: "",
+              body: incoming.notes
+                ? `【报表同步作品】${incoming.notes}`
+                : "【报表同步作品】来自创作者后台导出报表同步归档。",
+              tags: [],
+              cta: "",
+              tips: [],
+              mode: "local",
+              createdAt: archive.publishedAt ?? nowIso,
+              isPublished: true,
+              publishedAt: archive.publishedAt ?? nowIso,
+              publishArchive: archive,
+            };
+            newlyCreated.push(createdItem);
+            created += 1;
+          });
+
+          return {
+            history: [...newlyCreated, ...nextHistory].slice(0, 100),
+            currentResult: nextCurrent,
+          };
+        });
+
+        return { updated, created };
+      },
       toggleArchived: (id) =>
         set((state) => {
           const updateItem = (item: CopywritingResult): CopywritingResult => {
